@@ -605,6 +605,9 @@
     <ClCompile Include="ObjectSerializer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="rttr\registration">
@@ -615,6 +618,9 @@
     </None>
     <None Include="rttr\type">
       <Filter>RTTR</Filter>
+    </None>
+    <None Include="Object.inl">
+      <Filter>헤더 파일</Filter>
     </None>
   </ItemGroup>
 </Project>

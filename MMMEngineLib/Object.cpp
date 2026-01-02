@@ -2,6 +2,7 @@
 #include "rttr/registration"
 #include "rttr/detail/policies/ctor_policies.h"
 #include "ObjectManager.h"
+#include <cassert>
 
 uint64_t MMMEngine::Object::s_nextInstanceID = 1;
 
@@ -17,10 +18,24 @@ RTTR_REGISTRATION
 		.property_readonly("isDestroyed", &MMMEngine::Object::IsDestroyed);
 }
 
-template<typename T, typename ...Args>
-MMMEngine::ObjectPtr<T> MMMEngine::Object::CreateInstance(Args&& ...args)
+MMMEngine::Object::Object() : m_instanceID(s_nextInstanceID++)
 {
-	return ObjectManager::Get()->CreateHandle<T>(std::forward<Args>(args)...);
+#ifdef _DEBUG
+	if (!ObjectManager::Get()->IsCreatingObject())
+	{
+		assert(false && "Object는 ObjectManager/CreateInstance로만 생성할 수 있습니다.");
+		std::abort();
+	}
+#endif
+	m_name = "<Unnamed> [ Instance ID : " + std::to_string(m_instanceID) + " ]";
+	m_guid = GUID::NewGuid();
+}
+
+MMMEngine::Object::~Object()
+{
+#ifdef _DEBUG
+	assert(ObjectManager::Get()->IsDestroyingObject() && "Object는 ObjectManager/Destroy로만 파괴할 수 있습니다.");
+#endif
 }
 
 void MMMEngine::Object::Destroy(MMMEngine::ObjectPtr<MMMEngine::Object> objPtr)

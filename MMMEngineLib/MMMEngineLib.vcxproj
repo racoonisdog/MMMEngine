@@ -286,6 +286,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectSerializer.cpp" />
@@ -322,6 +323,7 @@
     <ClCompile Include="rttr\variant_sequential_view.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Object.inl" />
     <None Include="rttr\registration" />
     <None Include="rttr\registration_friend" />
     <None Include="rttr\type" />

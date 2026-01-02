@@ -8,10 +8,13 @@ namespace MMMEngine
 	{
 	private:
 		friend class App;
+		friend class ObjectManager;
+		friend class Scene;
 		RTTR_ENABLE(MMMEngine::Object)
 		RTTR_REGISTRATION_FRIEND
 	protected:
 		GameObject() = default;
+	public:
 		virtual ~GameObject() = default;
 	};
 }

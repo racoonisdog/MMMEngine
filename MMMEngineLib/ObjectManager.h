@@ -11,6 +11,9 @@ namespace MMMEngine
     private:
         friend class App;
 
+        bool m_isCreatingObject = false;
+        bool m_isDestroyingObject = false;
+
         std::vector<Object*> m_objects;
         std::vector<uint32_t> m_handleGenerations;
         std::queue<uint32_t> m_freeHandleIDs;
@@ -65,6 +68,50 @@ namespace MMMEngine
         }
 
     public:
+        bool IsCreatingObject() const
+        {
+            return m_isCreatingObject;
+        }
+
+        bool IsDestroyingObject() const 
+        { 
+            return m_isDestroyingObject; 
+        }
+
+        // RAII 스코프 -> Object 스택 생성 막기용
+        class CreationScope
+        {
+        public:
+            explicit CreationScope(ObjectManager* mgr)
+                : m_mgr(mgr)
+            {
+                m_mgr->m_isCreatingObject = true;
+            }
+
+            ~CreationScope()
+            {
+                m_mgr->m_isCreatingObject = false;
+            }
+
+        private:
+            ObjectManager* m_mgr;
+        };
+
+        class DestroyScope
+        {
+        public:
+            DestroyScope(ObjectManager* mgr) : m_mgr(mgr)
+            {
+                m_mgr->m_isDestroyingObject = true;
+            }
+            ~DestroyScope()
+            {
+                m_mgr->m_isDestroyingObject = false;
+            }
+        private:
+            ObjectManager* m_mgr;
+        };
+
         // === 유효성 검증 ===
         bool IsValidHandle(uint32_t handleID, uint32_t generation, const Object* ptr) const
         {
@@ -87,6 +134,8 @@ namespace MMMEngine
         ObjectPtr<T> CreateHandle(Args&&... args)
         {
             static_assert(std::is_base_of_v<Object, T>, "T must derive from Object");
+
+            CreationScope scope(this);
 
             T* newObj = new T(std::forward<Args>(args)...);
             uint32_t handleID;
@@ -130,7 +179,11 @@ namespace MMMEngine
             for (Object* obj : m_objects)
             {
                 if (obj)
+                {
+                    DestroyScope scope(this);
                     delete obj;
+                }
+                    
             }
         }
     };

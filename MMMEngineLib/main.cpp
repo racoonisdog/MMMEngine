@@ -32,6 +32,11 @@ public:
 	void Foo()
 	{
 		auto inst = CreateInstance<GameObject>();
+		if (inst)
+		{
+			std::cout << GetName() << std::endl;
+			std::cout << inst->GetName() << std::endl;
+		}
 	}
 };
 
@@ -59,8 +64,8 @@ int main()
 	type::invoke("f", {});
 
 	std::cout << "Generated GUID: " << id.ToString() << std::endl;
-
-
+	auto FooObj = Object::CreateInstance<FooObject>();
+	FooObj->Foo();
 
 	return 0;
 }

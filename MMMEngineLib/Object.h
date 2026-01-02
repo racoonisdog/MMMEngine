@@ -28,19 +28,15 @@ namespace MMMEngine
 
 		inline void		SetGUID(const GUID& guid) { m_guid = guid; }
 	protected:
-		Object() : m_instanceID(s_nextInstanceID++)
-		{
-			m_name = "<Unnamed> [ Instance ID : " + std::to_string(m_instanceID) + " ]";
-			m_guid = GUID::NewGuid();
-		}
-		virtual ~Object() = default;
+        Object();
+        virtual ~Object();
 	public:
-
 		Object(const Object&) = delete;
 		Object& operator=(const Object&) = delete;
 
 		template<typename T, typename ...Args>
-		static ObjectPtr<T> CreateInstance(Args && ...args);
+        static ObjectPtr<T> CreateInstance(Args && ...args);
+
 		static void Destroy(ObjectPtr<Object> objPtr);
 
 		inline uint64_t				GetInstanceID() const { return m_instanceID; }
@@ -52,13 +48,20 @@ namespace MMMEngine
 
 		inline const bool&			IsDestroyed()	const { return m_isDestroyed; }
 	};
+    
+    class ObjectPtrBase
+    {
+    public:
+        virtual Object* GetRaw() const = 0;
+    };
 
     template<typename T>
-    class ObjectPtr
+    class ObjectPtr : public ObjectPtrBase
     {
     private:
-        friend class Object;
         friend class ObjectManager;
+
+        Object* GetRaw() const override { return m_ptr; }
 
         T* m_ptr = nullptr;
         uint32_t m_handleID = UINT32_MAX;
@@ -126,8 +129,6 @@ namespace MMMEngine
 
         bool IsValid() const
         {
-            if (m_handleID == UINT32_MAX)
-                return false;
             return ObjectManager::Get()->IsValidHandle(m_handleID, m_handleGeneration, m_ptr);
         }
 
@@ -135,4 +136,7 @@ namespace MMMEngine
         uint32_t GetGeneration() const { return m_handleGeneration; }
     };
 
+
 }
+
+#include "Object.inl"
