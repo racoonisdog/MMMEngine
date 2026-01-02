@@ -3,6 +3,7 @@
 #define NOMINMAX
 #include "App.h"
 #include "GUID.h"
+#include "GameObject.h"
 
 using namespace MMMEngine;
 
@@ -23,6 +24,15 @@ class Test
 {
 public:
 	void Foo() { std::cout << "Foo called" << std::endl; }
+};
+
+class FooObject : public Object
+{
+public:
+	void Foo()
+	{
+		auto inst = CreateInstance<GameObject>();
+	}
 };
 
 int main()
@@ -49,4 +59,8 @@ int main()
 	type::invoke("f", {});
 
 	std::cout << "Generated GUID: " << id.ToString() << std::endl;
+
+
+
+	return 0;
 }

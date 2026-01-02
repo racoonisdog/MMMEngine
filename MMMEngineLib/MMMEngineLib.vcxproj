@@ -149,10 +149,11 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="Delegates.hpp" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GUID.h" />
-    <ClInclude Include="JsonSerializer.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="ObjectSerializer.h" />
     <ClInclude Include="rttr\access_levels.h" />
     <ClInclude Include="rttr\argument.h" />
     <ClInclude Include="rttr\array_range.h" />
@@ -285,9 +286,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
-    <ClCompile Include="JsonSerializer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="ObjectSerializer.cpp" />
     <ClCompile Include="rttr\constructor.cpp" />
     <ClCompile Include="rttr\destructor.cpp" />
     <ClCompile Include="rttr\detail\comparison\compare_equal.cpp" />

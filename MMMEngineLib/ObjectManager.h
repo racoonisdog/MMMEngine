@@ -6,131 +6,132 @@
 
 namespace MMMEngine
 {
-	template<typename T>
-	class ObjectPtr
-	{
-	private:
-		friend class ObjectManager;
-		T* m_ptr;
-		uint32_t m_handleID;
-		uint32_t m_handleGeneration;
-	public:
-		T* Get() const
-		{
-			if (ObjectManager::Get()->IsValidObjectPtr(*this))
-			{
-				return m_ptr;
-			}
-			return nullptr;
-		}
+    class ObjectManager : public Singleton<ObjectManager>
+    {
+    private:
+        friend class App;
 
-		T& operator*() const
-		{
-			return *Get();
-		}
+        std::vector<Object*> m_objects;
+        std::vector<uint32_t> m_handleGenerations;
+        std::queue<uint32_t> m_freeHandleIDs;
+        std::vector<uint32_t> m_pendingDestroy;
 
-		T* operator->() const
-		{
-			return Get();
-		}
+        void ProcessPendingDestroy()
+        {
+            for (uint32_t handleID : m_pendingDestroy)
+            {
+                if (handleID >= m_objects.size())
+                    continue;
 
-		bool IsValid() const
-		{
-			return ObjectManager::Get()->IsValidObjectPtr(*this);
-		}
-	};
+                Object* obj = m_objects[handleID];
+                if (!obj)
+                    continue;
 
-	class ObjectManager : public Singleton<ObjectManager>
-	{
-	private:
-		friend class Object;
+                delete obj;
+                m_objects[handleID] = nullptr;
+                m_freeHandleIDs.push(handleID);
+            }
 
-		template <typename T>
-		friend class ObjectPtr;
-		
-		std::vector<Object*> m_objects;
-		std::vector<uint32_t> m_handleGenerations;
-		std::queue<uint32_t> m_freeHandleIDs;	
+            m_pendingDestroy.clear();
+        }
 
-		void RegisterObject(Object* obj);
-		void UnregisterObject(Object* obj);
+        // === ID로 핸들 복원 (직렬화용) ===
+        template<typename T>
+        ObjectPtr<T> GetHandle(uint32_t handleID)
+        {
+            if (handleID >= m_objects.size())
+                return ObjectPtr<T>();
 
-		template<typename T>
-		ObjectPtr<T> CreateObject()
-		{
-			static_assert(std::is_base_of<Object, T>::value, "T must be derived from Object");
-			T* newObj = new T();
-			RegisterObject(newObj);
-			ObjectPtr<T> objPtr;
-			objPtr.m_ptr = newObj;
-			if (m_freeHandleIDs.empty())
-			{
-				m_objects.push_back(newObj);
-				m_handleGenerations.push_back(0);
-				objPtr.m_handleID = static_cast<uint32_t>(m_objects.size() - 1);
-				objPtr.m_handleGeneration = m_handleGenerations[objPtr.m_handleID];
-			}
-			else
-			{
-				uint32_t freeID = m_freeHandleIDs.front();
-				m_freeHandleIDs.pop();
-				m_objects[freeID] = newObj;
-				objPtr.m_handleID = freeID;
-				objPtr.m_handleGeneration = ++m_handleGenerations[freeID];
-			}
-			return objPtr;
-		}
+            Object* obj = m_objects[handleID];
+            if (!obj || obj->IsDestroyed())
+                return ObjectPtr<T>();
 
-		template<typename T>
-		ObjectPtr<T> CreateObject(std::string name)
-		{
-			static_assert(std::is_base_of<Object, T>::value, "T must be derived from Object");
-			T* newObj = new T();
-			newObj->SetName(name);
-			RegisterObject(newObj);
-			ObjectPtr<T> objPtr;
-			objPtr.m_ptr = newObj;
+            T* typedObj = dynamic_cast<T*>(obj);
+            if (!typedObj)
+                return ObjectPtr<T>();
 
-			if (m_freeHandleIDs.empty())
-			{
-				m_objects.push_back(newObj);
-				m_handleGenerations.push_back(0);
-				objPtr.m_handleID = static_cast<uint32_t>(m_objects.size() - 1);
-				objPtr.m_handleGeneration = m_handleGenerations[objPtr.m_handleID];
-			}
-			else
-			{
-				uint32_t freeID = m_freeHandleIDs.front();
-				m_freeHandleIDs.pop();
-				m_objects[freeID] = newObj;
-				objPtr.m_handleID = freeID;
-				objPtr.m_handleGeneration = ++m_handleGenerations[freeID];
-			}
+            uint32_t generation = m_handleGenerations[handleID];
+            return ObjectPtr<T>(typedObj, handleID, generation);
+        }
 
-			return objPtr;
-		}
+        // === 디버깅 ===
+        size_t GetObjectCount() const
+        {
+            size_t count = 0;
+            for (const Object* obj : m_objects)
+                if (obj && !obj->IsDestroyed())
+                    count++;
+            return count;
+        }
 
-		template<typename T>
-		void DestroyObject(ObjectPtr<typename T> obj)
-		{
+    public:
+        // === 유효성 검증 ===
+        bool IsValidHandle(uint32_t handleID, uint32_t generation, const Object* ptr) const
+        {
+            if (handleID >= m_objects.size())
+                return false;
 
-		}
+            if (m_objects[handleID] != ptr)
+                return false;
 
-	public:
-		bool IsValidObjectPtr(const ObjectPtr<Object>& objPtr)
-		{
-			if (objPtr.m_handleID >= m_objects.size())
-				return false;
-			if (m_objects[objPtr.m_handleID] != objPtr.m_ptr)
-				return false;
-			if (m_handleGenerations[objPtr.m_handleID] != objPtr.m_handleGeneration)
-				return false;
-			if (objPtr.m_ptr->IsDestroyed())
-				return false;
-			return true;
-		}
+            if (m_handleGenerations[handleID] != generation)
+                return false;
 
-		ObjectManager();
-		~ObjectManager();
-	};
+            if (ptr && ptr->IsDestroyed())
+                return false;
+
+            return true;
+        }
+
+        template<typename T, typename... Args>
+        ObjectPtr<T> CreateHandle(Args&&... args)
+        {
+            static_assert(std::is_base_of_v<Object, T>, "T must derive from Object");
+
+            T* newObj = new T(std::forward<Args>(args)...);
+            uint32_t handleID;
+            uint32_t generation;
+
+            if (m_freeHandleIDs.empty())
+            {
+                // 새 슬롯 할당
+                handleID = static_cast<uint32_t>(m_objects.size());
+                m_objects.push_back(newObj);
+                m_handleGenerations.push_back(0);
+                generation = 0;
+            }
+            else
+            {
+                // 재사용 슬롯
+                handleID = m_freeHandleIDs.front();
+                m_freeHandleIDs.pop();
+                m_objects[handleID] = newObj;
+                generation = ++m_handleGenerations[handleID];
+            }
+
+            return ObjectPtr<T>(newObj, handleID, generation);
+        }
+
+        // === 파괴 ===
+        template<typename T>
+        void Destroy(ObjectPtr<T> objPtr)
+        {
+            if (objPtr.IsValid())
+            {
+                m_pendingDestroy.push_back(objPtr.m_handleID);
+                objPtr.m_ptr->MarkDestory();
+            }
+        }
+
+        ObjectManager() = default;
+        ~ObjectManager()
+        {
+            // 모든 객체 정리
+            for (Object* obj : m_objects)
+            {
+                if (obj)
+                    delete obj;
+            }
+        }
+    };
 } 
