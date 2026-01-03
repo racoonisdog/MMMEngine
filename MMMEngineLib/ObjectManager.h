@@ -17,8 +17,8 @@ namespace MMMEngine
 
         mutable std::mutex m_mutex;
         std::vector<Object*> m_objects;
-        std::vector<uint32_t> m_handleGenerations;
-        std::queue<uint32_t> m_freeHandleIDs;
+        std::vector<uint32_t> m_ptrGenerations;
+        std::queue<uint32_t> m_freePtrIDs;
         std::vector<uint32_t> m_pendingDestroy;
 
         void ProcessPendingDestroy()
@@ -26,18 +26,18 @@ namespace MMMEngine
             std::lock_guard<std::mutex> lock(m_mutex);
             DestroyScope scope;
 
-            for (uint32_t handleID : m_pendingDestroy)
+            for (uint32_t ptrID : m_pendingDestroy)
             {
-                if (handleID >= m_objects.size())
+                if (ptrID >= m_objects.size())
                     continue;
 
-                Object* obj = m_objects[handleID];
+                Object* obj = m_objects[ptrID];
                 if (!obj)
                     continue;
 
                 delete obj;
-                m_objects[handleID] = nullptr;
-                m_freeHandleIDs.push(handleID);
+                m_objects[ptrID] = nullptr;
+                m_freePtrIDs.push(ptrID);
             }
 
             m_pendingDestroy.clear();
@@ -45,12 +45,12 @@ namespace MMMEngine
 
         // === ID로 핸들 복원 (직렬화용) ===
         template<typename T>
-        ObjectPtr<T> GetHandle(uint32_t handleID)
+        ObjectPtr<T> GetPtr(uint32_t ptrID)
         {
-            if (handleID >= m_objects.size())
+            if (ptrID >= m_objects.size())
                 return ObjectPtr<T>();
 
-            Object* obj = m_objects[handleID];
+            Object* obj = m_objects[ptrID];
             if (!obj || obj->IsDestroyed())
                 return ObjectPtr<T>();
 
@@ -58,8 +58,8 @@ namespace MMMEngine
             if (!typedObj)
                 return ObjectPtr<T>();
 
-            uint32_t generation = m_handleGenerations[handleID];
-            return ObjectPtr<T>(typedObj, handleID, generation);
+            uint32_t generation = m_ptrGenerations[ptrID];
+            return ObjectPtr<T>(typedObj, ptrID, generation);
         }
 
         // === 디버깅 ===
@@ -113,15 +113,15 @@ namespace MMMEngine
         };
 
         // === 유효성 검증 ===
-        bool IsValidHandle(uint32_t handleID, uint32_t generation, const Object* ptr) const
+        bool IsValidPtr(uint32_t ptrID, uint32_t generation, const Object* ptr) const
         {
-            if (handleID >= m_objects.size())
+            if (ptrID >= m_objects.size())
                 return false;
 
-            if (m_objects[handleID] != ptr)
+            if (m_objects[ptrID] != ptr)
                 return false;
 
-            if (m_handleGenerations[handleID] != generation)
+            if (m_ptrGenerations[ptrID] != generation)
                 return false;
 
             if (ptr && ptr->IsDestroyed())
@@ -131,7 +131,7 @@ namespace MMMEngine
         }
 
         template<typename T, typename... Args>
-        ObjectPtr<T> CreateHandle(Args&&... args)
+        ObjectPtr<T> CreatePtr(Args&&... args)
         {
             static_assert(std::is_base_of_v<Object, T>, "T는 반드시 Object를 상속받아야 합니다.");
             static_assert(!std::is_abstract_v<T>, "추상적인 Object는 만들 수 없습니다.");
@@ -141,27 +141,27 @@ namespace MMMEngine
             CreationScope scope;
 
             T* newObj = new T(std::forward<Args>(args)...);
-            uint32_t handleID;
+            uint32_t ptrID;
             uint32_t generation;
 
-            if (m_freeHandleIDs.empty())
+            if (m_freePtrIDs.empty())
             {
                 // 새 슬롯 할당
-                handleID = static_cast<uint32_t>(m_objects.size());
+                ptrID = static_cast<uint32_t>(m_objects.size());
                 m_objects.push_back(newObj);
-                m_handleGenerations.push_back(0);
+                m_ptrGenerations.push_back(0);
                 generation = 0;
             }
             else
             {
                 // 재사용 슬롯
-                handleID = m_freeHandleIDs.front();
-                m_freeHandleIDs.pop();
-                m_objects[handleID] = newObj;
-                generation = ++m_handleGenerations[handleID];
+                ptrID = m_freePtrIDs.front();
+                m_freePtrIDs.pop();
+                m_objects[ptrID] = newObj;
+                generation = ++m_ptrGenerations[ptrID];
             }
 
-            return ObjectPtr<T>(newObj, handleID, generation);
+            return ObjectPtr<T>(newObj, ptrID, generation);
         }
 
         // === 파괴 ===

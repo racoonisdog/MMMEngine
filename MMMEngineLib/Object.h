@@ -62,8 +62,8 @@ namespace MMMEngine
 
         virtual Object* GetBase() const = 0;
     public:
-        virtual uint32_t    GetHandleID() const = 0;
-        virtual uint32_t    GetGeneration() const = 0;
+        virtual uint32_t    GetPtrID() const = 0;
+        virtual uint32_t    GetPtrGeneration() const = 0;
         virtual bool        IsValid() const = 0;
         
         virtual bool IsSameObject(const ObjectPtrBase& other) const = 0;
@@ -83,24 +83,24 @@ namespace MMMEngine
         friend class ObjectManager;
         friend class ObjectSerializer;
 
-        T* m_ptr = nullptr;
-        uint32_t m_handleID = UINT32_MAX;
-        uint32_t m_handleGeneration = 0;
+        T* m_raw = nullptr;
+        uint32_t m_ptrID = UINT32_MAX;
+        uint32_t m_ptrGeneration = 0;
 
-        virtual Object* GetBase() const override { return m_ptr; }
+        virtual Object* GetBase() const override { return m_raw; }
 
         T* Get() const
         {
             if (!IsValid())
                 return nullptr;
-            return m_ptr;
+            return m_raw;
         }
 
         // private 생성자 - ObjectManager만 생성 가능
-        ObjectPtr(T* ptr, uint32_t id, uint32_t gen)
-            : m_ptr(ptr)
-            , m_handleID(id)
-            , m_handleGeneration(gen)
+        ObjectPtr(T* raw, uint32_t id, uint32_t gen)
+            : m_raw(raw)
+            , m_ptrID(id)
+            , m_ptrGeneration(gen)
         {
         }
 
@@ -116,23 +116,23 @@ namespace MMMEngine
 
         T& operator*() const 
         {
-            T* ptr = Get();
-            assert(ptr && "ObjectPtr의 역참조가 잘못되었습니다!");
-            return *ptr;
+            T* raw = Get();
+            assert(raw && "ObjectPtr의 역참조가 잘못되었습니다!");
+            return *raw;
         }
 
         T* operator->() const
         {
-            T* ptr = Get();
-            assert(ptr && "유효하지 않은 ObjectPtr에 접근했습니다!");
-            return ptr;
+            T* raw = Get();
+            assert(raw && "유효하지 않은 ObjectPtr에 접근했습니다!");
+            return raw;
         }
 
         bool operator==(const ObjectPtr<T>& other) const
         {
             // 같은 핸들 슬롯 + 같은 세대 = 같은 핸들
-            return m_handleID == other.m_handleID &&
-                m_handleGeneration == other.m_handleGeneration;
+            return m_ptrID == other.m_ptrID &&
+                m_ptrGeneration == other.m_ptrGeneration;
         }
 
         bool operator!=(const ObjectPtr<T>& other) const
@@ -142,8 +142,8 @@ namespace MMMEngine
 
         virtual bool operator==(const ObjectPtrBase& other) const override
         {
-            return m_handleID == other.GetHandleID() &&
-                m_handleGeneration == other.GetGeneration();
+            return m_ptrID == other.GetPtrID() &&
+                m_ptrGeneration == other.GetPtrGeneration();
         }
 
         virtual bool operator!=(const ObjectPtrBase& other) const override
@@ -154,19 +154,19 @@ namespace MMMEngine
         // === nullptr 비교 (null 핸들 검사) ===
         virtual bool operator==(std::nullptr_t) const override
         {
-            return m_handleID == UINT32_MAX;  // null 핸들
+            return m_ptrID == UINT32_MAX;  // null 핸들
         }
 
         virtual bool operator!=(std::nullptr_t) const override
         {
-            return m_handleID != UINT32_MAX;
+            return m_ptrID != UINT32_MAX;
         }
 
         bool IsSameObject(const ObjectPtr<T>& other) const
         {
             // 같은 핸들이면 같은 객체
-            if (m_handleID != other.m_handleID ||
-                m_handleGeneration != other.m_handleGeneration)
+            if (m_ptrID != other.m_ptrID ||
+                m_ptrGeneration != other.m_ptrGeneration)
                 return false;
 
             return IsValid() && other.IsValid();
@@ -174,14 +174,14 @@ namespace MMMEngine
 
         virtual bool IsSameObject(const ObjectPtrBase& other) const override
         {
-            if (m_handleID != other.GetHandleID() ||
-                m_handleGeneration != other.GetGeneration())
+            if (m_ptrID != other.GetPtrID() ||
+                m_ptrGeneration != other.GetPtrGeneration())
                 return false;
 
             return IsValid() &&
-                ObjectManager::Get().IsValidHandle(
-                    other.GetHandleID(),
-                    other.GetGeneration(),
+                ObjectManager::Get().IsValidPtr(
+                    other.GetPtrID(),
+                    other.GetPtrGeneration(),
                     other.GetBase()
                 );
         }
@@ -190,11 +190,11 @@ namespace MMMEngine
 
         virtual bool IsValid() const override
         {
-            return ObjectManager::Get().IsValidHandle(m_handleID, m_handleGeneration, m_ptr);
+            return ObjectManager::Get().IsValidPtr(m_ptrID, m_ptrGeneration, m_raw);
         }
 
-        virtual uint32_t GetHandleID() const override { return m_handleID; }
-        virtual uint32_t GetGeneration() const override { return m_handleGeneration; }
+        virtual uint32_t GetPtrID() const override { return m_ptrID; }
+        virtual uint32_t GetPtrGeneration() const override { return m_ptrGeneration; }
     };
 }
 

@@ -7,7 +7,7 @@ namespace MMMEngine
     ObjectPtr<T> Object::CreateInstance(Args&&... args)
     {
         return ObjectManager::Get()
-            .CreateHandle<T>(std::forward<Args>(args)...);
+            .CreatePtr<T>(std::forward<Args>(args)...);
     }
 
     template<typename T>
