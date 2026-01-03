@@ -88,23 +88,26 @@
     <Filter Include="RTTR\Detail\VariantSequentialView">
       <UniqueIdentifier>{3a03b383-9339-4182-8dc3-a4d941d8604d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Core">
+      <UniqueIdentifier>{6e95a25c-97cb-4986-92fc-2c2c159e1884}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Core\Object API">
+      <UniqueIdentifier>{15f04ef4-0d77-4cbb-b82e-1ebeb228d8f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Core">
+      <UniqueIdentifier>{b7472de8-e436-4e0f-bfe7-6d4d1a14f463}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Core\Object API">
+      <UniqueIdentifier>{30f2f91b-60c1-4b27-b369-eeb01b79f5f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Utility">
+      <UniqueIdentifier>{6bbd6fd2-454b-4946-89b5-785f6376765a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Utility">
+      <UniqueIdentifier>{bb817747-9bed-4c9b-9d18-d3727af467be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="App.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Delegates.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Singleton.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GUID.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="rttr\access_levels.h">
       <Filter>RTTR\Header</Filter>
     </ClInclude>
@@ -489,20 +492,32 @@
     <ClInclude Include="rttr\detail\variant_sequential_view\variant_sequential_view_private.h">
       <Filter>RTTR\Detail\VariantSequentialView</Filter>
     </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>헤더 파일\Core\Object API</Filter>
+    </ClInclude>
     <ClInclude Include="ObjectManager.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Object API</Filter>
     </ClInclude>
     <ClInclude Include="ObjectSerializer.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Object API</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h">
+      <Filter>헤더 파일\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Delegates.hpp">
+      <Filter>헤더 파일\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="GUID.h">
+      <Filter>헤더 파일\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton.hpp">
+      <Filter>헤더 파일\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="App.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -600,13 +615,16 @@
       <Filter>RTTR\Detail\Variant</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Object API</Filter>
     </ClCompile>
     <ClCompile Include="ObjectSerializer.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Object API</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>소스 파일\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -620,7 +638,7 @@
       <Filter>RTTR</Filter>
     </None>
     <None Include="Object.inl">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Object API</Filter>
     </None>
   </ItemGroup>
 </Project>
