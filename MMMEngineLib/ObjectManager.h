@@ -10,16 +10,31 @@ namespace MMMEngine
     class ObjectManager : public Singleton<ObjectManager>
     {
     private:
+
+        struct ObjectPtrInfo
+        {
+            Object* raw = nullptr;
+            uint32_t ptrGenerations = 0;
+
+            float destroyRemainTime = -1.0f;
+            bool destroyScheduled = false;
+            bool destroyPending = false;     
+        };
+
         friend class App;
 
         static inline thread_local bool m_isCreatingObject;
         static inline thread_local bool m_isDestroyingObject;
 
         mutable std::mutex m_mutex;
-        std::vector<Object*> m_objects;
-        std::vector<uint32_t> m_ptrGenerations;
+
+        std::vector<ObjectPtrInfo> m_objectPtrInfos;
         std::queue<uint32_t> m_freePtrIDs;
-        std::vector<uint32_t> m_pendingDestroy;
+
+        std::vector<uint32_t> m_delayedDestroy;   //ÆÄ±« ¿¹¾à ID
+        std::vector<uint32_t> m_pendingDestroy;   //¿ÏÀü ÆÄ±« ID
+
+        void Update(float deltaTime);
 
         void ProcessPendingDestroy();
 
@@ -27,10 +42,10 @@ namespace MMMEngine
         template<typename T>
         ObjectPtr<T> GetPtr(uint32_t ptrID)
         {
-            if (ptrID >= m_objects.size())
+            if (ptrID >= m_objectPtrInfos.size())
                 return ObjectPtr<T>();
 
-            Object* obj = m_objects[ptrID];
+            Object* obj = m_objectPtrInfos[ptrID].raw;
             if (!obj || obj->IsDestroyed())
                 return ObjectPtr<T>();
 
@@ -38,7 +53,7 @@ namespace MMMEngine
             if (!typedObj)
                 return ObjectPtr<T>();
 
-            uint32_t generation = m_ptrGenerations[ptrID];
+            uint32_t generation = m_objectPtrInfos[ptrID].ptrGenerations;
             return ObjectPtr<T>(typedObj, ptrID, generation);
         }
 
@@ -96,9 +111,8 @@ namespace MMMEngine
             if (m_freePtrIDs.empty())
             {
                 // »õ ½½·Ô ÇÒ´ç
-                ptrID = static_cast<uint32_t>(m_objects.size());
-                m_objects.push_back(newObj);
-                m_ptrGenerations.push_back(0);
+                ptrID = static_cast<uint32_t>(m_objectPtrInfos.size());
+                m_objectPtrInfos.push_back({ newObj,0,0 });
                 generation = 0;
             }
             else
@@ -106,23 +120,14 @@ namespace MMMEngine
                 // Àç»ç¿ë ½½·Ô
                 ptrID = m_freePtrIDs.front();
                 m_freePtrIDs.pop();
-                m_objects[ptrID] = newObj;
-                generation = ++m_ptrGenerations[ptrID];
+                m_objectPtrInfos[ptrID].raw = newObj;
+                generation = ++m_objectPtrInfos[ptrID].ptrGenerations;
             }
 
             return ObjectPtr<T>(newObj, ptrID, generation);
         }
 
-        template<typename T>
-        void Destroy(ObjectPtr<T> objPtr)
-        {
-            if (objPtr.IsValid())
-            {
-                std::lock_guard<std::mutex> lock(m_mutex);
-                m_pendingDestroy.push_back(objPtr.m_ptrID);
-                objPtr.m_raw->MarkDestory();
-            }
-        }
+        void Destroy(const ObjectPtrBase& objPtr, float delayTime = 0.0f);
 
         ObjectManager() = default;
         ~ObjectManager();

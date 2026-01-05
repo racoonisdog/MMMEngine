@@ -11,12 +11,6 @@ namespace MMMEngine
     }
 
     template<typename T>
-    void MMMEngine::Object::Destroy(MMMEngine::ObjectPtr<T> objPtr)
-    {
-        ObjectManager::Get().Destroy(objPtr);
-    }
-
-    template<typename T>
     bool MMMEngine::ObjectPtr<T>::IsValid() const
     {
         return ObjectManager::Get().IsValidPtr(m_ptrID, m_ptrGeneration, m_raw);

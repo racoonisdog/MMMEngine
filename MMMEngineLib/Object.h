@@ -10,9 +10,11 @@ namespace MMMEngine
 	{
 	private:
 		friend class ObjectManager;
+        friend class ObjectSerializer;
 
 		template<typename T>
 		friend class ObjectPtr;
+        friend class ObjectPtrBase;
 		
 		RTTR_ENABLE()
 		RTTR_REGISTRATION_FRIEND
@@ -25,7 +27,7 @@ namespace MMMEngine
 
 		bool			m_isDestroyed = false;
 
-		inline void		MarkDestory() { m_isDestroyed = true; }
+		inline void		MarkDestroy() { m_isDestroyed = true; }
 
 		inline void		SetGUID(const GUID& guid) { m_guid = guid; }
 	protected:
@@ -38,8 +40,7 @@ namespace MMMEngine
 		template<typename T, typename ...Args>
         static ObjectPtr<T> CreateInstance(Args && ...args);
 
-        template<typename T>
-		static void Destroy(ObjectPtr<T> objPtr);
+		static void Destroy(const ObjectPtrBase& objPtr, float delay = 0.0f);
 
 		inline uint64_t				GetInstanceID() const { return m_instanceID; }
 
@@ -59,6 +60,8 @@ namespace MMMEngine
 
         template<typename T>
         friend class ObjectPtr;
+        friend class ObjectManager;
+        friend class ObjectSerializer;
 
         virtual Object* GetBase() const = 0;
     public:
@@ -128,18 +131,6 @@ namespace MMMEngine
             return raw;
         }
 
-        bool operator==(const ObjectPtr<T>& other) const
-        {
-            // 같은 핸들 슬롯 + 같은 세대 = 같은 핸들
-            return m_ptrID == other.m_ptrID &&
-                m_ptrGeneration == other.m_ptrGeneration;
-        }
-
-        bool operator!=(const ObjectPtr<T>& other) const
-        {
-            return !(*this == other);
-        }
-
         virtual bool operator==(const ObjectPtrBase& other) const override
         {
             return m_ptrID == other.GetPtrID() &&
@@ -160,16 +151,6 @@ namespace MMMEngine
         virtual bool operator!=(std::nullptr_t) const override
         {
             return m_ptrID != UINT32_MAX;
-        }
-
-        bool IsSameObject(const ObjectPtr<T>& other) const
-        {
-            // 같은 핸들이면 같은 객체
-            if (m_ptrID != other.m_ptrID ||
-                m_ptrGeneration != other.m_ptrGeneration)
-                return false;
-
-            return IsValid() && other.IsValid();
         }
 
         virtual bool IsSameObject(const ObjectPtrBase& other) const override;

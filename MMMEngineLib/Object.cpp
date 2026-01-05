@@ -64,3 +64,7 @@ MMMEngine::Object::~Object()
 	}
 }
 
+void MMMEngine::Object::Destroy(const ObjectPtrBase& objPtr, float delay)
+{
+	ObjectManager::Get().Destroy(objPtr, delay);
+}
