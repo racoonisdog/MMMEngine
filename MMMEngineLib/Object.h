@@ -30,8 +30,7 @@ namespace MMMEngine
 
 		bool			m_isDestroyed = false;
 
-		inline void		MarkDestroy() { m_isDestroyed = true; }
-
+        inline void		MarkDestroy() { if (m_isDestroyed) return; m_isDestroyed = true; BeforeDestroy();  }
 		inline void		SetGUID(const GUID& guid) { m_guid = guid; }
 	protected:
         Object();
@@ -39,6 +38,8 @@ namespace MMMEngine
 
         template<typename T>
         ObjectPtr<T> SelfPtr(T* self);
+
+        virtual void BeforeDestroy() {};
 	public:
 		Object(const Object&) = delete;
 		Object& operator=(const Object&) = delete;
@@ -97,6 +98,7 @@ namespace MMMEngine
     private:
         friend class ObjectManager;
         friend class ObjectSerializer;
+        template<typename> friend class ObjectPtr;
 
         T* m_raw = nullptr;
         uint32_t m_ptrID = UINT32_MAX;
@@ -163,7 +165,7 @@ namespace MMMEngine
         {
             if (U* casted = dynamic_cast<U*>(m_raw))
             {
-                return ObjectManager::Get().GetPtrFast<U>(m_raw, m_ptrID, m_ptrGeneration);
+                return ObjectManager::Get().GetPtrFast<U>(casted, m_ptrID, m_ptrGeneration);
             }
             
             return ObjectPtr<U>();
@@ -220,6 +222,18 @@ namespace MMMEngine
         {
             return m_ptrID != UINT32_MAX;
         }
+
+        bool operator==(T* other) const { return Get() == other; }
+        bool operator!=(T* other) const { return Get() != other; }
+
+        friend bool operator==(T* lhs, const ObjectPtr& rhs) { return rhs == lhs; }
+        friend bool operator!=(T* lhs, const ObjectPtr& rhs) { return rhs != lhs; }
+
+        bool operator==(const T* other) const { return Get() == other; }
+        bool operator!=(const T* other) const { return Get() != other; }
+
+        friend bool operator==(const T* lhs, const ObjectPtr& rhs) { return rhs == lhs; }
+        friend bool operator!=(const T* lhs, const ObjectPtr& rhs) { return rhs != lhs; }
 
         virtual bool IsSameObject(const ObjectPtrBase& other) const override;
 

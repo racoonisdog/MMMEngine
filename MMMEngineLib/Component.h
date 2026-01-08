@@ -18,6 +18,7 @@ namespace MMMEngine
 	protected:
 		Component() = default;
 		virtual void Initialize() {};
+		virtual void BeforeDestroy() override {};
 	public:
 		virtual ~Component() = default;
 

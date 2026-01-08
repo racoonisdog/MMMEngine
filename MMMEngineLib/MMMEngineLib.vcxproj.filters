@@ -600,6 +600,9 @@
     <ClInclude Include="dxtk\Inc\XboxDDSTextureLoader.h">
       <Filter>DXTK\Inc</Filter>
     </ClInclude>
+    <ClInclude Include="StringHelper.h">
+      <Filter>헤더 파일\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -718,6 +721,9 @@
     </ClCompile>
     <ClCompile Include="Transform.cpp">
       <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="StringHelper.cpp">
+      <Filter>소스 파일\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,5 @@
 #include "Transform.h"
+#include "StringHelper.h"
 #include "rttr/registration"
 
 RTTR_REGISTRATION
@@ -6,7 +7,16 @@ RTTR_REGISTRATION
 	using namespace rttr;
 	using namespace MMMEngine;
 
-	registration::class_<Transform>("Transform");
+	using Vec3Fn = void (Transform::*)(const Vector3&);
+	using QuatFn = void (Transform::*)(const Quaternion&);
+	Vec3Fn setpos = &Transform::SetLocalPosition;
+	QuatFn setrot = &Transform::SetLocalRotation;
+	Vec3Fn setscale = &Transform::SetLocalScale;
+
+	registration::class_<Transform>("Transform")
+		.property("Position", &Transform::GetLocalPosition, setpos)
+		.property("Roation", &Transform::GetLocalRotation, setrot)
+		.property("Scale", &Transform::GetLocalScale, setscale);
 
 	registration::class_<ObjectPtr<Transform>>("ObjectPtr<Transform>")
 		.constructor<>(
@@ -56,13 +66,9 @@ MMMEngine::Transform::Transform()
 
 }
 
-MMMEngine::Transform::~Transform()
+void MMMEngine::Transform::BeforeDestroy()
 {
-	while (!m_childs.empty())
-	{
-		auto child = m_childs.back();
-		child->SetParent(nullptr);
-	}
+	DetachChildren();
 	SetParent(nullptr);
 }
 
@@ -182,7 +188,7 @@ MMMEngine::ObjectPtr<MMMEngine::Transform> MMMEngine::Transform::GetChild(size_t
 	return m_childs[index];
 }
 
-void MMMEngine::Transform::SetWorldPosition(Vector3 pos)
+void MMMEngine::Transform::SetWorldPosition(const Vector3& pos)
 {
 	if (!m_parent)
 	{
@@ -212,7 +218,7 @@ void MMMEngine::Transform::SetWorldPosition(Vector3 pos)
 	onMatrixUpdate.Invoke(this);
 }
 
-void MMMEngine::Transform::SetWorldRotation(Quaternion rot)
+void MMMEngine::Transform::SetWorldRotation(const Quaternion& rot)
 {
 	if (m_parent)
 	{
@@ -230,7 +236,7 @@ void MMMEngine::Transform::SetWorldRotation(Quaternion rot)
 	onMatrixUpdate.Invoke(this);
 }
 
-void MMMEngine::Transform::SetWorldEulerRotation(Vector3 rot)
+void MMMEngine::Transform::SetWorldEulerRotation(const Vector3& rot)
 {
 	// 오일러 각(도 단위)을 라디안 단위로 변환
 	auto radRotX = DirectX::XMConvertToRadians(rot.x);
@@ -243,7 +249,7 @@ void MMMEngine::Transform::SetWorldEulerRotation(Vector3 rot)
 	SetWorldRotation(worldRot);
 }
 
-void MMMEngine::Transform::SetWorldScale(Vector3 scale)
+void MMMEngine::Transform::SetWorldScale(const Vector3& scale)
 {
 	if (m_parent)
 	{
@@ -264,14 +270,14 @@ void MMMEngine::Transform::SetWorldScale(Vector3 scale)
 	onMatrixUpdate.Invoke(this);
 }
 
-void MMMEngine::Transform::SetLocalPosition(Vector3 pos)
+void MMMEngine::Transform::SetLocalPosition(const Vector3& pos)
 {
 	m_localPosition = pos;
 	MarkDirty();
 	onMatrixUpdate.Invoke(this);
 }
 
-void MMMEngine::Transform::SetLocalRotation(Quaternion rot)
+void MMMEngine::Transform::SetLocalRotation(const Quaternion& rot)
 {
 	m_localRotation = rot;
 	MarkDirty();
@@ -357,3 +363,124 @@ void MMMEngine::Transform::SetParent(ObjectPtr<Transform> parent, bool worldPosi
 	MarkDirty();
 	onMatrixUpdate.Invoke(this);  //GetGameObject()->UpdateActiveInHierarchy(); // 부모가 바뀌었으므로 Hierarchy 활성화 상태 업데이트
 }
+
+MMMEngine::ObjectPtr<MMMEngine::Transform> MMMEngine::Transform::Find(const std::string& path)
+{
+	if (path.empty())
+		return nullptr;
+
+	// 1. 경로를 '/'로 분할
+	std::vector<std::string> tokens = StringHelper::Split(path, '/');
+	if (tokens.empty())
+		return nullptr;
+
+	// 2. 현재 Transform에서 시작
+	auto current = SelfPtr(this);
+
+	// 3. 토큰 순회
+	for (const auto& token : tokens)
+	{
+		bool found = false;
+
+		for (const auto& child : current->m_childs)
+		{
+			if (child && child->GetName() == token)
+			{
+				// 일치하는 자식 발견
+				current = child;
+				found = true;
+				break;
+			}
+		}
+
+		if (!found)
+		{
+			// 현재 레벨에서 이름을 못 찾으면 경로 실패
+			return ObjectPtr<Transform>();
+		}
+	}
+
+	return current;
+}
+
+MMMEngine::ObjectPtr<MMMEngine::Transform> MMMEngine::Transform::GetRoot()
+{
+	auto current = SelfPtr(this);
+
+	while (current->m_parent != nullptr)
+	{
+		if (!current.IsValid())
+			break;
+		current = current->m_parent;
+	}
+
+	return current;
+}
+
+void MMMEngine::Transform::DetachChildren()
+{
+	std::vector<ObjectPtr<Transform>> childrenCopy = m_childs;
+
+	for (auto& child : childrenCopy)
+	{
+		if(child.IsValid())
+			child->SetParent(nullptr);
+	}
+
+	m_childs.clear();
+}
+
+void MMMEngine::Transform::SetSiblingIndex(size_t idx)
+{
+	if (!m_parent)
+		return;
+
+	if (idx >= m_parent->m_childs.size())
+	{
+		// 인덱스가 범위를 벗어나면 아무 작업도 하지 않음
+		return;
+	}
+
+	if (m_parent->m_childs[idx] == SelfPtr(this))
+	{
+		// 이미 해당 인덱스에 있다면 아무 작업도 하지 않음
+		return;
+	}
+
+	//자식의 배열자 위치를 찾음
+	auto& children = m_parent->m_childs;
+	auto current_it = std::find(children.begin(), children.end(), this);
+
+	// 현재 인덱스 계산
+	size_t current_idx = std::distance(children.begin(), current_it);
+
+	//std::rotate를 사용하여 요소 이동
+	if (current_idx < idx)
+	{
+		// 현재 인덱스가 목표 인덱스보다 작으면 오른쪽으로 이동
+		std::rotate(children.begin() + current_idx,
+			children.begin() + current_idx + 1,
+			children.begin() + idx + 1);
+	}
+	else
+	{
+		// 현재 인덱스가 목표 인덱스보다 크면 왼쪽으로 이동
+		std::rotate(children.begin() + idx,
+			children.begin() + current_idx,
+			children.begin() + current_idx + 1);
+	}
+}
+
+size_t MMMEngine::Transform::GetSiblingIndex() const
+{
+	if (m_parent)
+	{
+		auto it = std::find(m_parent->m_childs.begin(), m_parent->m_childs.end(), this);
+		if (it != m_parent->m_childs.end())
+		{
+			return std::distance(m_parent->m_childs.begin(), it);
+		}
+	}
+	return 0; // 부모가 없거나 찾을 수 없는 경우 0 반환
+}
+

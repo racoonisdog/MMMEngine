@@ -34,7 +34,6 @@ namespace MMMEngine
         void Update(float deltaTime);
 
         void ProcessPendingDestroy();
-
     public:
         bool IsCreatingObject() const;
 

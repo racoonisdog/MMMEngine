@@ -3,6 +3,7 @@
 #include "rttr/detail/policies/ctor_policies.h"
 #include "Component.h"
 #include "Transform.h"
+#include "ObjectManager.h"
 #include <cmath>
 
 RTTR_REGISTRATION
@@ -10,7 +11,9 @@ RTTR_REGISTRATION
 	using namespace rttr;
 	using namespace MMMEngine;
 
-    registration::class_<GameObject>("GameObject");
+	registration::class_<GameObject>("GameObject")
+		.property("Layer", &GameObject::GetLayer, &GameObject::SetLayer)
+		.property("Tag", &GameObject::GetTag, &GameObject::SetTag);
 
 	registration::class_<ObjectPtr<GameObject>>("ObjectPtr<GameObject>")
 		.constructor(
@@ -65,7 +68,8 @@ void MMMEngine::GameObject::UpdateActiveInHierarchy()
 	// 자식들의 활성화 상태 갱신
 	for (auto& child : m_transform->m_childs)
 	{
-		child->GetGameObject()->UpdateActiveInHierarchy();
+		if(child.IsValid())
+			child->GetGameObject()->UpdateActiveInHierarchy();
 	}
 }
 
@@ -81,6 +85,11 @@ MMMEngine::GameObject::GameObject(std::string name)
 {
 	SetName(name);
 	Initialize();
+}
+
+void MMMEngine::GameObject::BeforeDestroy()
+{
+	ObjectManager::Get().Destroy(m_transform);
 }
 
 void MMMEngine::GameObject::SetActive(bool active)

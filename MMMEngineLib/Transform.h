@@ -35,8 +35,9 @@ namespace MMMEngine
 	protected:
 		Transform();
 		virtual void Initialize() override {};
+		virtual void BeforeDestroy() override;
 	public:
-		virtual ~Transform();
+		virtual ~Transform() = default;
 
 		Event<Transform, void(void)> onMatrixUpdate{ this };
 
@@ -53,22 +54,22 @@ namespace MMMEngine
 		const Vector3 GetWorldEulerRotation() const; // return degree (0 ~ 360)
 		const Vector3 GetWorldScale() const;
 
-		void SetWorldPosition(Vector3 pos);
+		void SetWorldPosition(const Vector3& pos);
 		inline void SetWorldPosition(float x, float y, float z) { SetWorldPosition({ x,y,z }); }
 
-		void SetWorldRotation(Quaternion rot);
+		void SetWorldRotation(const Quaternion& rot);
 		inline void SetWorldRotation(float x, float y, float z, float w) { SetWorldRotation({ x,y,z,w }); }
 
-		void SetWorldEulerRotation(Vector3 rot); // use degree (0 ~ 360)
+		void SetWorldEulerRotation(const Vector3& rot); // use degree (0 ~ 360)
 		inline void SetWorldEulerRotation(float x, float y, float z) { SetWorldEulerRotation({ x,y,z }); } // use degree (0 ~ 360)
 
-		void SetWorldScale(Vector3 scale);
+		void SetWorldScale(const Vector3& scale);
 		inline void SetWorldScale(float x, float y, float z) { SetWorldScale({ x,y,z }); }
 
-		void SetLocalPosition(Vector3 pos);
+		void SetLocalPosition(const Vector3& pos);
 		inline void SetLocalPosition(float x, float y, float z) { SetLocalPosition({ x,y,z }); }
 
-		void SetLocalRotation(Quaternion rot);
+		void SetLocalRotation(const Quaternion& rot);
 		inline void SetLocalRotation(float x, float y, float z, float w) { SetLocalRotation({ x,y,z,w }); }
 
 		void SetLocalScale(const Vector3& scale);
@@ -80,11 +81,11 @@ namespace MMMEngine
 		void SetParent(ObjectPtr<Transform> parent, bool worldPositionStays = true);
 
 		// TODO : 나중에 Sibling 관련 함수를 모두 제작해야 함
-		//ObjectPtr<Transform> Find(const std::wstring& name);
-		//ObjectPtr<Transform> GetRoot();
-		//void DetachChildren();
+		ObjectPtr<Transform> Find(const std::string& path);
+		ObjectPtr<Transform> GetRoot();
+		void DetachChildren();
 
-		//virtual void SetSiblingIndex(size_t idx);
-		//size_t GetSiblingIndex() const;
+		virtual void SetSiblingIndex(size_t idx);
+		size_t GetSiblingIndex() const;
 	};
 }

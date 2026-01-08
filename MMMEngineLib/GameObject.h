@@ -22,7 +22,7 @@ namespace MMMEngine
 		std::vector<ObjectPtr<Component>> m_components;
 
 		std::string m_tag = "";
-		uint32_t m_layer = -1;
+		uint32_t m_layer = static_cast<uint32_t>(-1);
 
 		bool m_active = true;
 		bool m_activeInHierarchy = true; // Hierarchy에서 활성화 여부
@@ -34,17 +34,20 @@ namespace MMMEngine
 	protected:
 		GameObject();
 		GameObject(std::string name);
+		virtual void BeforeDestroy() override;
 	public:
 		virtual ~GameObject() = default;
 		
 		void SetActive(bool active);
 		void SetTag(const std::string& tag) { m_tag = tag; }
+		void SetLayer(const uint32_t& layer) { m_layer = layer; }
 
 		bool IsActiveSelf() const { return m_active; }
 		bool IsActiveInHierarchy() const { return m_activeInHierarchy; }
 
-		const std::string& GetTag() const { return m_tag; }
-		//const SceneRef GetScene() const { return m_scene; }
+		const std::string&	GetTag()	const { return m_tag; }
+		const uint32_t&		GetLayer()	const { return m_layer; }
+		//const SceneRef		GetScene(	const { return m_scene; }
 
 		template <typename T>
 		ObjectPtr<T> AddComponent()
