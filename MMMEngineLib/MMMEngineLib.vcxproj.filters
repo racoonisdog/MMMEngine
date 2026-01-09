@@ -525,7 +525,7 @@
     <ClInclude Include="ObjectSerializer.h">
       <Filter>헤더 파일\Core\Object API</Filter>
     </ClInclude>
-    <ClInclude Include="App.h">
+    <ClInclude Include="Application.h">
       <Filter>헤더 파일\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Delegates.hpp">
@@ -728,7 +728,7 @@
     <ClCompile Include="ObjectSerializer.cpp">
       <Filter>소스 파일\Core\Object API</Filter>
     </ClCompile>
-    <ClCompile Include="App.cpp">
+    <ClCompile Include="Application.cpp">
       <Filter>소스 파일\Utility</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">

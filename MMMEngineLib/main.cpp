@@ -1,7 +1,7 @@
 #include <iostream>
 
 #define NOMINMAX
-#include "App.h"
+#include "Application.h"
 #include "GUID.h"
 #include "GameObject.h"
 
