@@ -519,7 +519,7 @@
     <ClInclude Include="rttr\detail\variant_sequential_view\variant_sequential_view_private.h">
       <Filter>RTTR\Detail\VariantSequentialView</Filter>
     </ClInclude>
-    <ClInclude Include="MMMObject.h">
+    <ClInclude Include="Object.h">
       <Filter>헤더 파일\Core\Object API</Filter>
     </ClInclude>
     <ClInclude Include="ObjectManager.h">
@@ -734,7 +734,7 @@
     <ClCompile Include="rttr\detail\variant\variant_compare.cpp">
       <Filter>RTTR\Detail\Variant</Filter>
     </ClCompile>
-    <ClCompile Include="MMMObject.cpp">
+    <ClCompile Include="Object.cpp">
       <Filter>소스 파일\Core\Object API</Filter>
     </ClCompile>
     <ClCompile Include="ObjectSerializer.cpp">
@@ -758,9 +758,6 @@
     <ClCompile Include="StringHelper.cpp">
       <Filter>소스 파일\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="InputManager.cpp">
       <Filter>소스 파일\Core\Input API</Filter>
     </ClCompile>
@@ -769,6 +766,9 @@
     </ClCompile>
     <ClCompile Include="TimeManager.cpp">
       <Filter>소스 파일\Core\Time API</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>소스 파일\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

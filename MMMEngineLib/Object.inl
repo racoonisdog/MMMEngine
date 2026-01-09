@@ -1,6 +1,6 @@
 #pragma once
 #include "ObjectManager.h"
-#include "MMMObject.h"
+#include "Object.h"
 
 namespace MMMEngine
 {
