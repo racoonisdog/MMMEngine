@@ -15,7 +15,7 @@ RTTR_REGISTRATION
 
 	registration::class_<Object>("Object")
 		.property("Name", &Object::GetName, &Object::SetName)
-		.property("GUID", &Object::GetGUID, &Object::SetGUID)
+		.property("MUID", &Object::GetMUID, &Object::SetMUID)
 		.property_readonly("InstanceID", &Object::GetInstanceID)
 		.property_readonly("isDestroyed", &Object::IsDestroyed);
 
@@ -43,7 +43,7 @@ MMMEngine::Object::Object() : m_instanceID(s_nextInstanceID++)
 	}
 
 	m_name = "<Unnamed> [ Instance ID : " + std::to_string(m_instanceID) + " ]";
-	m_guid = GUID::NewGuid();
+	m_muid = MUID::NewMUID();
 	m_ptrID = UINT32_MAX;
 	m_ptrGen = 0;
 }

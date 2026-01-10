@@ -2,7 +2,7 @@
 #include "fast_delegate/MultiCastDelegate.h"
 #include <stdexcept>
 
-namespace MMMEngine
+namespace MMMEngine::Utility
 {
 	template<typename... Args>
 	class Action {

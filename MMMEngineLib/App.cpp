@@ -1,8 +1,8 @@
-#include "Application.h"
+#include "App.h"
 #include <wrl/client.h>
 
 
-MMMEngine::Application::Application()
+MMMEngine::Utility::App::App()
 	: m_hInstance(GetModuleHandle(NULL))
 	, m_hWnd(NULL)
 	, m_isRunning(false)
@@ -11,12 +11,12 @@ MMMEngine::Application::Application()
 {
 }
 
-MMMEngine::Application::~Application()
+MMMEngine::Utility::App::~App()
 {
 
 }
 
-int MMMEngine::Application::Run()
+int MMMEngine::Utility::App::Run()
 {
 	if (FAILED(CoInitialize(nullptr)))
 		return -1;
@@ -51,7 +51,7 @@ int MMMEngine::Application::Run()
 	return (int)msg.wParam;
 }
 
-void MMMEngine::Application::Quit()
+void MMMEngine::Utility::App::Quit()
 {
 	m_isRunning = false;
 	if (m_hWnd)
@@ -60,22 +60,22 @@ void MMMEngine::Application::Quit()
 		PostQuitMessage(0);
 }
 
-void MMMEngine::Application::SetProcessHandle(HINSTANCE hinstance)
+void MMMEngine::Utility::App::SetProcessHandle(HINSTANCE hinstance)
 {
 	m_hInstance = hinstance;
 }
 
-MMMEngine::Application::WindowInfo MMMEngine::Application::GetWindowInfo()
+MMMEngine::Utility::App::WindowInfo MMMEngine::Utility::App::GetWindowInfo()
 {
 	return m_windowInfo;
 }
 
-HWND MMMEngine::Application::GetWindowHandle()
+HWND MMMEngine::Utility::App::GetWindowHandle()
 {
 	return m_hWnd;
 }
 
-LRESULT MMMEngine::Application::HandleWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT MMMEngine::Utility::App::HandleWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	//#ifdef _DEBUG
 	//if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
@@ -105,16 +105,13 @@ LRESULT MMMEngine::Application::HandleWindowMessage(HWND hWnd, UINT uMsg, WPARAM
 			}
 		}
 		break;
-	case SIZE_MINIMIZED:
-		m_needResizeWindow = true;
-		break;
 	default:
 		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 	return 0;
 }
 
-bool MMMEngine::Application::CreateMainWindow()
+bool MMMEngine::Utility::App::CreateMainWindow()
 {
 	// 윈도우 클래스 정의
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX) };
@@ -148,15 +145,15 @@ bool MMMEngine::Application::CreateMainWindow()
 	return true;
 }
 
-LRESULT MMMEngine::Application::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT MMMEngine::Utility::App::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg == WM_NCCREATE) {
 		auto* cs = reinterpret_cast<CREATESTRUCTW*>(lParam);
 		SetWindowLongPtrW(hWnd, GWLP_USERDATA, (LONG_PTR)cs->lpCreateParams);
-		return TRUE; 
+		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 
-	Application* pApp = reinterpret_cast<Application*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	App* pApp = reinterpret_cast<App*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	if (pApp) {
 		return pApp->HandleWindowMessage(hWnd, uMsg, wParam, lParam);
 	}

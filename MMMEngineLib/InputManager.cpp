@@ -4,92 +4,92 @@
 void MMMEngine::InputManager::InitKeyCodeMap()
 {
     // KeyCode와 Windows Virtual Key Code 매핑
-    m_keyCodeMap[Input::KeyCode::A] = 'A';
-    m_keyCodeMap[Input::KeyCode::B] = 'B';
-    m_keyCodeMap[Input::KeyCode::C] = 'C';
-    m_keyCodeMap[Input::KeyCode::D] = 'D';
-    m_keyCodeMap[Input::KeyCode::E] = 'E';
-    m_keyCodeMap[Input::KeyCode::F] = 'F';
-    m_keyCodeMap[Input::KeyCode::G] = 'G';
-    m_keyCodeMap[Input::KeyCode::H] = 'H';
-    m_keyCodeMap[Input::KeyCode::I] = 'I';
-    m_keyCodeMap[Input::KeyCode::J] = 'J';
-    m_keyCodeMap[Input::KeyCode::K] = 'K';
-    m_keyCodeMap[Input::KeyCode::L] = 'L';
-    m_keyCodeMap[Input::KeyCode::M] = 'M';
-    m_keyCodeMap[Input::KeyCode::N] = 'N';
-    m_keyCodeMap[Input::KeyCode::O] = 'O';
-    m_keyCodeMap[Input::KeyCode::P] = 'P';
-    m_keyCodeMap[Input::KeyCode::Q] = 'Q';
-    m_keyCodeMap[Input::KeyCode::R] = 'R';
-    m_keyCodeMap[Input::KeyCode::S] = 'S';
-    m_keyCodeMap[Input::KeyCode::T] = 'T';
-    m_keyCodeMap[Input::KeyCode::U] = 'U';
-    m_keyCodeMap[Input::KeyCode::V] = 'V';
-    m_keyCodeMap[Input::KeyCode::W] = 'W';
-    m_keyCodeMap[Input::KeyCode::X] = 'X';
-    m_keyCodeMap[Input::KeyCode::Y] = 'Y';
-    m_keyCodeMap[Input::KeyCode::Z] = 'Z';
+    m_keyCodeMap[KeyCode::A] = 'A';
+    m_keyCodeMap[KeyCode::B] = 'B';
+    m_keyCodeMap[KeyCode::C] = 'C';
+    m_keyCodeMap[KeyCode::D] = 'D';
+    m_keyCodeMap[KeyCode::E] = 'E';
+    m_keyCodeMap[KeyCode::F] = 'F';
+    m_keyCodeMap[KeyCode::G] = 'G';
+    m_keyCodeMap[KeyCode::H] = 'H';
+    m_keyCodeMap[KeyCode::I] = 'I';
+    m_keyCodeMap[KeyCode::J] = 'J';
+    m_keyCodeMap[KeyCode::K] = 'K';
+    m_keyCodeMap[KeyCode::L] = 'L';
+    m_keyCodeMap[KeyCode::M] = 'M';
+    m_keyCodeMap[KeyCode::N] = 'N';
+    m_keyCodeMap[KeyCode::O] = 'O';
+    m_keyCodeMap[KeyCode::P] = 'P';
+    m_keyCodeMap[KeyCode::Q] = 'Q';
+    m_keyCodeMap[KeyCode::R] = 'R';
+    m_keyCodeMap[KeyCode::S] = 'S';
+    m_keyCodeMap[KeyCode::T] = 'T';
+    m_keyCodeMap[KeyCode::U] = 'U';
+    m_keyCodeMap[KeyCode::V] = 'V';
+    m_keyCodeMap[KeyCode::W] = 'W';
+    m_keyCodeMap[KeyCode::X] = 'X';
+    m_keyCodeMap[KeyCode::Y] = 'Y';
+    m_keyCodeMap[KeyCode::Z] = 'Z';
 
-    m_keyCodeMap[Input::KeyCode::Alpha0] = '0';
-    m_keyCodeMap[Input::KeyCode::Alpha1] = '1';
-    m_keyCodeMap[Input::KeyCode::Alpha2] = '2';
-    m_keyCodeMap[Input::KeyCode::Alpha3] = '3';
-    m_keyCodeMap[Input::KeyCode::Alpha4] = '4';
-    m_keyCodeMap[Input::KeyCode::Alpha5] = '5';
-    m_keyCodeMap[Input::KeyCode::Alpha6] = '6';
-    m_keyCodeMap[Input::KeyCode::Alpha7] = '7';
-    m_keyCodeMap[Input::KeyCode::Alpha8] = '8';
-    m_keyCodeMap[Input::KeyCode::Alpha9] = '9';
+    m_keyCodeMap[KeyCode::Alpha0] = '0';
+    m_keyCodeMap[KeyCode::Alpha1] = '1';
+    m_keyCodeMap[KeyCode::Alpha2] = '2';
+    m_keyCodeMap[KeyCode::Alpha3] = '3';
+    m_keyCodeMap[KeyCode::Alpha4] = '4';
+    m_keyCodeMap[KeyCode::Alpha5] = '5';
+    m_keyCodeMap[KeyCode::Alpha6] = '6';
+    m_keyCodeMap[KeyCode::Alpha7] = '7';
+    m_keyCodeMap[KeyCode::Alpha8] = '8';
+    m_keyCodeMap[KeyCode::Alpha9] = '9';
 
-    m_keyCodeMap[Input::KeyCode::Escape] = VK_ESCAPE;
-    m_keyCodeMap[Input::KeyCode::Space] = VK_SPACE;
-    m_keyCodeMap[Input::KeyCode::Enter] = VK_RETURN;
-    m_keyCodeMap[Input::KeyCode::Tab] = VK_TAB;
-    m_keyCodeMap[Input::KeyCode::Backspace] = VK_BACK;
-    m_keyCodeMap[Input::KeyCode::Delete] = VK_DELETE;
+    m_keyCodeMap[KeyCode::Escape] = VK_ESCAPE;
+    m_keyCodeMap[KeyCode::Space] = VK_SPACE;
+    m_keyCodeMap[KeyCode::Enter] = VK_RETURN;
+    m_keyCodeMap[KeyCode::Tab] = VK_TAB;
+    m_keyCodeMap[KeyCode::Backspace] = VK_BACK;
+    m_keyCodeMap[KeyCode::Delete] = VK_DELETE;
 
-    m_keyCodeMap[Input::KeyCode::LeftShift] = VK_LSHIFT;
-    m_keyCodeMap[Input::KeyCode::RightShift] = VK_RSHIFT;
-    m_keyCodeMap[Input::KeyCode::LeftControl] = VK_LCONTROL;
-    m_keyCodeMap[Input::KeyCode::RightControl] = VK_RCONTROL;
-    m_keyCodeMap[Input::KeyCode::LeftAlt] = VK_LMENU; // VK_MENU는 Alt 키
-    m_keyCodeMap[Input::KeyCode::RightAlt] = VK_RMENU;
+    m_keyCodeMap[KeyCode::LeftShift] = VK_LSHIFT;
+    m_keyCodeMap[KeyCode::RightShift] = VK_RSHIFT;
+    m_keyCodeMap[KeyCode::LeftControl] = VK_LCONTROL;
+    m_keyCodeMap[KeyCode::RightControl] = VK_RCONTROL;
+    m_keyCodeMap[KeyCode::LeftAlt] = VK_LMENU; // VK_MENU는 Alt 키
+    m_keyCodeMap[KeyCode::RightAlt] = VK_RMENU;
 
-    m_keyCodeMap[Input::KeyCode::UpArrow] = VK_UP;
-    m_keyCodeMap[Input::KeyCode::DownArrow] = VK_DOWN;
-    m_keyCodeMap[Input::KeyCode::LeftArrow] = VK_LEFT;
-    m_keyCodeMap[Input::KeyCode::RightArrow] = VK_RIGHT;
+    m_keyCodeMap[KeyCode::UpArrow] = VK_UP;
+    m_keyCodeMap[KeyCode::DownArrow] = VK_DOWN;
+    m_keyCodeMap[KeyCode::LeftArrow] = VK_LEFT;
+    m_keyCodeMap[KeyCode::RightArrow] = VK_RIGHT;
 
-    m_keyCodeMap[Input::KeyCode::Comma] = VK_OEM_COMMA;
-    m_keyCodeMap[Input::KeyCode::Period] = VK_OEM_PERIOD;
-    m_keyCodeMap[Input::KeyCode::Slash] = VK_OEM_2;
-    m_keyCodeMap[Input::KeyCode::Semicolon] = VK_OEM_1;
-    m_keyCodeMap[Input::KeyCode::Quote] = VK_OEM_7;
-    m_keyCodeMap[Input::KeyCode::LeftBracket] = VK_OEM_4;
-    m_keyCodeMap[Input::KeyCode::RightBracket] = VK_OEM_6;
-    m_keyCodeMap[Input::KeyCode::Minus] = VK_OEM_MINUS;
-    m_keyCodeMap[Input::KeyCode::Equals] = VK_OEM_PLUS;
+    m_keyCodeMap[KeyCode::Comma] = VK_OEM_COMMA;
+    m_keyCodeMap[KeyCode::Period] = VK_OEM_PERIOD;
+    m_keyCodeMap[KeyCode::Slash] = VK_OEM_2;
+    m_keyCodeMap[KeyCode::Semicolon] = VK_OEM_1;
+    m_keyCodeMap[KeyCode::Quote] = VK_OEM_7;
+    m_keyCodeMap[KeyCode::LeftBracket] = VK_OEM_4;
+    m_keyCodeMap[KeyCode::RightBracket] = VK_OEM_6;
+    m_keyCodeMap[KeyCode::Minus] = VK_OEM_MINUS;
+    m_keyCodeMap[KeyCode::Equals] = VK_OEM_PLUS;
 
-    m_keyCodeMap[Input::KeyCode::F1] = VK_F1;
-    m_keyCodeMap[Input::KeyCode::F2] = VK_F2;
-    m_keyCodeMap[Input::KeyCode::F3] = VK_F3;
-    m_keyCodeMap[Input::KeyCode::F4] = VK_F4;
-    m_keyCodeMap[Input::KeyCode::F5] = VK_F5;
-    m_keyCodeMap[Input::KeyCode::F6] = VK_F6;
-    m_keyCodeMap[Input::KeyCode::F7] = VK_F7;
-    m_keyCodeMap[Input::KeyCode::F8] = VK_F8;
-    m_keyCodeMap[Input::KeyCode::F9] = VK_F9;
-    m_keyCodeMap[Input::KeyCode::F10] = VK_F10;
-    m_keyCodeMap[Input::KeyCode::F11] = VK_F11;
-    m_keyCodeMap[Input::KeyCode::F12] = VK_F12;
+    m_keyCodeMap[KeyCode::F1] = VK_F1;
+    m_keyCodeMap[KeyCode::F2] = VK_F2;
+    m_keyCodeMap[KeyCode::F3] = VK_F3;
+    m_keyCodeMap[KeyCode::F4] = VK_F4;
+    m_keyCodeMap[KeyCode::F5] = VK_F5;
+    m_keyCodeMap[KeyCode::F6] = VK_F6;
+    m_keyCodeMap[KeyCode::F7] = VK_F7;
+    m_keyCodeMap[KeyCode::F8] = VK_F8;
+    m_keyCodeMap[KeyCode::F9] = VK_F9;
+    m_keyCodeMap[KeyCode::F10] = VK_F10;
+    m_keyCodeMap[KeyCode::F11] = VK_F11;
+    m_keyCodeMap[KeyCode::F12] = VK_F12;
 
-    m_keyCodeMap[Input::KeyCode::MouseLeft] = VK_LBUTTON;
-    m_keyCodeMap[Input::KeyCode::MouseRight] = VK_RBUTTON;
-    m_keyCodeMap[Input::KeyCode::MouseMiddle] = VK_MBUTTON;
+    m_keyCodeMap[KeyCode::MouseLeft] = VK_LBUTTON;
+    m_keyCodeMap[KeyCode::MouseRight] = VK_RBUTTON;
+    m_keyCodeMap[KeyCode::MouseMiddle] = VK_MBUTTON;
 }
 
-int MMMEngine::InputManager::GetNativeKeyCode(Input::KeyCode keyCode) const
+int MMMEngine::InputManager::GetNativeKeyCode(KeyCode keyCode) const
 {
     auto it = m_keyCodeMap.find(keyCode);
     if (it != m_keyCodeMap.end())
@@ -144,19 +144,19 @@ Vector2 MMMEngine::InputManager::GetMousePos()
 
     return Vector2{ (float)m_mouseClient.x, (float)m_mouseClient.y };
 }
-bool MMMEngine::InputManager::GetKey(Input::KeyCode keyCode)
+bool MMMEngine::InputManager::GetKey(KeyCode keyCode)
 {
     auto nativeKeyCode = GetNativeKeyCode(keyCode);
     if (nativeKeyCode == -1) return false;
     return (m_currState[nativeKeyCode] & Input::KEY_PRESSED) != 0;
 }
-bool MMMEngine::InputManager::GetKeyDown(Input::KeyCode keyCode)
+bool MMMEngine::InputManager::GetKeyDown(KeyCode keyCode)
 {
     auto nativeKeyCode = GetNativeKeyCode(keyCode);
     if (nativeKeyCode == -1) return false;
     return (!(m_prevState[nativeKeyCode] & Input::KEY_PRESSED) && (m_currState[nativeKeyCode] & Input::KEY_PRESSED));
 }
-bool MMMEngine::InputManager::GetKeyUp(Input::KeyCode keyCode)
+bool MMMEngine::InputManager::GetKeyUp(KeyCode keyCode)
 {
     auto nativeKeyCode = GetNativeKeyCode(keyCode);
     if (nativeKeyCode == -1) return false;

@@ -131,7 +131,7 @@ std::optional<json> MMMEngine::ObjectSerializer::SerializeObjectPtr(const varian
 
     // GUID 프로퍼티 접근
     rttr::type objType = objInstance.get_derived_type();
-    auto guidProp = objType.get_property("GUID");
+    auto guidProp = objType.get_property("MUID");
 
     if (guidProp.is_valid())
     {

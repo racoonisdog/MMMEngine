@@ -5,6 +5,8 @@
 #include <queue>
 #include <mutex>
 
+using namespace MMMEngine::Utility;
+
 namespace MMMEngine
 {
     class ObjectManager : public Singleton<ObjectManager>
@@ -20,7 +22,7 @@ namespace MMMEngine
             bool destroyScheduled = false;  
         };
 
-        friend class Application;
+        friend class App;
 
         static inline thread_local bool m_isCreatingObject;
         static inline thread_local bool m_isDestroyingObject;

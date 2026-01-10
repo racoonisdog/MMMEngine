@@ -147,7 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
+    <ClInclude Include="App.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Delegates.hpp" />
     <ClInclude Include="dxtk\Inc\Audio.h" />
@@ -172,7 +172,11 @@
     <ClInclude Include="dxtk\Inc\WICTextureLoader.h" />
     <ClInclude Include="dxtk\Inc\XboxDDSTextureLoader.h" />
     <ClInclude Include="GameObject.h" />
-    <ClInclude Include="GUID.h" />
+    <ClInclude Include="GlobalRegistry.h" />
+    <ClInclude Include="MMMApplication.h" />
+    <ClInclude Include="MUID.h" />
+    <ClInclude Include="InputConstant.h" />
+    <ClInclude Include="InputKeyCode.h" />
     <ClInclude Include="MMMInput.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="MMMResource.h" />
@@ -316,11 +320,10 @@
     <ClInclude Include="ResourceManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="App.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="dxtk\Src\SimpleMath.cpp" />
     <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="MMMInput.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object.cpp" />

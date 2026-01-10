@@ -5,9 +5,9 @@
 #include "Singleton.hpp"
 #include "Delegates.hpp"
 
-namespace MMMEngine
+namespace MMMEngine::Utility
 {
-	class Application : public Singleton<Application>
+	class App
 	{
 	public:
 		struct WindowInfo
@@ -18,17 +18,17 @@ namespace MMMEngine
 			LONG style;
 		};
 
-		Application();
-		~Application();
+		App();
+		~App();
 
 		int Run();
 		void Quit();
 
-		Event<Application, void(void)> OnIntialize{ this };
-		Event<Application, void(void)> OnShutdown{ this };
-		Event<Application, void(void)> OnUpdate{ this };
-		Event<Application, void(void)> OnRender{ this };
-		Event<Application, void(int,int)> OnResize{ this };
+		Event<App, void(void)> OnIntialize{ this };
+		Event<App, void(void)> OnShutdown{ this };
+		Event<App, void(void)> OnUpdate{ this };
+		Event<App, void(void)> OnRender{ this };
+		Event<App, void(int,int)> OnResize{ this };
 
 		void SetProcessHandle(HINSTANCE hinstance);
 		WindowInfo GetWindowInfo();

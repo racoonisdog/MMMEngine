@@ -1,12 +1,16 @@
 #include <iostream>
 
 #define NOMINMAX
-#include "Application.h"
-#include "GUID.h"
+
+#include "GlobalRegistry.h"
+#include "MMMApplication.h"
+#include "App.h"
+#include "MUID.h"
 #include "GameObject.h"
-#include "InputManager.h"
+#include "MMMInput.h"
 
 using namespace MMMEngine;
+using namespace MMMEngine::Utility;
 
 #include <rttr/registration>
 static void f() { std::cout << "Hello World" << std::endl; }
@@ -20,10 +24,13 @@ RTTR_REGISTRATION
 void Update() 
 {
 	InputManager::Get().Update();
-	if (Input::GetKey(Input::KeyCode::A))
+	if (Input::GetKey(KeyCode::A))
 	{
 		std::cout << "A!" << std::endl;
 	}
+
+	if (Input::GetKeyDown(KeyCode::Escape))
+		Application::Quit();
 }
 
 void Render() {  }
@@ -74,20 +81,23 @@ int main()
 
 	act.AddListener<Test, &Test::Foo>(&testObj);
 
+	App app;
 
-	Application::Get().OnIntialize.AddListenerLambda([]() { InputManager::Get().StartUp(Application::Get().GetWindowHandle()); });
-	Application::Get().OnUpdate.AddListener<&Update>();
-	Application::Get().OnRender.AddListener<&Render>();
+	MMMEngine::g_pApp = &app;
+
+	app.OnIntialize.AddListenerLambda([&app]() { InputManager::Get().StartUp(app.GetWindowHandle()); });
+	app.OnUpdate.AddListener<&Update>();
+	app.OnRender.AddListener<&Render>();
 
 	act.Invoke();
 
-	Application::Get().Run();
+	app.Run();
 
-	MMMEngine::GUID id = MMMEngine::GUID::NewGuid();
+	MUID id = MUID::NewMUID();
 	
 	type::invoke("f", {});
 
-	std::cout << "Generated GUID: " << id.ToString() << std::endl;
+	std::cout << "Generated MUID: " << id.ToString() << std::endl;
 	auto FooObj = Object::NewObject<FooObject>();
 	FooObj->Foo();
 
@@ -101,7 +111,7 @@ int main()
 		auto obj = var.get_value<ObjPtr<GameObject>>();
 		std::cout << obj->GetName() << std::endl;
 
-		std::cout << (*obj).GetGUID() << std::endl;
+		std::cout << (*obj).GetMUID() << std::endl;
 
 		auto prop = (*obj).get_type().get_property("Components");
 		if (prop)

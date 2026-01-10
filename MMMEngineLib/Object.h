@@ -1,9 +1,11 @@
 #pragma once
 #include "rttr/type"
 #include "rttr/registration_friend.h"
-#include "GUID.h"
+#include "MUID.h"
 #include <type_traits>
 #include <cassert>
+
+using namespace MMMEngine::Utility;
 
 namespace MMMEngine
 {
@@ -26,12 +28,12 @@ namespace MMMEngine
         uint32_t        m_ptrGen;
 		uint64_t		m_instanceID;
 		std::string		m_name;
-		GUID			m_guid;
+		MUID			m_muid;
 
 		bool			m_isDestroyed = false;
 
         inline void		MarkDestroy() { if (m_isDestroyed) return; m_isDestroyed = true; Dispose();  }
-		inline void		SetGUID(const GUID& guid) { m_guid = guid; }
+		inline void		SetMUID(const MUID& muid) { m_muid = muid; }
 	protected:
         Object();
         virtual ~Object();
@@ -59,7 +61,7 @@ namespace MMMEngine
 
 		inline uint64_t				GetInstanceID() const { return m_instanceID; }
 
-		inline const GUID&			GetGUID()		const { return m_guid; }
+		inline const MUID&			GetMUID()		const { return m_muid; }
 
 		inline const std::string&	GetName()		const { return m_name; }
 		inline void					SetName(const std::string& name) { m_name = name; }
@@ -79,7 +81,7 @@ namespace MMMEngine
 
         virtual void* GetRaw() const = 0;
     public:
-        virtual void Reset() = 0;
+        virtual void        Reset() = 0;
         virtual uint32_t    GetPtrID() const = 0;
         virtual uint32_t    GetPtrGeneration() const = 0;
         virtual bool        IsValid() const = 0;
@@ -102,9 +104,9 @@ namespace MMMEngine
         friend class ObjectSerializer;
         template<typename> friend class ObjPtr;
 
-        T* m_raw = nullptr;
-        uint32_t m_ptrID = UINT32_MAX;
-        uint32_t m_ptrGeneration = 0;
+        T*          m_raw               = nullptr;
+        uint32_t    m_ptrID             = UINT32_MAX;
+        uint32_t    m_ptrGeneration     = 0;
 
         virtual void* GetRaw() const override { return m_raw; }
 
@@ -175,7 +177,7 @@ namespace MMMEngine
 
         /// <summary>
         /// 타입 변환을 시도한 후 성공 시 타입변환된 ObjectPtr을 반환합니다.
-        /// As<U>()는 완전유효한 타입변환을 목표로 두기 떄문에
+        /// As<U>()는 완전유효한 타입변환을 목표로 두기 때문에
         /// 변환에 실패한 경우 컴파일타임에러가 일어납니다.
         /// </summary>
         /// <typeparam name="U"></typeparam>

@@ -133,6 +133,12 @@
     <Filter Include="소스 파일\Core\Time API">
       <UniqueIdentifier>{dc3fa110-e47b-42bb-905e-25c4efa41aaa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Core\Application API">
+      <UniqueIdentifier>{8cb218df-594c-49d2-9e63-218696dadb13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Core\Global Registry">
+      <UniqueIdentifier>{93651194-ba3a-4e45-bd12-1fd240cc5473}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rttr\access_levels.h">
@@ -528,13 +534,10 @@
     <ClInclude Include="ObjectSerializer.h">
       <Filter>헤더 파일\Core\Object API</Filter>
     </ClInclude>
-    <ClInclude Include="Application.h">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Delegates.hpp">
       <Filter>헤더 파일\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="GUID.h">
+    <ClInclude Include="MUID.h">
       <Filter>헤더 파일\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Singleton.hpp">
@@ -635,6 +638,21 @@
     </ClInclude>
     <ClInclude Include="MMMTime.h">
       <Filter>헤더 파일\Core\Time API</Filter>
+    </ClInclude>
+    <ClInclude Include="InputKeyCode.h">
+      <Filter>헤더 파일\Core\Input API</Filter>
+    </ClInclude>
+    <ClInclude Include="InputConstant.h">
+      <Filter>헤더 파일\Core\Input API</Filter>
+    </ClInclude>
+    <ClInclude Include="MMMApplication.h">
+      <Filter>헤더 파일\Core\Application API</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h">
+      <Filter>헤더 파일\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalRegistry.h">
+      <Filter>헤더 파일\Core\Global Registry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -740,9 +758,6 @@
     <ClCompile Include="ObjectSerializer.cpp">
       <Filter>소스 파일\Core\Object API</Filter>
     </ClCompile>
-    <ClCompile Include="Application.cpp">
-      <Filter>소스 파일\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>소스 파일\Core</Filter>
     </ClCompile>
@@ -761,14 +776,14 @@
     <ClCompile Include="InputManager.cpp">
       <Filter>소스 파일\Core\Input API</Filter>
     </ClCompile>
-    <ClCompile Include="MMMInput.cpp">
-      <Filter>소스 파일\Core\Input API</Filter>
-    </ClCompile>
     <ClCompile Include="TimeManager.cpp">
       <Filter>소스 파일\Core\Time API</Filter>
     </ClCompile>
     <ClCompile Include="Component.cpp">
       <Filter>소스 파일\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>소스 파일\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

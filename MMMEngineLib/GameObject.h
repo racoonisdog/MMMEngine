@@ -12,7 +12,6 @@ namespace MMMEngine
 	private:
 		RTTR_ENABLE(Object)
 		RTTR_REGISTRATION_FRIEND
-		friend class Application;
 		friend class ObjectManager;
 		friend class Scene;
 		friend class Component;

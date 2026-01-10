@@ -1,20 +1,23 @@
 ﻿#pragma once
 #include <memory>
 
-template <typename T>
-class Singleton
+namespace MMMEngine::Utility
 {
-public:
-    Singleton(const Singleton&) = delete;
-    Singleton& operator=(const Singleton&) = delete;
-
-    static T& Get()
+    template <typename T>
+    class Singleton
     {
-        static T instance;
-        return instance;
-    }
+    public:
+        Singleton(const Singleton&) = delete;
+        Singleton& operator=(const Singleton&) = delete;
 
-protected:
-    Singleton() = default;
-    virtual ~Singleton() = default;
-};
+        static T& Get()
+        {
+            static T instance;
+            return instance;
+        }
+
+    protected:
+        Singleton() = default;
+        virtual ~Singleton() = default;
+    };
+}

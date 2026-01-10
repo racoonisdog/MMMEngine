@@ -6,25 +6,25 @@
 
 #include "uuid/uuid.h"
 
-namespace MMMEngine
+namespace MMMEngine::Utility
 {
 	// uuid 라이브러리를 감싸는 GUID 클래스, 함수 호출 인터페이스 제공 (정적)
-	class GUID
+	class MUID
 	{
 	private:
 		uuids::uuid m_uuid;
 
 	public:
 		// 기본 생성자 (nil UUID)
-		GUID() : m_uuid() {}
+		MUID() : m_uuid() {}
 
 		// 내부 uuid 객체로부터 생성
-		explicit GUID(const uuids::uuid& uuid) : m_uuid(uuid) {}
+		explicit MUID(const uuids::uuid& uuid) : m_uuid(uuid) {}
 
 		// 정적 팩토리 메서드들
 
 		// 새로운 랜덤 GUID 생성
-		static GUID NewGuid() {
+		static MUID NewMUID() {
 			std::random_device rd;
 			auto seed_data = std::array<int, std::mt19937::state_size>{};
 			std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
@@ -32,20 +32,20 @@ namespace MMMEngine
 			std::mt19937 generator(seq);
 
 			uuids::uuid_random_generator gen{ generator };
-			return GUID(gen());
+			return MUID(gen());
 		}
 
 		// Nil (빈) GUID 생성
-		static GUID Empty() {
-			return GUID();
+		static MUID Empty() {
+			return MUID();
 		}
 
 		// 문자열로부터 GUID 파싱
-		static std::optional<GUID> Parse(const std::string& str) {
+		static std::optional<MUID> Parse(const std::string& str) {
 			try {
 				auto uuid = uuids::uuid::from_string(str);
 				if (uuid.has_value()) {
-					return GUID(uuid.value());
+					return MUID(uuid.value());
 				}
 				return std::nullopt;
 			}
@@ -55,18 +55,18 @@ namespace MMMEngine
 		}
 
 		// 문자열로부터 GUID 파싱 (예외 던짐)
-		static GUID ParseOrThrow(const std::string& str) {
+		static MUID ParseOrThrow(const std::string& str) {
 			auto result = Parse(str);
 			if (!result.has_value()) {
-				throw std::invalid_argument("Invalid GUID string: " + str);
+				throw std::invalid_argument("Invalid MUID string: " + str);
 			}
 			return result.value();
 		}
 
 		// 이름 기반 GUID 생성 (DNS 네임스페이스)
-		static GUID FromName(const std::string& name) {
+		static MUID FromName(const std::string& name) {
 			static auto generator = uuids::uuid_name_generator(uuids::uuid::from_string("6ba7b810-9dad-11d1-80b4-00c04fd430c8").value());
-			return GUID(generator(name));
+			return MUID(generator(name));
 		}
 
 		// 변환 메서드들
@@ -122,32 +122,32 @@ namespace MMMEngine
 
 		// 비교 연산자들
 
-		bool operator==(const GUID& other) const {
+		bool operator==(const MUID& other) const {
 			return m_uuid == other.m_uuid;
 		}
 
-		bool operator!=(const GUID& other) const {
+		bool operator!=(const MUID& other) const {
 			return m_uuid != other.m_uuid;
 		}
 
-		bool operator<(const GUID& other) const {
+		bool operator<(const MUID& other) const {
 			return m_uuid < other.m_uuid;
 		}
 
-		bool operator>(const GUID& other) const {
+		bool operator>(const MUID& other) const {
 			return other.m_uuid < m_uuid;
 		}
 
-		bool operator<=(const GUID& other) const {
+		bool operator<=(const MUID& other) const {
 			return !(other.m_uuid < m_uuid);
 		}
 
-		bool operator>=(const GUID& other) const {
+		bool operator>=(const MUID& other) const {
 			return !(m_uuid < other.m_uuid);
 		}
 
 		// 스트림 출력
-		friend std::ostream& operator<<(std::ostream& os, const GUID& guid) {
+		friend std::ostream& operator<<(std::ostream& os, const MUID& guid) {
 			os << guid.ToString();
 			return os;
 		}
@@ -159,9 +159,9 @@ namespace MMMEngine
 
 		// 해시 지원 (unordered_map/set에서 사용)
 		struct Hash {
-			std::size_t operator()(const GUID& guid) const {
+			std::size_t operator()(const MUID& guid) const {
 				return std::hash<uuids::uuid>{}(guid.m_uuid);
 			}
 		};
 	};
-} // namespace MMMEngine
+}

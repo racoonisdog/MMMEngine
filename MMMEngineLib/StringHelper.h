@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-namespace MMMEngine
+namespace MMMEngine::Utility
 {
 	class StringHelper
 	{
