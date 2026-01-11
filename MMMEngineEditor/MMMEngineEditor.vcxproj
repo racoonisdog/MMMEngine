@@ -108,10 +108,14 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>Default</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)MMMEngineLib\rttr\..;$(SolutionDir)MMMEngineLib\dxtk\Inc;$(SolutionDir)MMMEngineLib\dxtk;$(SolutionDir)MMMEngineLib</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <TreatWChar_tAsBuiltInType />
+      <ForceConformanceInForLoopScope />
+      <RemoveUnreferencedCodeData />
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

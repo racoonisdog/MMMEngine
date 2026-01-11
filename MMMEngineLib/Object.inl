@@ -18,6 +18,28 @@ namespace MMMEngine
     }
 
     template<typename T>
+    template<typename U>
+    ObjPtr<U> ObjPtr<T>::Cast() const
+    {
+        if (U* casted = dynamic_cast<U*>(m_raw))
+        {
+            return ObjectManager::Get().GetPtrFast<U>(casted, m_ptrID, m_ptrGeneration);
+        }
+
+        return ObjPtr<U>();
+    }
+
+    template<typename T>
+    template<typename U>
+    ObjPtr<U> ObjPtr<T>::As() const
+    {
+        static_assert(std::is_base_of_v<Object, U>,
+            "As<U>() : U는 Object를 상속받아야 합니다.");
+
+        return ObjectManager::Get().GetPtr<U>(m_ptrID, m_ptrGeneration);
+    }
+
+    template<typename T>
     bool ObjPtr<T>::IsSameObject(const ObjPtrBase& other) const
     {
         if (m_ptrID != other.GetPtrID() ||
@@ -54,4 +76,27 @@ namespace MMMEngine
 #endif
         return ObjectManager::Get().GetPtrFast<T>(static_cast<T*>(this), m_ptrID, m_ptrGen);
     }
+}
+
+namespace rttr
+{
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4506 ) // warning C4506: 인라인 함수에 대한 정의가 없습니다.
+#endif
+
+    template<typename T>
+    struct wrapper_mapper<std::reference_wrapper<MMMEngine::ObjPtr<T>>>
+    {
+        using type = std::reference_wrapper<MMMEngine::ObjPtr<T>>;
+        using wrapped_type = MMMEngine::ObjPtr<T>&;
+
+        static wrapped_type get(const type& obj) { return obj.get(); }
+
+        static type create(wrapped_type value) { return std::ref(value); }
+    };
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 }
