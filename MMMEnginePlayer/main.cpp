@@ -54,9 +54,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
-	App app{ hInstance,L"MMMPlayer",1280,720 };
-	MMMEngine::g_pApp = &app;
-
 	//if (!Player::g_pathMap.LoadFromFile(L"Data/PathMap.bin"))
 	//	return -1;
 
@@ -65,6 +62,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	//if (!Player::g_pak.Open(L"Data/assets.pak"))
 	//	return -3;
+
+	App app{ hInstance,L"MMMPlayer",1280,720 };
+	MMMEngine::g_pApp = &app;
 
 	app.OnInitialize.AddListener<&Initialize>();
 	app.OnUpdate.AddListener<&Update>();

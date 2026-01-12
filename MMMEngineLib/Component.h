@@ -4,6 +4,7 @@
 
 namespace MMMEngine
 {
+	class Transform;
 	class Component : public Object
 	{
 	private:
@@ -23,5 +24,6 @@ namespace MMMEngine
 		virtual ~Component() = default;
 
 		inline ObjPtr<GameObject> GetGameObject() { return m_gameObject; };
+		ObjPtr<Transform> GetTransform();
 	};
 }

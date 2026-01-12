@@ -21,3 +21,11 @@ void MMMEngine::Component::Dispose()
 		GetGameObject()->UnRegisterComponent(SelfPtr(this));
 	UnInitialize();
 }
+
+MMMEngine::ObjPtr<MMMEngine::Transform> MMMEngine::Component::GetTransform()
+{
+	if(m_gameObject.IsValid())
+		return m_gameObject->GetTransform();
+
+	return nullptr;
+}

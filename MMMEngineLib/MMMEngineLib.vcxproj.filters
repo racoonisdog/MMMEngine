@@ -145,6 +145,12 @@
     <Filter Include="헤더 파일\Core\Resource API\Asset">
       <UniqueIdentifier>{23e0feb8-9639-40bb-958f-b55439ae7992}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Core\Resource API\Implement">
+      <UniqueIdentifier>{ef071b7d-2136-4e32-9d10-0edb89843e5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Core\Resource API\Implement\Format">
+      <UniqueIdentifier>{ac83eb5d-ca52-4d2e-af3b-ac567d187d39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rttr\access_levels.h">
@@ -663,9 +669,6 @@
     <ClInclude Include="Scene.h">
       <Filter>헤더 파일\Core\Scene API</Filter>
     </ClInclude>
-    <ClInclude Include="MMMResources.h">
-      <Filter>헤더 파일\Core\Resource API</Filter>
-    </ClInclude>
     <ClInclude Include="AssetEntry.h">
       <Filter>헤더 파일\Core\Resource API\Asset</Filter>
     </ClInclude>
@@ -674,6 +677,12 @@
     </ClInclude>
     <ClInclude Include="IBytesProvider.h">
       <Filter>헤더 파일\Core\Resource API\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="MMMResources.h">
+      <Filter>헤더 파일\Core\Resource API</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceFormat.h">
+      <Filter>헤더 파일\Core\Resource API\Implement\Format</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
