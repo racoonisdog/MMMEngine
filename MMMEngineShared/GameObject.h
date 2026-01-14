@@ -34,7 +34,7 @@ namespace MMMEngine
 		void Initialize();
 		std::vector<ObjPtr<Component>> GetComponentsCopy() { return m_components; }
 		const SceneRef& GetScene() const { return m_scene; }
-		void SetScene(SceneRef scene) { m_scene = scene; }
+		void SetScene(const SceneRef& scene) { m_scene = scene; }
 	protected:
 		GameObject();
 		GameObject(std::string name);

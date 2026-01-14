@@ -13,6 +13,7 @@ RTTR_REGISTRATION
 	using namespace MMMEngine;
 
 	registration::class_<GameObject>("GameObject")
+		.property("Scene", &GameObject::GetScene, &GameObject::SetScene, registration::private_access)
 		.property("Layer", &GameObject::GetLayer, &GameObject::SetLayer)
 		.property("Tag", &GameObject::GetTag, &GameObject::SetTag)
 		.property_readonly("Components", &GameObject::GetAllComponents);
@@ -142,4 +143,21 @@ void MMMEngine::GameObject::SetActive(bool active)
 	m_active = active;
 
 	UpdateActiveInHierarchy();
+}
+
+
+// todo : Scene 매니저에서 모든 씬을 순회하면서 찾기 -> 우리가 원하는 로직임
+MMMEngine::ObjPtr<MMMEngine::GameObject> MMMEngine::GameObject::Find(const std::wstring& name)
+{
+	return ObjPtr<GameObject>();
+}
+
+MMMEngine::ObjPtr<MMMEngine::GameObject> MMMEngine::GameObject::FindWithTag(const std::string& name)
+{
+	return ObjPtr<GameObject>();
+}
+
+std::vector<MMMEngine::ObjPtr<MMMEngine::GameObject>> MMMEngine::GameObject::FindGameObjectsWithTag(const std::string& name)
+{
+	return std::vector<ObjPtr<GameObject>>();
 }
