@@ -17,6 +17,8 @@
 #include "ObjectManager.h"
 #include "SceneManager.h"
 
+#include "SceneSerializer.h"
+
 using namespace MMMEngine;
 using namespace MMMEngine::Utility;
 
@@ -35,6 +37,8 @@ void Initialize()
 	Object::NewObject<GameObject>();
 	Object::NewObject<GameObject>();
 	Object::NewObject<GameObject>();
+
+	SceneSerializer::Get().Serialize(*SceneManager::Get().GetSceneRaw(SceneManager::Get().GetCurrentScene()), L"Assets/Scene");
 }
 
 void Update()
@@ -54,7 +58,7 @@ void Update()
 		BehaviourManager::Get().AllBroadCastBehaviourMessage("OnSceneLoaded");
 	}
 
-	BehaviourManager::Get().InitializeBehaviours();
+	BehaviourManager::Get().InitializeBehaviours();    // Awake, OnEnable, Start 메시지 전송 (순차적으로)
 
 
 	TimeManager::Get().ConsumeFixedSteps([&](float fixedDt)
