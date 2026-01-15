@@ -18,6 +18,9 @@ namespace MMMEngine
 		friend class ObjectManager;
         friend class ObjectSerializer;
 
+        template<typename T>
+        friend struct rttr::wrapper_mapper;
+
 		template<typename T>
 		friend class ObjPtr;
         friend class ObjPtrBase;
@@ -238,6 +241,36 @@ namespace MMMEngine
         virtual uint32_t GetPtrGeneration() const override { return m_ptrGeneration; }
     };
 }
+
+namespace rttr
+{
+    template <typename T>
+    struct wrapper_mapper<MMMEngine::ObjPtr<T>>
+    {
+        using type = MMMEngine::ObjPtr<T>;
+        using wrapped_type = T*; // get()의 반환 타입과 반드시 일치해야 함 :contentReference[oaicite:2]{index=2}
+
+        static wrapped_type get(const type& obj)
+        {
+            // friend wrapper_mapper 선언되어 있어서 private Get() 접근 가능
+            return obj.Get(); // 유효성 검사 포함
+        }
+
+        template <typename U>
+        static MMMEngine::ObjPtr<U> convert(const type& source, bool& ok)
+        {
+            // ObjPtr<T> -> ObjPtr<U> 변환 지원 (예: Base -> Derived)
+            if (auto casted = source.Cast<U>())
+            {
+                ok = true;
+                return casted;
+            }
+
+            ok = false;
+            return MMMEngine::ObjPtr<U>();
+        }
+    };
+} // namespace rttr
 
 namespace std
 {

@@ -24,8 +24,29 @@ json SerializeComponent(ObjPtr<Component> comp)
 
 	for (auto& prop : type.get_properties())
 	{
+		auto sss = prop.get_name();
 		rttr::variant value = prop.get_value(*comp);
 
+		if (value.get_type().get_name().to_string().find("ObjPtr") != std::string::npos)
+		{
+			MMMEngine::Object* obj = nullptr;
+			if (value.convert(obj))   // Transform* -> Object*
+			{
+				// obj로 공통 처리
+				std::string ss = "r5";
+
+				auto duid = obj->GetMUID().ToString();
+
+				auto s4 = 241410;
+			}
+		}
+
+
+		auto vv = value.get_value<ObjPtr<Object>>();
+		if (vv.IsValid())
+		{
+			auto rir = 550;
+		}
 
 		// 데이터 타입에 따른 JSON 변환 (간단한 예시)
 		if (value.is_type<ObjPtr<Object>>()) {
