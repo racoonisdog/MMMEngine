@@ -478,10 +478,8 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
     g_objectTable.clear();
 }
 
-SnapShot MMMEngine::SceneSerializer::SerializeToMemory(const Scene& scene)
+void MMMEngine::SceneSerializer::SerializeToMemory(const Scene& scene, SnapShot& snapshot)
 {
-    json snapshot;
-
     auto sceneMUID = scene.GetMUID().IsEmpty() ? Utility::MUID::NewMUID() : scene.GetMUID();
 
     snapshot["MUID"] = sceneMUID.ToString();
@@ -512,7 +510,6 @@ SnapShot MMMEngine::SceneSerializer::SerializeToMemory(const Scene& scene)
     }
 
     snapshot["GameObjects"] = goArray;
-    return snapshot;
 }
 
 void MMMEngine::SceneSerializer::ExtractScenes(const std::vector<Scene*>& scenes,

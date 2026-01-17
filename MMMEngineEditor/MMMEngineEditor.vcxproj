@@ -155,6 +155,7 @@
     <ClInclude Include="ImGuiEditorContext.h" />
     <ClInclude Include="ProjectManager.h" />
     <ClInclude Include="Project.h" />
+    <ClInclude Include="ProjectSelectDialog.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HierarchyWindow.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="imgui-docking\imgui_widgets.cpp" />
     <ClCompile Include="ImGuiEditorContext.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ProjectSelectDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MMMEngineShared\MMMEngineShared.vcxproj">

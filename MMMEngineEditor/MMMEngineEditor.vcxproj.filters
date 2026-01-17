@@ -43,6 +43,9 @@
     <Filter Include="헤더 파일\EditorWindow">
       <UniqueIdentifier>{e99458c1-bb5b-4989-ac60-fb961dbb3c87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Project">
+      <UniqueIdentifier>{6179e345-0100-4c05-99da-7afa1b557ef6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorRegistry.h">
@@ -87,6 +90,9 @@
     <ClInclude Include="HierarchyWindow.h">
       <Filter>헤더 파일\EditorWindow</Filter>
     </ClInclude>
+    <ClInclude Include="ProjectSelectDialog.h">
+      <Filter>헤더 파일\Project</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -121,6 +127,9 @@
     </ClCompile>
     <ClCompile Include="HierarchyWindow.cpp">
       <Filter>소스 파일\EditorWIndow</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectSelectDialog.cpp">
+      <Filter>소스 파일\Project</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

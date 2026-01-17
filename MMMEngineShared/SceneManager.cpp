@@ -75,7 +75,8 @@ void MMMEngine::SceneManager::CreateEmptyScene()
 {
 	m_scenes.push_back(std::make_unique<Scene>());
 	m_scenes.back()->SetName("EmptyScene");
-	SnapShot snapShot = SceneSerializer::Get().SerializeToMemory(*m_scenes.back());
+	SnapShot snapShot; 
+	SceneSerializer::Get().SerializeToMemory(*m_scenes.back(), snapShot);
 	m_scenes.back()->SetSnapShot(std::move(snapShot));
 	m_currentSceneID = 0;
 }
@@ -184,7 +185,7 @@ bool MMMEngine::SceneManager::CheckSceneIsChanged()
 	return false;
 }
 
-MMMEngine::ObjPtr< MMMEngine::GameObject> MMMEngine::SceneManager::FindWithMUID(const SceneRef& ref, Utility::MUID muid)
+MMMEngine::ObjPtr<MMMEngine::GameObject> MMMEngine::SceneManager::FindWithMUID(const SceneRef& ref, Utility::MUID muid)
 {
 	auto scene = m_scenes[ref.id].get();
 

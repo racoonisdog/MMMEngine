@@ -230,16 +230,16 @@ LRESULT MMMEngine::Utility::App::HandleWindowMessage(HWND hWnd, UINT uMsg, WPARA
 	LRESULT result = 0;
 
 	switch (uMsg) {
-	case WM_SETCURSOR:
-		// 클라이언트 영역에서 기본 화살표 커서 설정
-		if (LOWORD(lParam) == HTCLIENT)
-		{
-			SetCursor(LoadCursor(NULL, IDC_ARROW));
-			return TRUE;
-		}
-		// 비클라이언트 영역은 기본 처리
-		result = DefWindowProc(hWnd, uMsg, wParam, lParam);
-		break;
+	//case WM_SETCURSOR:
+	//	// 클라이언트 영역에서 기본 화살표 커서 설정
+	//	if (LOWORD(lParam) == HTCLIENT)
+	//	{
+	//		SetCursor(LoadCursor(NULL, IDC_ARROW));
+	//		return TRUE;
+	//	}
+	//	// 비클라이언트 영역은 기본 처리
+	//	result = DefWindowProc(hWnd, uMsg, wParam, lParam);
+	//	break;
 	case WM_SYSKEYDOWN:  // Alt + 다른 키 조합
 		if (wParam == VK_RETURN && (lParam & 0x60000000) == 0x20000000)  // Alt+Enter
 		{

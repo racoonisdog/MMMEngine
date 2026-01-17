@@ -10,7 +10,7 @@ namespace MMMEngine
 		void Serialize(const Scene& scene, std::wstring path);
 		void Deserialize(Scene& scene, const SnapShot& snapshot);
 
-		SnapShot SerializeToMemory(const Scene& scene);
+		void SerializeToMemory(const Scene& scene, SnapShot& snapshot);
 
 		void ExtractScenes(const std::vector<Scene*>& scenes, const std::wstring& rootPath);
 	};
