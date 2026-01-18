@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DragAndDrop.h" />
     <ClInclude Include="EditorRegistry.h" />
     <ClInclude Include="HierarchyWindow.h" />
     <ClInclude Include="imgui-docking\backends\imgui_impl_dx11.h" />

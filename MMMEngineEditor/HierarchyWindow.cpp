@@ -1,7 +1,7 @@
 #include "HierarchyWindow.h"
 #include "SceneManager.h"
 #include "Transform.h"
-
+#include "DragAndDrop.h"
 #include "EditorRegistry.h"
 using namespace MMMEngine::EditorRegistry;
 
@@ -9,6 +9,7 @@ using namespace MMMEngine::EditorRegistry;
 
 using namespace MMMEngine;
 using namespace MMMEngine::Utility;
+using namespace MMMEngine::Editor;
 
 struct ReparentCmd
 {
@@ -17,34 +18,6 @@ struct ReparentCmd
 };
 
 static std::vector<ReparentCmd> g_reparentQueue;
-
-MUID GetMuid(const std::string& type)
-{
-	MUID result = MUID::Empty();
-
-	if (ImGui::BeginDragDropTarget())
-	{
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(type.c_str()))
-		{
-			if (payload->IsDelivery() && payload->Data && payload->DataSize == sizeof(MUID))
-			{
-				std::memcpy(&result, payload->Data, sizeof(MUID));
-			}
-		}
-		ImGui::EndDragDropTarget();
-	}
-	return result;
-}
-
-void GiveMuid(std::string type, MUID muid, std::string display)
-{
-	if (ImGui::BeginDragDropSource())
-	{
-		ImGui::SetDragDropPayload(type.c_str(), &muid, sizeof(MUID));
-		ImGui::Text(display.c_str());
-		ImGui::EndDragDropSource();
-	}
-}
 
 void DrawDropLine(const char* id, float height = 4.0f)
 {
