@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="Behaviour.h" />
+    <ClInclude Include="ColliderComponent.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Delegates.hpp" />
     <ClInclude Include="DisplayMode.h" />
@@ -194,6 +195,8 @@
     <ClInclude Include="InputKeyCode.h" />
     <ClInclude Include="MMMInput.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="PhysX.h" />
+    <ClInclude Include="PhysxHelper.h" />
     <ClInclude Include="RenderCommand.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderManager.h" />
@@ -203,6 +206,7 @@
     <ClInclude Include="MMMTime.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="RigidBodyComponent.h" />
     <ClInclude Include="rttr\access_levels.h" />
     <ClInclude Include="rttr\argument.h" />
     <ClInclude Include="rttr\array_range.h" />
@@ -351,6 +355,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Behaviour.cpp" />
     <ClCompile Include="BehaviourManger.cpp" />
+    <ClCompile Include="ColliderComponent.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="dxtk\Src\SimpleMath.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -360,10 +365,13 @@
     <ClCompile Include="MUID.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="PhysX.cpp" />
+    <ClCompile Include="PhysxHelper.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="RigidBodyComponent.cpp" />
     <ClCompile Include="rttr\constructor.cpp" />
     <ClCompile Include="rttr\destructor.cpp" />
     <ClCompile Include="rttr\detail\comparison\compare_equal.cpp" />

@@ -1,0 +1,158 @@
+#pragma once
+#include <physx/PxPhysicsAPI.h>
+#include "ColliderComponent.h"
+#include "Transform.h"
+
+struct Transform_temp { Vector3 pos; Quaternion Quat; };
+
+
+class RigidBodyComponent
+{
+public:
+	//물체의 타입
+	enum class Type
+	{
+		Static,
+		Dynamic
+	};
+
+	//가하는 힘의 종류
+	enum class ForceMode
+	{
+		Force,
+		Impulse,
+		VelocityChange,
+		Acceleration
+	};
+
+	struct Desc
+	{
+		Type type = Type::Dynamic;
+		float mass = 1.0f;
+		//선형감쇠수치 , 공기저항, 속도에 비례해서 감소
+		float linearDamping = 0.0f;
+		//각속도 감쇠 수치, 회전 관성을 줄임(회전이 점점 느려지고 멈춘다)
+		float angularDamping = 0.05f;
+		bool useGravity = true;
+		bool isKinematic = false;
+	};
+
+
+
+public:
+	explicit RigidBodyComponent(const Desc& desc) : m_Desc(desc) {};
+
+	void OnDestroy();
+	//Scene에 등록
+	void CreateActor(physx::PxPhysics* physics, const Transform& transform);
+
+
+
+	//Shape 붙이기
+	void AttachCollider(ColliderComponent* collider);
+
+	void DetachCollider(ColliderComponent* collider);
+
+	physx::PxRigidActor* GetActor() const { return m_Actor; }
+
+	//위치 초기화 //m_Tr = &owner->GetTransform(); 민기씨 엔진에 넣을때 교체
+	void BindTransform(Transform* tr) { m_Tr = tr; }
+
+	void DestroyActor();
+
+	//physics에 물리정보를 던져주는 용도
+	void PushToPhysics();
+	//simulate이후 getGlobalPose()일어서 m_Tr에 반영하기 위한 함수
+	void PullFromPhysics();
+
+	//좌표를 강제로 바꿨을때 dirty설정 ( 외부적 요인으로 인해 변경했을때만 호출 )
+	void PushPoseIfDirty();
+
+	void PushForces();
+
+
+	void Teleport(const Transform& world);
+	void SetKinematicTarget(const Transform& world);
+	void MoveKinematicTarget();
+	void Editor_changeTrans(const Transform& world);
+
+	//힘, 속도 등 조작용 API
+	void AddForce(Vector3 f, ForceMode mod);
+	void AddTorque(Vector3 tor, ForceMode mod);
+
+	//rigid값 설정시 physx에 반영하는 함수
+	void PushStateChanges();
+	//sleep/wake 시스템
+	void PushWakeUp();
+
+	void AddImpulse(Vector3 imp);
+
+	void SetLinearVelocity(Vector3 v);
+
+	Vector3 GetLinearVelocity() const;
+
+	void SetAngularVelocity(Vector3 w);
+
+	Vector3 GetAngularVelocity() const;
+
+	void WakeUp();
+
+	void SetUseGravity(bool value) { m_Desc.useGravity = value; m_DescDirty = true; m_WakeRequested = true; }
+	void SetKinematic(bool value) { m_Desc.isKinematic = value; m_DescDirty = true; m_WakeRequested = true; }
+	void SetMass(float mass) { m_Desc.mass = mass; m_DescDirty = true; m_WakeRequested = true; }
+	void SetDamping(float lin, float ang) { m_Desc.linearDamping = lin; m_Desc.angularDamping = ang, m_DescDirty = true; m_WakeRequested = true; }
+
+private:
+	Desc m_Desc;
+	Transform* m_Tr = nullptr;
+
+	//Actor변수
+	physx::PxRigidActor* m_Actor = nullptr;
+	//collider 리스트
+	//std::vector<ColliderComponent*> m_PendingColliders;
+	std::vector<ColliderComponent*> m_Colliders;
+
+	//Transform이 바뀌었다는 flag용도 ( 텔레포트, 오브젝트를 직접 끌어서 이동, 키네마틱 이동( 플래폼, 컷씬 경로 이동 등 ), 스크립트에 의한 이동)
+	bool m_PoseDirty = false;
+	//텔레포트, 엔진이 강제로 바꾼 trans용도
+	Transform m_RequestedWorldPose;
+
+	//키네마틱 이동용
+	bool m_HasKinematicTarget = false;
+	//setKinematictarget으로 보낼값
+	Transform m_KinematicTarget;
+
+
+	// 상태 플래그 ( desc를 런타임이나 에디터에서 변경시 true로됨)
+	bool m_DescDirty = false;
+	// 물체를 끌어다 놓거나 텔레포트했을때 wake 알려주도록 설정하는 flag값
+	bool m_WakeRequested = false;
+
+
+	//force, torque 설정 변수
+	//바로 처리하는게 아니라 컨테이너에 담아두고 함수를 통해 순차적으로 실행하도록
+	struct ForceCmd
+	{
+		Vector3 vec;
+		ForceMode mode;
+	};
+
+	struct TorqueCmd
+	{
+		Vector3 vec;
+		ForceMode mode;
+	};
+
+	std::vector<ForceCmd>  m_ForceQueue;
+	std::vector<TorqueCmd> m_TorqueQueue;
+
+	physx::PxPhysics* m_Physics = nullptr;
+
+private:
+	physx::PxForceMode::Enum ToPxForceMode(ForceMode mode);
+
+	void SetType(Type newType);
+
+
+};
+

@@ -172,6 +172,18 @@
     <Filter Include="헤더 파일\Core\Render API">
       <UniqueIdentifier>{043cb42d-6ea4-4e75-85eb-9a7d6b03d0cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Core\PhysX">
+      <UniqueIdentifier>{72f6366c-4f87-41f8-8207-373d4c5918ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Core\PhysX">
+      <UniqueIdentifier>{b5c40fdb-529b-4cec-83da-68a39d56a1ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Core\PhysX\Component">
+      <UniqueIdentifier>{51048f6b-6da5-42ca-b52b-57bbf10e4d29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Core\PhysX\Component">
+      <UniqueIdentifier>{ba214d60-d531-4a50-a0e6-3ca1e47ee9f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rttr\access_levels.h">
@@ -741,6 +753,18 @@
     <ClInclude Include="RenderCommand.h">
       <Filter>헤더 파일\Core\Render API</Filter>
     </ClInclude>
+    <ClInclude Include="PhysX.h">
+      <Filter>헤더 파일\Core\PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBodyComponent.h">
+      <Filter>헤더 파일\Core\PhysX\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysxHelper.h">
+      <Filter>헤더 파일\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ColliderComponent.h">
+      <Filter>헤더 파일\Core\PhysX\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rttr\constructor.cpp">
@@ -910,6 +934,18 @@
     </ClCompile>
     <ClCompile Include="rttr_directxmath_registry.cpp">
       <Filter>소스 파일\Utility\RTTRRegistry</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysX.cpp">
+      <Filter>소스 파일\Core\PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="RigidBodyComponent.cpp">
+      <Filter>소스 파일\Core\PhysX\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysxHelper.cpp">
+      <Filter>소스 파일\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="ColliderComponent.cpp">
+      <Filter>소스 파일\Core\PhysX\Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
