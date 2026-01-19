@@ -196,6 +196,12 @@
     <Filter Include="헤더 파일\Core\Render API\Renderer">
       <UniqueIdentifier>{284d5cdc-81e6-4563-b6e2-af7346ef182a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Core\Behaviour API\ScriptLoader">
+      <UniqueIdentifier>{26e64790-fb4f-41a4-ab03-f82ee13aa8ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Core\Behaviour API\ScriptLoader">
+      <UniqueIdentifier>{ac9c3fcd-296c-4781-9f20-4ea519460450}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rttr\access_levels.h">
@@ -732,17 +738,11 @@
     <ClInclude Include="BehaviourManager.h">
       <Filter>헤더 파일\Core\Behaviour API</Filter>
     </ClInclude>
-    <ClInclude Include="ScriptBehaviour.h">
-      <Filter>헤더 파일\Core\Behaviour API</Filter>
-    </ClInclude>
     <ClInclude Include="Export.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ExportSingleton.hpp">
       <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="MissingScriptBehaviour.h">
-      <Filter>헤더 파일\Core\Behaviour API</Filter>
     </ClInclude>
     <ClInclude Include="SceneRef.h">
       <Filter>헤더 파일\Core\Scene API</Filter>
@@ -791,6 +791,15 @@
     </ClInclude>
     <ClInclude Include="MaterialSerealizer.h">
       <Filter>헤더 파일\Core\Render API\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptBehaviour.h">
+      <Filter>헤더 파일\Core\Behaviour API\ScriptLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="MissingScriptBehaviour.h">
+      <Filter>헤더 파일\Core\Behaviour API\ScriptLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptLoader.h">
+      <Filter>헤더 파일\Core\Behaviour API\ScriptLoader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -929,12 +938,6 @@
     <ClCompile Include="GlobalRegistry.cpp">
       <Filter>소스 파일\Core\GlobalRegistry</Filter>
     </ClCompile>
-    <ClCompile Include="MissingScriptBehaviour.cpp">
-      <Filter>소스 파일\Core\Behaviour API</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptBehaviour.cpp">
-      <Filter>소스 파일\Core\Behaviour API</Filter>
-    </ClCompile>
     <ClCompile Include="Resource.cpp">
       <Filter>소스 파일\Core\Resource API</Filter>
     </ClCompile>
@@ -991,6 +994,15 @@
     </ClCompile>
     <ClCompile Include="MaterialSerealizer.cpp">
       <Filter>소스 파일\Core\Render API\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="MissingScriptBehaviour.cpp">
+      <Filter>소스 파일\Core\Behaviour API\ScriptLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptBehaviour.cpp">
+      <Filter>소스 파일\Core\Behaviour API\ScriptLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptLoader.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

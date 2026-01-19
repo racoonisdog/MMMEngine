@@ -345,6 +345,7 @@
     <ClInclude Include="SceneRef.h" />
     <ClInclude Include="SceneSerializer.h" />
     <ClInclude Include="ScriptBehaviour.h" />
+    <ClInclude Include="ScriptLoader.h" />
     <ClInclude Include="SerializableEvent.h" />
     <ClInclude Include="VSShader.h" />
     <ClInclude Include="Singleton.hpp" />
@@ -422,6 +423,7 @@
     <ClCompile Include="ScriptBehaviour.cpp" />
     <ClCompile Include="VShader.cpp" />
     <ClCompile Include="SkyboxRenderer.cpp" />
+    <ClCompile Include="ScriptLoader.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="TimeManager.cpp">
