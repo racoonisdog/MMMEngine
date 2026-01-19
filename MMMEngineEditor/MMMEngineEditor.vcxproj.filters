@@ -46,6 +46,12 @@
     <Filter Include="헤더 파일\EditorWindow\ForEditorContext">
       <UniqueIdentifier>{ec4962c3-a422-4040-bc15-fd4c8e4c2f6b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Build">
+      <UniqueIdentifier>{af116535-42b3-4225-b0e2-bcdc5228a987}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Build">
+      <UniqueIdentifier>{fad277f4-86f5-4186-b6b1-24ebde931458}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorRegistry.h">
@@ -102,6 +108,9 @@
     <ClInclude Include="StartUpProjectWindow.h">
       <Filter>헤더 파일\EditorWindow</Filter>
     </ClInclude>
+    <ClInclude Include="BuildManager.h">
+      <Filter>헤더 파일\Build</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -148,6 +157,9 @@
     </ClCompile>
     <ClCompile Include="StartUpProjectWindow.cpp">
       <Filter>소스 파일\EditorWIndow</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildManager.cpp">
+      <Filter>소스 파일\Project</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

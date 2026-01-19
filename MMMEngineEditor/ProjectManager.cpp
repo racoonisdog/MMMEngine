@@ -201,8 +201,8 @@ namespace MMMEngine
 }
 )";
 
-        fs::path file = scriptsDir / "ExampleBehaviour.cpp";
-        std::ofstream out2(file, std::ios::binary);
+        fs::path file2 = scriptsDir / "ExampleBehaviour.cpp";
+        std::ofstream out2(file2, std::ios::binary);
         if (!out2) return;
 
         // NOTE: ScriptBehaviour.h include는 vcxproj의 AdditionalIncludeDirectories에 의해 해결된다고 가정
@@ -253,13 +253,15 @@ void MMMEngine::ExampleBehaviour::Update()
 
         // fallback
         std::string engineSharedInclude = R"($(ProjectDir)..\..\..\MMMEngineShared)";
-        std::string engineSharedLibDir = R"($(ProjectDir)..\..\..\X64\Debug)";
+        std::string engineSharedDebugLibDir = R"($(ProjectDir)..\..\..\X64\Debug)";
+        std::string engineSharedReleaseLibDir = R"($(ProjectDir)..\..\..\X64\Release)";
         std::string engineSharedLibName = "EngineShared.lib";
 
         if (!engineDir.empty())
         {
             engineSharedInclude = engineDir + R"(\MMMEngineShared\)";
-            engineSharedLibDir = engineDir + R"(\X64\Debug)";
+            engineSharedDebugLibDir = engineDir + R"(\X64\Debug)";
+            engineSharedReleaseLibDir = engineDir + R"(\X64\Debug)";
         }
 
         std::ofstream out(vcxprojPath, std::ios::binary);
@@ -344,7 +346,7 @@ void MMMEngine::ExampleBehaviour::Update()
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>)xml" << engineSharedLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>)xml" << engineSharedDebugLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -362,7 +364,7 @@ void MMMEngine::ExampleBehaviour::Update()
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>)xml" << engineSharedLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>)xml" << engineSharedReleaseLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

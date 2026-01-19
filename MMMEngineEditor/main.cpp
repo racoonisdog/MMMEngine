@@ -14,6 +14,7 @@
 #include "ObjectManager.h"
 #include "ProjectManager.h"
 
+#include "StringHelper.h"
 #include "ImGuiEditorContext.h"
 
 using namespace MMMEngine;
@@ -38,6 +39,7 @@ void Initialize()
 		// 존재하는 경우 씬을 처음으로 스타트
 		auto currentProject = ProjectManager::Get().GetActiveProject();
 		SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", currentProject.lastSceneIndex, true);
+		app->SetWindowTitle(L"MMMEditor [ " + Utility::StringHelper::StringToWString(currentProject.rootPath) + L" ]");
 	}
 
 	ObjectManager::Get().StartUp();
@@ -66,6 +68,7 @@ void Update_ProjectNotLoaded()
 	{
 		auto currentProject = ProjectManager::Get().GetActiveProject();
 		SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", 0, true);
+		GlobalRegistry::g_pApp->SetWindowTitle(L"MMMEditor [ " + Utility::StringHelper::StringToWString(currentProject.rootPath) + L" ]");
 		return;
 	}
 }
