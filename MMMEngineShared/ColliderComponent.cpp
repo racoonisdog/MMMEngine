@@ -1,4 +1,5 @@
 #include "ColliderComponent.h"
+#include "RigidBodyComponent.h"
 
 
 void MMMEngine::ColliderComponent::ApplySceneQueryFlag()
@@ -13,6 +14,7 @@ void MMMEngine::ColliderComponent::ApplySceneQueryFlag()
     m_Shape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, query);
 }
 
+//*** 레이어 규칙 변경했는데 즉시 반영이 안된다면 여기를 건드리기
 void MMMEngine::ColliderComponent::ApplyFilterData()
 {
     if (!m_Shape) return;
@@ -55,6 +57,7 @@ void MMMEngine::ColliderComponent::ApplyShapeModeFlags()
 }
 
 
+//Trigger가 Scene Query에서 기본적으로 빠지는 정책인 상태 아니면 여기 수정
 void MMMEngine::ColliderComponent::SetShapeMode(ShapeMode mode)
 {
     m_Mode = mode;

@@ -158,7 +158,9 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="Behaviour.h" />
+    <ClInclude Include="CapsuleColliderComponent.h" />
     <ClInclude Include="ColliderComponent.h" />
+    <ClInclude Include="CollisionMatrix.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Delegates.hpp" />
     <ClInclude Include="DisplayMode.h" />
@@ -192,6 +194,7 @@
     <ClInclude Include="MMMResources.h" />
     <ClInclude Include="MMMSceneManagement.h" />
     <ClInclude Include="MMMScreen.h" />
+    <ClInclude Include="ModelColliderComponent.h" />
     <ClInclude Include="MUID.h" />
     <ClInclude Include="InputConstant.h" />
     <ClInclude Include="InputKeyCode.h" />
@@ -362,16 +365,19 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Behaviour.cpp" />
     <ClCompile Include="BehaviourManger.cpp" />
+    <ClCompile Include="CapsuleColliderComponent.cpp" />
     <ClCompile Include="ColliderComponent.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="CollisionMatrix.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="dxtk\Src\SimpleMath.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalRegistry.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="MissingScriptBehaviour.cpp" />
+    <ClCompile Include="ModelColliderComponent.cpp" />
     <ClCompile Include="MUID.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />

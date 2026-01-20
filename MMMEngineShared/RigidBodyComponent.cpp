@@ -2,6 +2,10 @@
 #include "PhysXHelper.h"
 #include "Transform.h"
 #include "rttr/registration"
+#include "ColliderComponent.h"
+#include "GameObject.h"
+#include "SceneManager.h"
+#include "PhysX.h"
 
 RTTR_REGISTRATION
 {
@@ -55,6 +59,13 @@ void MMMEngine::RigidBodyComponent::CreateActor(physx::PxPhysics* physics, Vecto
 	if (auto* t_dynamic = m_Actor->is<physx::PxRigidDynamic>()) {
 		physx::PxRigidBodyExt::updateMassAndInertia(*t_dynamic, m_Desc.mass);
 	}
+}
+
+//component자신을 Scene를 통해 physScene에 등록하는 용도의 init
+void MMMEngine::RigidBodyComponent::Initialize()
+{
+	//SceneManager::Get().GetSceneRaw(GetGameObject()->GetScene())->GetPhysScene().RegisterRigid(this, PhysicX::Get());
+	//physManager::Get()->GetPhysScene().RegisterRigid(this, PhysicX::Get());
 }
 
 void MMMEngine::RigidBodyComponent::OnDestroy()

@@ -1,1003 +1,283 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="RTTR">
-      <UniqueIdentifier>{be47c0d1-f6ff-43df-8903-3cb95045af8e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Header">
-      <UniqueIdentifier>{e71d7841-59f2-49f9-be3a-221f95f1b475}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Source">
-      <UniqueIdentifier>{93c4dafc-25d9-4843-8d70-be5cb7a88b9d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail">
-      <UniqueIdentifier>{e91c32bc-6edd-48a1-bffb-4a29d9e1bf83}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Base">
-      <UniqueIdentifier>{c82bb520-2201-4d88-a220-dc833cf288b2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Comparison">
-      <UniqueIdentifier>{6016a758-718b-4758-b428-8c7d194fed9c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Constructor">
-      <UniqueIdentifier>{f0c97e93-3ccc-49cd-a1ae-1ae2ad1cdcc1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Conversion">
-      <UniqueIdentifier>{88a4858c-6249-4fb5-8f9d-01fcbaebc6ae}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\DefaultArguments">
-      <UniqueIdentifier>{176c632f-05c3-4a95-b753-ebf5d150eea8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Destructor">
-      <UniqueIdentifier>{2a706375-0be9-43cf-88a4-e3c1b2995a02}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Enumeration">
-      <UniqueIdentifier>{4f987260-50c9-4958-b2af-3a5193a1bfd1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Filter">
-      <UniqueIdentifier>{52a3d4ea-832b-40d8-a10d-510ba0bcd13b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Impl">
-      <UniqueIdentifier>{a559d2c7-4c08-463b-848f-e32574b3420e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Library">
-      <UniqueIdentifier>{8c9e8b6f-5593-4e34-af5a-a3f69a1066de}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Metadata">
-      <UniqueIdentifier>{c458a42c-0345-47cc-9012-152cab9efe28}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Method">
-      <UniqueIdentifier>{2e39eefa-90c5-49f1-814e-20a0c6db3adb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Misc">
-      <UniqueIdentifier>{6c7702bf-0958-41e4-9d5d-47c957fcfc22}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\ParameterInfo">
-      <UniqueIdentifier>{c940f63d-e95f-4bc5-8188-4b57cdfcc674}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Policies">
-      <UniqueIdentifier>{4865714e-404c-454a-9f49-635725e66172}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Property">
-      <UniqueIdentifier>{0f598998-0505-4182-857e-88b644876430}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Registration">
-      <UniqueIdentifier>{1cf6d45b-b27f-4e97-974a-3060bcd09e28}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Type">
-      <UniqueIdentifier>{0d17755f-62e9-4dd7-ba97-d4c415eb5b20}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\Variant">
-      <UniqueIdentifier>{b1599867-852f-4380-9bd9-8017a31473ed}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\VariantAssociativeView">
-      <UniqueIdentifier>{dbb92958-e5b7-4fef-bee3-7659a0e3ef92}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="RTTR\Detail\VariantSequentialView">
-      <UniqueIdentifier>{3a03b383-9339-4182-8dc3-a4d941d8604d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core">
-      <UniqueIdentifier>{6e95a25c-97cb-4986-92fc-2c2c159e1884}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Object API">
-      <UniqueIdentifier>{15f04ef4-0d77-4cbb-b82e-1ebeb228d8f0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core">
-      <UniqueIdentifier>{b7472de8-e436-4e0f-bfe7-6d4d1a14f463}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Object API">
-      <UniqueIdentifier>{30f2f91b-60c1-4b27-b369-eeb01b79f5f5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Utility">
-      <UniqueIdentifier>{6bbd6fd2-454b-4946-89b5-785f6376765a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Utility">
-      <UniqueIdentifier>{bb817747-9bed-4c9b-9d18-d3727af467be}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DXTK">
-      <UniqueIdentifier>{c1f31de4-7de7-4812-9d2f-5225d890f3e4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DXTK\Src">
-      <UniqueIdentifier>{22a3ca23-ec10-4a58-9d4d-c71761373146}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DXTK\Inc">
-      <UniqueIdentifier>{d2942064-b39a-40f4-86b6-3aa64d93dc96}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Resource API">
-      <UniqueIdentifier>{9429d884-7bed-4e3a-8a66-6736b614e7c7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Scene API">
-      <UniqueIdentifier>{f41342cf-51ab-49c1-a516-6aa1444b9872}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Input API">
-      <UniqueIdentifier>{0541079b-0c19-4d7d-9149-a84c89ebef56}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Input API">
-      <UniqueIdentifier>{a1c10f2f-8f28-4dd3-a335-a9ab53d1d169}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Time API">
-      <UniqueIdentifier>{92e9c672-6b84-46be-8699-a0b5f3f8e686}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Time API">
-      <UniqueIdentifier>{dc3fa110-e47b-42bb-905e-25c4efa41aaa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Application API">
-      <UniqueIdentifier>{8cb218df-594c-49d2-9e63-218696dadb13}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Global Registry">
-      <UniqueIdentifier>{93651194-ba3a-4e45-bd12-1fd240cc5473}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Screen API">
-      <UniqueIdentifier>{63578d04-b180-4852-ad1b-7bb967344042}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Common">
-      <UniqueIdentifier>{e296e3ca-bfb6-4f05-a670-78d6d9a801f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Behaviour API">
-      <UniqueIdentifier>{ef8554e5-7448-4e9f-9aab-845d6bd3c5bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Behaviour API">
-      <UniqueIdentifier>{a2261ff3-b7f4-480e-9137-39b33451370d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Resource API">
-      <UniqueIdentifier>{b4e5e7a3-5660-4bc1-8594-1f4c1e227717}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\GlobalRegistry">
-      <UniqueIdentifier>{217c690e-d5d9-466a-adc0-74b9d1005041}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Resource API\Importer">
-      <UniqueIdentifier>{39633105-b094-4f7f-b6a0-edf4b5acd602}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Scene API">
-      <UniqueIdentifier>{46632266-5bac-4656-8d00-478461ab2139}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Utility\RTTRRegistry">
-      <UniqueIdentifier>{72b6886a-0c46-4ae0-8d62-ce00537cd485}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Render API">
-      <UniqueIdentifier>{4061a8ff-da13-4a20-936b-e46a125b386b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Render API">
-      <UniqueIdentifier>{043cb42d-6ea4-4e75-85eb-9a7d6b03d0cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\PhysxAPI">
-      <UniqueIdentifier>{72f6366c-4f87-41f8-8207-373d4c5918ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\PhysxAPI\Component">
-      <UniqueIdentifier>{51048f6b-6da5-42ca-b52b-57bbf10e4d29}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\PhysxAPI">
-      <UniqueIdentifier>{b5c40fdb-529b-4cec-83da-68a39d56a1ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\PhysxAPI\Component">
-      <UniqueIdentifier>{ba214d60-d531-4a50-a0e6-3ca1e47ee9f8}</UniqueIdentifier>
-    <Filter Include="헤더 파일\Core\Behaviour API\ScriptLoader">
-      <UniqueIdentifier>{26e64790-fb4f-41a4-ab03-f82ee13aa8ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Behaviour API\ScriptLoader">
-      <UniqueIdentifier>{ac9c3fcd-296c-4781-9f20-4ea519460450}</UniqueIdentifier>
-    </Filter>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="Behaviour.cpp" />
+    <ClCompile Include="BehaviourManger.cpp" />
+    <ClCompile Include="ColliderComponent.cpp" />
+    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="dxtk\Src\SimpleMath.cpp" />
+    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GlobalRegistry.cpp" />
+    <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="MissingScriptBehaviour.cpp" />
+    <ClCompile Include="MUID.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="PhysicsEventCallback.cpp" />
+    <ClCompile Include="PhysicsFilter.cpp" />
+    <ClCompile Include="PhysScene.cpp" />
+    <ClCompile Include="PhysX.cpp" />
+    <ClCompile Include="PhysxHelper.cpp" />
+    <ClCompile Include="PhysxManager.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="Resource.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="RigidBodyComponent.cpp" />
+    <ClCompile Include="rttr\constructor.cpp" />
+    <ClCompile Include="rttr\destructor.cpp" />
+    <ClCompile Include="rttr\detail\comparison\compare_equal.cpp" />
+    <ClCompile Include="rttr\detail\comparison\compare_less.cpp" />
+    <ClCompile Include="rttr\detail\constructor\constructor_wrapper_base.cpp" />
+    <ClCompile Include="rttr\detail\conversion\std_conversion_functions.cpp" />
+    <ClCompile Include="rttr\detail\destructor\destructor_wrapper_base.cpp" />
+    <ClCompile Include="rttr\detail\enumeration\enumeration_helper.cpp" />
+    <ClCompile Include="rttr\detail\enumeration\enumeration_wrapper_base.cpp" />
+    <ClCompile Include="rttr\detail\library\library_unix.cpp" />
+    <ClCompile Include="rttr\detail\library\library_win.cpp" />
+    <ClCompile Include="rttr\detail\method\method_wrapper_base.cpp" />
+    <ClCompile Include="rttr\detail\misc\standard_types.cpp" />
+    <ClCompile Include="rttr\detail\parameter_info\parameter_info_wrapper_base.cpp" />
+    <ClCompile Include="rttr\detail\property\property_wrapper_base.cpp" />
+    <ClCompile Include="rttr\detail\registration\registration_executer.cpp" />
+    <ClCompile Include="rttr\detail\registration\registration_state_saver.cpp" />
+    <ClCompile Include="rttr\detail\type\type_data.cpp" />
+    <ClCompile Include="rttr\detail\type\type_register.cpp" />
+    <ClCompile Include="rttr\detail\variant\variant_compare.cpp" />
+    <ClCompile Include="rttr\enumeration.cpp" />
+    <ClCompile Include="rttr\library.cpp" />
+    <ClCompile Include="rttr\method.cpp" />
+    <ClCompile Include="rttr\parameter_info.cpp" />
+    <ClCompile Include="rttr\policy.cpp" />
+    <ClCompile Include="rttr\property.cpp" />
+    <ClCompile Include="rttr\registration.cpp" />
+    <ClCompile Include="rttr\type.cpp" />
+    <ClCompile Include="rttr\variant.cpp" />
+    <ClCompile Include="rttr\variant_associative_view.cpp" />
+    <ClCompile Include="rttr\variant_sequential_view.cpp" />
+    <ClCompile Include="rttr_directxmath_registry.cpp" />
+    <ClCompile Include="rttr_simplemath_registry.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneSerializer.cpp" />
+    <ClCompile Include="ScriptBehaviour.cpp" />
+    <ClCompile Include="ScriptLoader.cpp" />
+    <ClCompile Include="StringHelper.cpp" />
+    <ClCompile Include="TimeManager.cpp" />
+    <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="CapsuleColliderComponent.cpp" />
+    <ClCompile Include="ModelColliderComponent.cpp" />
+    <ClCompile Include="CollisionMatrix.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="rttr\access_levels.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\argument.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\array_range.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\associative_mapper.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\constructor.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\destructor.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\enum_flags.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\enumeration.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\filter_item.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\instance.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\library.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\method.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\parameter_info.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\policy.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\property.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\registration.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\registration_friend.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\rttr_cast.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\rttr_enable.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\sequential_mapper.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\string_view.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\type.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\variant.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\variant_associative_view.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\variant_sequential_view.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\wrapper_mapper.h">
-      <Filter>RTTR\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\base\core_prerequisites.h">
-      <Filter>RTTR\Detail\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\base\version.h">
-      <Filter>RTTR\Detail\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\comparison\comparable_types.h">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\comparison\compare_array_equal.h">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\comparison\compare_array_equal_impl.h">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\comparison\compare_array_less.h">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\comparison\compare_array_less_impl.h">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\comparison\compare_equal.h">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\comparison\compare_equal_impl.h">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\comparison\compare_less.h">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\comparison\compare_less_impl.h">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\constructor\constructor_invoker.h">
-      <Filter>RTTR\Detail\Constructor</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\constructor\constructor_wrapper.h">
-      <Filter>RTTR\Detail\Constructor</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\constructor\constructor_wrapper_base.h">
-      <Filter>RTTR\Detail\Constructor</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\constructor\constructor_wrapper_defaults.h">
-      <Filter>RTTR\Detail\Constructor</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\conversion\number_conversion.h">
-      <Filter>RTTR\Detail\Conversion</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\conversion\std_conversion_functions.h">
-      <Filter>RTTR\Detail\Conversion</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\default_arguments\default_arguments.h">
-      <Filter>RTTR\Detail\DefaultArguments</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\default_arguments\invoke_with_defaults.h">
-      <Filter>RTTR\Detail\DefaultArguments</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\destructor\destructor_wrapper.h">
-      <Filter>RTTR\Detail\Destructor</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\destructor\destructor_wrapper_base.h">
-      <Filter>RTTR\Detail\Destructor</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\enumeration\enum_data.h">
-      <Filter>RTTR\Detail\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\enumeration\enumeration_helper.h">
-      <Filter>RTTR\Detail\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\enumeration\enumeration_wrapper.h">
-      <Filter>RTTR\Detail\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\enumeration\enumeration_wrapper_base.h">
-      <Filter>RTTR\Detail\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\filter\filter_item_funcs.h">
-      <Filter>RTTR\Detail\Filter</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\impl\argument_impl.h">
-      <Filter>RTTR\Detail\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\impl\array_range_impl.h">
-      <Filter>RTTR\Detail\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\impl\associative_mapper_impl.h">
-      <Filter>RTTR\Detail\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\impl\enum_flags_impl.h">
-      <Filter>RTTR\Detail\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\impl\instance_impl.h">
-      <Filter>RTTR\Detail\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\impl\rttr_cast_impl.h">
-      <Filter>RTTR\Detail\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\impl\sequential_mapper_impl.h">
-      <Filter>RTTR\Detail\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\impl\string_view_impl.h">
-      <Filter>RTTR\Detail\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\impl\wrapper_mapper_impl.h">
-      <Filter>RTTR\Detail\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\library\library_p.h">
-      <Filter>RTTR\Detail\Library</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\metadata\metadata.h">
-      <Filter>RTTR\Detail\Metadata</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\metadata\metadata_handler.h">
-      <Filter>RTTR\Detail\Metadata</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\method\method_accessor.h">
-      <Filter>RTTR\Detail\Method</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\method\method_invoker.h">
-      <Filter>RTTR\Detail\Method</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\method\method_wrapper.h">
-      <Filter>RTTR\Detail\Method</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\method\method_wrapper_base.h">
-      <Filter>RTTR\Detail\Method</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\argument_extractor.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\argument_wrapper.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\class_item_mapper.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\data_address_container.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\flat_map.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\flat_multimap.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\function_traits.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\iterator_wrapper.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\misc_type_traits.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\register_wrapper_mapper_conversion.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\sequential_container_type_traits.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\std_type_traits.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\template_type_trait.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\template_type_trait_impl.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\misc\utility.h">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\parameter_info\parameter_info_wrapper.h">
-      <Filter>RTTR\Detail\ParameterInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\parameter_info\parameter_info_wrapper_base.h">
-      <Filter>RTTR\Detail\ParameterInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\parameter_info\parameter_infos.h">
-      <Filter>RTTR\Detail\ParameterInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\parameter_info\parameter_infos_compare.h">
-      <Filter>RTTR\Detail\ParameterInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\parameter_info\parameter_names.h">
-      <Filter>RTTR\Detail\ParameterInfo</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\policies\ctor_policies.h">
-      <Filter>RTTR\Detail\Policies</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\policies\meth_policies.h">
-      <Filter>RTTR\Detail\Policies</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\policies\prop_policies.h">
-      <Filter>RTTR\Detail\Policies</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\property\property_accessor.h">
-      <Filter>RTTR\Detail\Property</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\property\property_wrapper.h">
-      <Filter>RTTR\Detail\Property</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\property\property_wrapper_base.h">
-      <Filter>RTTR\Detail\Property</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\property\property_wrapper_func.h">
-      <Filter>RTTR\Detail\Property</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\property\property_wrapper_member_func.h">
-      <Filter>RTTR\Detail\Property</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\property\property_wrapper_member_object.h">
-      <Filter>RTTR\Detail\Property</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\property\property_wrapper_object.h">
-      <Filter>RTTR\Detail\Property</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\registration\bind_impl.h">
-      <Filter>RTTR\Detail\Registration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\registration\bind_types.h">
-      <Filter>RTTR\Detail\Registration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\registration\register_base_class_from_accessor.h">
-      <Filter>RTTR\Detail\Registration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\registration\registration_executer.h">
-      <Filter>RTTR\Detail\Registration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\registration\registration_impl.h">
-      <Filter>RTTR\Detail\Registration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\registration\registration_manager.h">
-      <Filter>RTTR\Detail\Registration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\registration\registration_state_saver.h">
-      <Filter>RTTR\Detail\Registration</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\accessor_type.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\base_classes.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\get_create_variant_func.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\get_derived_info_func.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\type_comparator.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\type_converter.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\type_data.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\type_impl.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\type_name.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\type_register.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\type_register_p.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\type\type_string_utils.h">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant\variant_compare.h">
-      <Filter>RTTR\Detail\Variant</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant\variant_data.h">
-      <Filter>RTTR\Detail\Variant</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant\variant_data_converter.h">
-      <Filter>RTTR\Detail\Variant</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant\variant_data_policy.h">
-      <Filter>RTTR\Detail\Variant</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant\variant_impl.h">
-      <Filter>RTTR\Detail\Variant</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant_associative_view\variant_associative_view_creator.h">
-      <Filter>RTTR\Detail\VariantAssociativeView</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant_associative_view\variant_associative_view_creator_impl.h">
-      <Filter>RTTR\Detail\VariantAssociativeView</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant_associative_view\variant_associative_view_private.h">
-      <Filter>RTTR\Detail\VariantAssociativeView</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant_sequential_view\variant_sequential_view_creator.h">
-      <Filter>RTTR\Detail\VariantSequentialView</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant_sequential_view\variant_sequential_view_creator_impl.h">
-      <Filter>RTTR\Detail\VariantSequentialView</Filter>
-    </ClInclude>
-    <ClInclude Include="rttr\detail\variant_sequential_view\variant_sequential_view_private.h">
-      <Filter>RTTR\Detail\VariantSequentialView</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>헤더 파일\Core\Object API</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectManager.h">
-      <Filter>헤더 파일\Core\Object API</Filter>
-    </ClInclude>
-    <ClInclude Include="Delegates.hpp">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="MUID.h">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Singleton.hpp">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\Audio.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\BufferHelpers.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\CommonStates.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\DDSTextureLoader.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\DirectXHelpers.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\Effects.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\GamePad.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\GeometricPrimitive.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\GraphicsMemory.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\Keyboard.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\Model.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\Mouse.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\PostProcess.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\PrimitiveBatch.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\ScreenGrab.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\SimpleMath.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\SpriteBatch.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\SpriteFont.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\VertexTypes.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\WICTextureLoader.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="dxtk\Inc\XboxDDSTextureLoader.h">
-      <Filter>DXTK\Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="StringHelper.h">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>헤더 파일\Core\Input API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMInput.h">
-      <Filter>헤더 파일\Core\Input API</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeManager.h">
-      <Filter>헤더 파일\Core\Time API</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>헤더 파일\Core\Resource API</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>헤더 파일\Core\Resource API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMTime.h">
-      <Filter>헤더 파일\Core\Time API</Filter>
-    </ClInclude>
-    <ClInclude Include="InputKeyCode.h">
-      <Filter>헤더 파일\Core\Input API</Filter>
-    </ClInclude>
-    <ClInclude Include="InputConstant.h">
-      <Filter>헤더 파일\Core\Input API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMApplication.h">
-      <Filter>헤더 파일\Core\Application API</Filter>
-    </ClInclude>
-    <ClInclude Include="App.h">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalRegistry.h">
-      <Filter>헤더 파일\Core\Global Registry</Filter>
-    </ClInclude>
-    <ClInclude Include="SerializableEvent.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>헤더 파일\Core\Scene API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMResources.h">
-      <Filter>헤더 파일\Core\Resource API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMScreen.h">
-      <Filter>헤더 파일\Core\Screen API</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneManager.h">
-      <Filter>헤더 파일\Core\Scene API</Filter>
-    </ClInclude>
-    <ClInclude Include="Resolution.h">
-      <Filter>헤더 파일\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="DisplayMode.h">
-      <Filter>헤더 파일\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Behaviour.h">
-      <Filter>헤더 파일\Core\Behaviour API</Filter>
-    </ClInclude>
-    <ClInclude Include="BehaviourManager.h">
-      <Filter>헤더 파일\Core\Behaviour API</Filter>
-    </ClInclude>
-    <ClInclude Include="Export.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ExportSingleton.hpp">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneRef.h">
-      <Filter>헤더 파일\Core\Scene API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMSceneManagement.h">
-      <Filter>헤더 파일\Core\Scene API</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneSerializer.h">
-      <Filter>헤더 파일\Core\Scene API</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderManager.h">
-      <Filter>헤더 파일\Core\Render API</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>헤더 파일\Core\Render API</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderQueue.h">
-      <Filter>헤더 파일\Core\Render API</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderCommand.h">
-      <Filter>헤더 파일\Core\Render API</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysX.h">
-      <Filter>헤더 파일\Core\PhysxAPI</Filter>
-    </ClInclude>
-    <ClInclude Include="RigidBodyComponent.h">
-      <Filter>헤더 파일\Core\PhysxAPI\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysxHelper.h">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="ColliderComponent.h">
-      <Filter>헤더 파일\Core\PhysxAPI\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysxManager.h">
-      <Filter>헤더 파일\Core\PhysxAPI</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsEventCallback.h">
-      <Filter>헤더 파일\Core\PhysxAPI</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysScene.h">
-      <Filter>헤더 파일\Core\PhysxAPI</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsFilter.h">
-      <Filter>헤더 파일\Core\PhysxAPI</Filter>
-	</ClInclude>
-    <ClInclude Include="ScriptBehaviour.h">
-      <Filter>헤더 파일\Core\Behaviour API\ScriptLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="MissingScriptBehaviour.h">
-      <Filter>헤더 파일\Core\Behaviour API\ScriptLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="ScriptLoader.h">
-      <Filter>헤더 파일\Core\Behaviour API\ScriptLoader</Filter>
-    </ClInclude>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="Behaviour.h" />
+    <ClInclude Include="ColliderComponent.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="Delegates.hpp" />
+    <ClInclude Include="DisplayMode.h" />
+    <ClInclude Include="dxtk\Inc\Audio.h" />
+    <ClInclude Include="dxtk\Inc\BufferHelpers.h" />
+    <ClInclude Include="dxtk\Inc\CommonStates.h" />
+    <ClInclude Include="dxtk\Inc\DDSTextureLoader.h" />
+    <ClInclude Include="dxtk\Inc\DirectXHelpers.h" />
+    <ClInclude Include="dxtk\Inc\Effects.h" />
+    <ClInclude Include="dxtk\Inc\GamePad.h" />
+    <ClInclude Include="dxtk\Inc\GeometricPrimitive.h" />
+    <ClInclude Include="dxtk\Inc\GraphicsMemory.h" />
+    <ClInclude Include="dxtk\Inc\Keyboard.h" />
+    <ClInclude Include="dxtk\Inc\Model.h" />
+    <ClInclude Include="dxtk\Inc\Mouse.h" />
+    <ClInclude Include="dxtk\Inc\PostProcess.h" />
+    <ClInclude Include="dxtk\Inc\PrimitiveBatch.h" />
+    <ClInclude Include="dxtk\Inc\ScreenGrab.h" />
+    <ClInclude Include="dxtk\Inc\SimpleMath.h" />
+    <ClInclude Include="dxtk\Inc\SpriteBatch.h" />
+    <ClInclude Include="dxtk\Inc\SpriteFont.h" />
+    <ClInclude Include="dxtk\Inc\VertexTypes.h" />
+    <ClInclude Include="dxtk\Inc\WICTextureLoader.h" />
+    <ClInclude Include="dxtk\Inc\XboxDDSTextureLoader.h" />
+    <ClInclude Include="Export.h" />
+    <ClInclude Include="ExportSingleton.hpp" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GlobalRegistry.h" />
+    <ClInclude Include="MissingScriptBehaviour.h" />
+    <ClInclude Include="MMMApplication.h" />
+    <ClInclude Include="MMMResources.h" />
+    <ClInclude Include="MMMSceneManagement.h" />
+    <ClInclude Include="MMMScreen.h" />
+    <ClInclude Include="MUID.h" />
+    <ClInclude Include="InputConstant.h" />
+    <ClInclude Include="InputKeyCode.h" />
+    <ClInclude Include="MMMInput.h" />
+    <ClInclude Include="InputManager.h" />
+    <ClInclude Include="PhysicsEventCallback.h" />
+    <ClInclude Include="PhysicsFilter.h" />
+    <ClInclude Include="PhysScene.h" />
+    <ClInclude Include="PhysX.h" />
+    <ClInclude Include="PhysxHelper.h" />
+    <ClInclude Include="PhysxManager.h" />
+    <ClInclude Include="RenderCommand.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="RenderQueue.h" />
+    <ClInclude Include="Resolution.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="MMMTime.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="RigidBodyComponent.h" />
+    <ClInclude Include="rttr\access_levels.h" />
+    <ClInclude Include="rttr\argument.h" />
+    <ClInclude Include="rttr\array_range.h" />
+    <ClInclude Include="rttr\associative_mapper.h" />
+    <ClInclude Include="rttr\constructor.h" />
+    <ClInclude Include="rttr\destructor.h" />
+    <ClInclude Include="rttr\detail\base\core_prerequisites.h" />
+    <ClInclude Include="rttr\detail\base\version.h" />
+    <ClInclude Include="rttr\detail\comparison\comparable_types.h" />
+    <ClInclude Include="rttr\detail\comparison\compare_array_equal.h" />
+    <ClInclude Include="rttr\detail\comparison\compare_array_equal_impl.h" />
+    <ClInclude Include="rttr\detail\comparison\compare_array_less.h" />
+    <ClInclude Include="rttr\detail\comparison\compare_array_less_impl.h" />
+    <ClInclude Include="rttr\detail\comparison\compare_equal.h" />
+    <ClInclude Include="rttr\detail\comparison\compare_equal_impl.h" />
+    <ClInclude Include="rttr\detail\comparison\compare_less.h" />
+    <ClInclude Include="rttr\detail\comparison\compare_less_impl.h" />
+    <ClInclude Include="rttr\detail\constructor\constructor_invoker.h" />
+    <ClInclude Include="rttr\detail\constructor\constructor_wrapper.h" />
+    <ClInclude Include="rttr\detail\constructor\constructor_wrapper_base.h" />
+    <ClInclude Include="rttr\detail\constructor\constructor_wrapper_defaults.h" />
+    <ClInclude Include="rttr\detail\conversion\number_conversion.h" />
+    <ClInclude Include="rttr\detail\conversion\std_conversion_functions.h" />
+    <ClInclude Include="rttr\detail\default_arguments\default_arguments.h" />
+    <ClInclude Include="rttr\detail\default_arguments\invoke_with_defaults.h" />
+    <ClInclude Include="rttr\detail\destructor\destructor_wrapper.h" />
+    <ClInclude Include="rttr\detail\destructor\destructor_wrapper_base.h" />
+    <ClInclude Include="rttr\detail\enumeration\enumeration_helper.h" />
+    <ClInclude Include="rttr\detail\enumeration\enumeration_wrapper.h" />
+    <ClInclude Include="rttr\detail\enumeration\enumeration_wrapper_base.h" />
+    <ClInclude Include="rttr\detail\enumeration\enum_data.h" />
+    <ClInclude Include="rttr\detail\filter\filter_item_funcs.h" />
+    <ClInclude Include="rttr\detail\impl\argument_impl.h" />
+    <ClInclude Include="rttr\detail\impl\array_range_impl.h" />
+    <ClInclude Include="rttr\detail\impl\associative_mapper_impl.h" />
+    <ClInclude Include="rttr\detail\impl\enum_flags_impl.h" />
+    <ClInclude Include="rttr\detail\impl\instance_impl.h" />
+    <ClInclude Include="rttr\detail\impl\rttr_cast_impl.h" />
+    <ClInclude Include="rttr\detail\impl\sequential_mapper_impl.h" />
+    <ClInclude Include="rttr\detail\impl\string_view_impl.h" />
+    <ClInclude Include="rttr\detail\impl\wrapper_mapper_impl.h" />
+    <ClInclude Include="rttr\detail\library\library_p.h" />
+    <ClInclude Include="rttr\detail\metadata\metadata.h" />
+    <ClInclude Include="rttr\detail\metadata\metadata_handler.h" />
+    <ClInclude Include="rttr\detail\method\method_accessor.h" />
+    <ClInclude Include="rttr\detail\method\method_invoker.h" />
+    <ClInclude Include="rttr\detail\method\method_wrapper.h" />
+    <ClInclude Include="rttr\detail\method\method_wrapper_base.h" />
+    <ClInclude Include="rttr\detail\misc\argument_extractor.h" />
+    <ClInclude Include="rttr\detail\misc\argument_wrapper.h" />
+    <ClInclude Include="rttr\detail\misc\class_item_mapper.h" />
+    <ClInclude Include="rttr\detail\misc\data_address_container.h" />
+    <ClInclude Include="rttr\detail\misc\flat_map.h" />
+    <ClInclude Include="rttr\detail\misc\flat_multimap.h" />
+    <ClInclude Include="rttr\detail\misc\function_traits.h" />
+    <ClInclude Include="rttr\detail\misc\iterator_wrapper.h" />
+    <ClInclude Include="rttr\detail\misc\misc_type_traits.h" />
+    <ClInclude Include="rttr\detail\misc\register_wrapper_mapper_conversion.h" />
+    <ClInclude Include="rttr\detail\misc\sequential_container_type_traits.h" />
+    <ClInclude Include="rttr\detail\misc\std_type_traits.h" />
+    <ClInclude Include="rttr\detail\misc\template_type_trait.h" />
+    <ClInclude Include="rttr\detail\misc\template_type_trait_impl.h" />
+    <ClInclude Include="rttr\detail\misc\utility.h" />
+    <ClInclude Include="rttr\detail\parameter_info\parameter_infos.h" />
+    <ClInclude Include="rttr\detail\parameter_info\parameter_infos_compare.h" />
+    <ClInclude Include="rttr\detail\parameter_info\parameter_info_wrapper.h" />
+    <ClInclude Include="rttr\detail\parameter_info\parameter_info_wrapper_base.h" />
+    <ClInclude Include="rttr\detail\parameter_info\parameter_names.h" />
+    <ClInclude Include="rttr\detail\policies\ctor_policies.h" />
+    <ClInclude Include="rttr\detail\policies\meth_policies.h" />
+    <ClInclude Include="rttr\detail\policies\prop_policies.h" />
+    <ClInclude Include="rttr\detail\property\property_accessor.h" />
+    <ClInclude Include="rttr\detail\property\property_wrapper.h" />
+    <ClInclude Include="rttr\detail\property\property_wrapper_base.h" />
+    <ClInclude Include="rttr\detail\property\property_wrapper_func.h" />
+    <ClInclude Include="rttr\detail\property\property_wrapper_member_func.h" />
+    <ClInclude Include="rttr\detail\property\property_wrapper_member_object.h" />
+    <ClInclude Include="rttr\detail\property\property_wrapper_object.h" />
+    <ClInclude Include="rttr\detail\registration\bind_impl.h" />
+    <ClInclude Include="rttr\detail\registration\bind_types.h" />
+    <ClInclude Include="rttr\detail\registration\register_base_class_from_accessor.h" />
+    <ClInclude Include="rttr\detail\registration\registration_executer.h" />
+    <ClInclude Include="rttr\detail\registration\registration_impl.h" />
+    <ClInclude Include="rttr\detail\registration\registration_manager.h" />
+    <ClInclude Include="rttr\detail\registration\registration_state_saver.h" />
+    <ClInclude Include="rttr\detail\type\accessor_type.h" />
+    <ClInclude Include="rttr\detail\type\base_classes.h" />
+    <ClInclude Include="rttr\detail\type\get_create_variant_func.h" />
+    <ClInclude Include="rttr\detail\type\get_derived_info_func.h" />
+    <ClInclude Include="rttr\detail\type\type_comparator.h" />
+    <ClInclude Include="rttr\detail\type\type_converter.h" />
+    <ClInclude Include="rttr\detail\type\type_data.h" />
+    <ClInclude Include="rttr\detail\type\type_impl.h" />
+    <ClInclude Include="rttr\detail\type\type_name.h" />
+    <ClInclude Include="rttr\detail\type\type_register.h" />
+    <ClInclude Include="rttr\detail\type\type_register_p.h" />
+    <ClInclude Include="rttr\detail\type\type_string_utils.h" />
+    <ClInclude Include="rttr\detail\variant\variant_compare.h" />
+    <ClInclude Include="rttr\detail\variant\variant_data.h" />
+    <ClInclude Include="rttr\detail\variant\variant_data_converter.h" />
+    <ClInclude Include="rttr\detail\variant\variant_data_policy.h" />
+    <ClInclude Include="rttr\detail\variant\variant_impl.h" />
+    <ClInclude Include="rttr\detail\variant_associative_view\variant_associative_view_creator.h" />
+    <ClInclude Include="rttr\detail\variant_associative_view\variant_associative_view_creator_impl.h" />
+    <ClInclude Include="rttr\detail\variant_associative_view\variant_associative_view_private.h" />
+    <ClInclude Include="rttr\detail\variant_sequential_view\variant_sequential_view_creator.h" />
+    <ClInclude Include="rttr\detail\variant_sequential_view\variant_sequential_view_creator_impl.h" />
+    <ClInclude Include="rttr\detail\variant_sequential_view\variant_sequential_view_private.h" />
+    <ClInclude Include="rttr\enumeration.h" />
+    <ClInclude Include="rttr\enum_flags.h" />
+    <ClInclude Include="rttr\filter_item.h" />
+    <ClInclude Include="rttr\instance.h" />
+    <ClInclude Include="rttr\library.h" />
+    <ClInclude Include="rttr\method.h" />
+    <ClInclude Include="rttr\parameter_info.h" />
+    <ClInclude Include="rttr\policy.h" />
+    <ClInclude Include="rttr\property.h" />
+    <ClInclude Include="rttr\registration.h" />
+    <ClInclude Include="rttr\registration_friend.h" />
+    <ClInclude Include="rttr\rttr_cast.h" />
+    <ClInclude Include="rttr\rttr_enable.h" />
+    <ClInclude Include="rttr\sequential_mapper.h" />
+    <ClInclude Include="rttr\string_view.h" />
+    <ClInclude Include="rttr\type.h" />
+    <ClInclude Include="rttr\variant.h" />
+    <ClInclude Include="rttr\variant_associative_view.h" />
+    <ClInclude Include="rttr\variant_sequential_view.h" />
+    <ClInclude Include="rttr\wrapper_mapper.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SceneRef.h" />
+    <ClInclude Include="SceneSerializer.h" />
+    <ClInclude Include="ScriptBehaviour.h" />
+    <ClInclude Include="ScriptLoader.h" />
+    <ClInclude Include="SerializableEvent.h" />
+    <ClInclude Include="Singleton.hpp" />
+    <ClInclude Include="StringHelper.h" />
+    <ClInclude Include="TimeManager.h" />
+    <ClInclude Include="Transform.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="BehaviourManager.h" />
+    <ClInclude Include="CapsuleColliderComponent.h" />
+    <ClInclude Include="ModelColliderComponent.h" />
+    <ClInclude Include="CollisionMatrix.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="rttr\constructor.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\destructor.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\enumeration.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\library.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\method.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\parameter_info.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\policy.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\property.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\registration.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\type.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\variant.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\variant_associative_view.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\variant_sequential_view.cpp">
-      <Filter>RTTR\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\comparison\compare_equal.cpp">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\comparison\compare_less.cpp">
-      <Filter>RTTR\Detail\Comparison</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\constructor\constructor_wrapper_base.cpp">
-      <Filter>RTTR\Detail\Constructor</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\conversion\std_conversion_functions.cpp">
-      <Filter>RTTR\Detail\Conversion</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\destructor\destructor_wrapper_base.cpp">
-      <Filter>RTTR\Detail\Destructor</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\enumeration\enumeration_helper.cpp">
-      <Filter>RTTR\Detail\Enumeration</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\enumeration\enumeration_wrapper_base.cpp">
-      <Filter>RTTR\Detail\Enumeration</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\library\library_unix.cpp">
-      <Filter>RTTR\Detail\Library</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\library\library_win.cpp">
-      <Filter>RTTR\Detail\Library</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\method\method_wrapper_base.cpp">
-      <Filter>RTTR\Detail\Method</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\misc\standard_types.cpp">
-      <Filter>RTTR\Detail\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\parameter_info\parameter_info_wrapper_base.cpp">
-      <Filter>RTTR\Detail\ParameterInfo</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\property\property_wrapper_base.cpp">
-      <Filter>RTTR\Detail\Property</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\registration\registration_executer.cpp">
-      <Filter>RTTR\Detail\Registration</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\registration\registration_state_saver.cpp">
-      <Filter>RTTR\Detail\Registration</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\type\type_data.cpp">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\type\type_register.cpp">
-      <Filter>RTTR\Detail\Type</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr\detail\variant\variant_compare.cpp">
-      <Filter>RTTR\Detail\Variant</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>소스 파일\Core\Object API</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectManager.cpp">
-      <Filter>소스 파일\Core\Object API</Filter>
-    </ClCompile>
-    <ClCompile Include="dxtk\Src\SimpleMath.cpp">
-      <Filter>DXTK\Src</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="StringHelper.cpp">
-      <Filter>소스 파일\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>소스 파일\Core\Input API</Filter>
-    </ClCompile>
-    <ClCompile Include="TimeManager.cpp">
-      <Filter>소스 파일\Core\Time API</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="App.cpp">
-      <Filter>소스 파일\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Behaviour.cpp">
-      <Filter>소스 파일\Core\Behaviour API</Filter>
-    </ClCompile>
-    <ClCompile Include="BehaviourManger.cpp">
-      <Filter>소스 파일\Core\Behaviour API</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>소스 파일\Core\Resource API</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalRegistry.cpp">
-      <Filter>소스 파일\Core\GlobalRegistry</Filter>
-    </ClCompile>
-    <ClCompile Include="Resource.cpp">
-      <Filter>소스 파일\Core\Resource API</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>소스 파일\Core\Scene API</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>소스 파일\Core\Scene API</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneSerializer.cpp">
-      <Filter>소스 파일\Core\Scene API</Filter>
-    </ClCompile>
-    <ClCompile Include="MUID.cpp">
-      <Filter>소스 파일\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr_simplemath_registry.cpp">
-      <Filter>소스 파일\Utility\RTTRRegistry</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderManager.cpp">
-      <Filter>소스 파일\Core\Render API</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>소스 파일\Core\Render API</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr_directxmath_registry.cpp">
-      <Filter>소스 파일\Utility\RTTRRegistry</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysxHelper.cpp">
-      <Filter>소스 파일\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="ColliderComponent.cpp">
-      <Filter>소스 파일\Core\PhysxAPI\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="RigidBodyComponent.cpp">
-      <Filter>소스 파일\Core\PhysxAPI\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysX.cpp">
-      <Filter>소스 파일\Core\PhysxAPI</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysxManager.cpp">
-      <Filter>소스 파일\Core\PhysxAPI</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsEventCallback.cpp">
-      <Filter>소스 파일\Core\PhysxAPI</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysScene.cpp">
-      <Filter>소스 파일\Core\PhysxAPI</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsFilter.cpp">
-      <Filter>소스 파일\Core\PhysxAPI</Filter>
-	</ClInclude>
-    <ClCompile Include="MissingScriptBehaviour.cpp">
-      <Filter>소스 파일\Core\Behaviour API\ScriptLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptBehaviour.cpp">
-      <Filter>소스 파일\Core\Behaviour API\ScriptLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptLoader.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="rttr\registration">
-      <Filter>RTTR</Filter>
-    </None>
-    <None Include="rttr\registration_friend">
-      <Filter>RTTR</Filter>
-    </None>
-    <None Include="rttr\type">
-      <Filter>RTTR</Filter>
-    </None>
-    <None Include="Object.inl">
-      <Filter>헤더 파일\Core\Object API</Filter>
-    </None>
-    <None Include="dxtk\Inc\SimpleMath.inl">
-      <Filter>DXTK\Inc</Filter>
-    </None>
+    <None Include="dxtk\Inc\SimpleMath.inl" />
+    <None Include="Object.inl" />
+    <None Include="rttr\registration" />
+    <None Include="rttr\registration_friend" />
+    <None Include="rttr\type" />
   </ItemGroup>
 </Project>

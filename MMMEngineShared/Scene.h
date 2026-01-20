@@ -5,6 +5,7 @@
 #include "rttr/type"
 #include "rttr/registration_friend.h"
 #include "json/json.hpp"
+#include "PhysScene.h"
 
 namespace MMMEngine
 {
@@ -29,6 +30,7 @@ namespace MMMEngine
 		void Clear();
 		std::vector<ObjPtr<GameObject>> GetGameObjects();
 		ObjPtr<GameObject> CreateGameObject(std::string name);
+
 	public:
 		~Scene();
 		void RegisterGameObject(ObjPtr<GameObject> go);

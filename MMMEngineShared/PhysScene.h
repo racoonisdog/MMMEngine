@@ -1,6 +1,9 @@
 #pragma once
 #include "PhysX.h"
 #include "PhysicsEventCallback.h"
+#include "RigidBodyComponent.h"
+#include "ColliderComponent.h"
+#include "CollisionMatrix.h"
 
 //using namespace DirectX::SimpleMath;
 
@@ -52,6 +55,25 @@ namespace MMMEngine
 		PhysScene(PhysScene&&) = delete;
 		PhysScene& operator=(PhysScene&&) = delete;
 
+		
+		//등록/해제/부착/분리/리빌드
+		void RegisterRigid(MMMEngine::RigidBodyComponent* rb, MMMEngine::PhysicX& core);
+		void UnregisterRigid(MMMEngine::RigidBodyComponent* rb);
+
+		void AttachCollider(MMMEngine::RigidBodyComponent* rb,
+			MMMEngine::ColliderComponent* col,
+			MMMEngine::PhysicX& core,
+			const CollisionMatrix& matrix);
+
+		void DetachCollider(MMMEngine::RigidBodyComponent* rb,
+			MMMEngine::ColliderComponent* col);
+
+		void RebuildCollider(MMMEngine::ColliderComponent* col,
+			MMMEngine::PhysicX& core,
+			const CollisionMatrix& matrix);
+
+		void ReapplyFilters(const CollisionMatrix& matrix);
+
 
 		const std::vector<MMMEngine::PhysXSimulationCallback::ContactEvent>& GetFrameContacts() const { return m_frameContacts; }
 		const std::vector<PhysXSimulationCallback::TriggerEvent>& GetFrameTriggers() const { return m_frameTriggers; }
@@ -66,5 +88,15 @@ namespace MMMEngine
 
 		std::vector<MMMEngine::PhysXSimulationCallback::ContactEvent> m_frameContacts;
 		std::vector<MMMEngine::PhysXSimulationCallback::TriggerEvent> m_frameTriggers;
+
+
+		//해당 scene에서 사용되는 rigid 목록
+		std::unordered_set<MMMEngine::RigidBodyComponent*> m_rigids;
+		
+		//해당 shape가 어느 actor에 붙어있는지 ( 어떤 collider가 rigid에 붙었는지 )
+		std::unordered_map< MMMEngine::ColliderComponent*, MMMEngine::RigidBodyComponent*> m_ownerByCollider;
+
+		// Rigid가 죽을때 일괄적으로 detach처리하기 위한 컨테이너
+		std::unordered_map<MMMEngine::RigidBodyComponent*, std::vector<MMMEngine::ColliderComponent*>> m_collidersByRigid;
 	};
 }

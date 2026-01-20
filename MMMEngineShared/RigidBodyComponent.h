@@ -1,12 +1,15 @@
 #pragma once
 #include <physx/PxPhysicsAPI.h>
-#include "ColliderComponent.h"
 #include "Component.h"
 #include "SimpleMath.h"
 #include "Export.h"
 #include "rttr/type"
 #include "Delegates.hpp"
 
+
+namespace MMMEngine {
+	class ColliderComponent;
+}
 
 namespace MMMEngine {
 	class MMMENGINE_API RigidBodyComponent : public Component
@@ -49,6 +52,8 @@ namespace MMMEngine {
 		RigidBodyComponent() = default;
 		explicit RigidBodyComponent(const Desc& desc) : m_Desc(desc) {};
 
+		void Initialize() override;	//생성자 이후 추가 초기화용
+
 		void OnDestroy();
 		//Scene에 등록
 		void CreateActor(physx::PxPhysics* physics, DirectX::SimpleMath::Vector3 worldPos, DirectX::SimpleMath::Quaternion Quater);
@@ -84,6 +89,7 @@ namespace MMMEngine {
 
 		//rigid값 설정시 physx에 반영하는 함수
 		void PushStateChanges();
+
 		//sleep/wake 시스템
 		void PushWakeUp();
 

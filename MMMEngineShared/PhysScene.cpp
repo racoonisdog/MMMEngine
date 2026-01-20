@@ -81,3 +81,33 @@ void MMMEngine::PhysScene::RemoveActor(physx::PxActor& actor)
 	if (!m_scene) return;
 	m_scene->removeActor(actor);
 }
+
+void MMMEngine::PhysScene::RegisterRigid(MMMEngine::RigidBodyComponent* rb, MMMEngine::PhysicX& core)
+{
+
+}
+
+void MMMEngine::PhysScene::UnregisterRigid(MMMEngine::RigidBodyComponent* rb)
+{
+
+}
+
+void MMMEngine::PhysScene::AttachCollider(MMMEngine::RigidBodyComponent* rb, MMMEngine::ColliderComponent* col, MMMEngine::PhysicX& core, const CollisionMatrix& matrix)
+{
+
+}
+
+void MMMEngine::PhysScene::DetachCollider(MMMEngine::RigidBodyComponent* rb, MMMEngine::ColliderComponent* col)
+{
+
+}
+
+void MMMEngine::PhysScene::RebuildCollider(MMMEngine::ColliderComponent* col, MMMEngine::PhysicX& core, const CollisionMatrix& matrix)
+{
+
+}
+
+void MMMEngine::PhysScene::ReapplyFilters(const CollisionMatrix& matrix)
+{
+
+}
