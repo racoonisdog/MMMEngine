@@ -22,7 +22,7 @@ void Initialize()
 	GlobalRegistry::g_pApp->OnWindowSizeChanged.AddListener<InputManager, &InputManager::HandleWindowResize>(&InputManager::Get());
 
 	SceneManager::Get().StartUp(L"Data", 0, false);
-	BehaviourManager::Get().StartUp();
+	BehaviourManager::Get().StartUp(L"UserScripts");
 }
 
 void Update()

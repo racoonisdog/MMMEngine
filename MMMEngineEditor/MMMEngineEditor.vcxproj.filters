@@ -46,6 +46,24 @@
     <Filter Include="헤더 파일\EditorWindow\ForEditorContext">
       <UniqueIdentifier>{ec4962c3-a422-4040-bc15-fd4c8e4c2f6b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Build">
+      <UniqueIdentifier>{af116535-42b3-4225-b0e2-bcdc5228a987}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Build">
+      <UniqueIdentifier>{fad277f4-86f5-4186-b6b1-24ebde931458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Helper">
+      <UniqueIdentifier>{dfe2ffe3-5f69-486c-8a5a-3dfa4bee71c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Helper">
+      <UniqueIdentifier>{afce7a11-b75e-4d5a-98cc-d4b4f13a637d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\EditorWIndow\Popup">
+      <UniqueIdentifier>{a88f4183-a68b-4589-8151-31cef6a91d8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\EditorWindow\Popup">
+      <UniqueIdentifier>{c08b3bc1-1c08-415a-937f-35637ba02f9e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorRegistry.h">
@@ -90,17 +108,26 @@
     <ClInclude Include="InspectorWindow.h">
       <Filter>헤더 파일\EditorWindow</Filter>
     </ClInclude>
-    <ClInclude Include="SceneListWindow.h">
-      <Filter>헤더 파일\EditorWindow</Filter>
-    </ClInclude>
     <ClInclude Include="DragAndDrop.h">
       <Filter>헤더 파일\EditorWindow\ForEditorContext</Filter>
     </ClInclude>
     <ClInclude Include="ProjectManager.h">
       <Filter>헤더 파일\Project</Filter>
     </ClInclude>
+    <ClInclude Include="BuildManager.h">
+      <Filter>헤더 파일\Build</Filter>
+    </ClInclude>
+    <ClInclude Include="DLLHotLoadHelper.h">
+      <Filter>헤더 파일\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneListWindow.h">
+      <Filter>헤더 파일\EditorWindow\Popup</Filter>
+    </ClInclude>
     <ClInclude Include="StartUpProjectWindow.h">
-      <Filter>헤더 파일\EditorWindow</Filter>
+      <Filter>헤더 파일\EditorWindow\Popup</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptBuildWindow.h">
+      <Filter>헤더 파일\EditorWindow\Popup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -140,14 +167,23 @@
     <ClCompile Include="InspectorWindow.cpp">
       <Filter>소스 파일\EditorWIndow</Filter>
     </ClCompile>
-    <ClCompile Include="SceneListWindow.cpp">
-      <Filter>소스 파일\EditorWIndow</Filter>
-    </ClCompile>
     <ClCompile Include="ProjectManager.cpp">
       <Filter>소스 파일\Project</Filter>
     </ClCompile>
+    <ClCompile Include="DLLHotLoadHelper.cpp">
+      <Filter>소스 파일\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildManager.cpp">
+      <Filter>소스 파일\Build</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneListWindow.cpp">
+      <Filter>소스 파일\EditorWIndow\Popup</Filter>
+    </ClCompile>
     <ClCompile Include="StartUpProjectWindow.cpp">
-      <Filter>소스 파일\EditorWIndow</Filter>
+      <Filter>소스 파일\EditorWIndow\Popup</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptBuildWindow.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

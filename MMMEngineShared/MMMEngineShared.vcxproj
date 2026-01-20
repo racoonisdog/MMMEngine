@@ -346,6 +346,7 @@
     <ClInclude Include="SceneRef.h" />
     <ClInclude Include="SceneSerializer.h" />
     <ClInclude Include="ScriptBehaviour.h" />
+    <ClInclude Include="ScriptLoader.h" />
     <ClInclude Include="SerializableEvent.h" />
     <ClInclude Include="Singleton.hpp" />
     <ClInclude Include="StringHelper.h" />
@@ -431,6 +432,7 @@
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneSerializer.cpp" />
     <ClCompile Include="ScriptBehaviour.cpp" />
+    <ClCompile Include="ScriptLoader.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="TimeManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

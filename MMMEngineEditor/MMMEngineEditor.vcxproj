@@ -141,6 +141,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BuildManager.h" />
+    <ClInclude Include="DLLHotLoadHelper.h" />
     <ClInclude Include="DragAndDrop.h" />
     <ClInclude Include="EditorRegistry.h" />
     <ClInclude Include="HierarchyWindow.h" />
@@ -158,9 +160,12 @@
     <ClInclude Include="Project.h" />
     <ClInclude Include="ProjectManager.h" />
     <ClInclude Include="SceneListWindow.h" />
+    <ClInclude Include="ScriptBuildWindow.h" />
     <ClInclude Include="StartUpProjectWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BuildManager.cpp" />
+    <ClCompile Include="DLLHotLoadHelper.cpp" />
     <ClCompile Include="HierarchyWindow.cpp" />
     <ClCompile Include="imgui-docking\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="imgui-docking\backends\imgui_impl_null.cpp" />
@@ -175,6 +180,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ProjectManager.cpp" />
     <ClCompile Include="SceneListWindow.cpp" />
+    <ClCompile Include="ScriptBuildWindow.cpp" />
     <ClCompile Include="StartUpProjectWindow.cpp" />
   </ItemGroup>
   <ItemGroup>

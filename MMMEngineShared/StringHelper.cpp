@@ -115,3 +115,23 @@ std::wstring MMMEngine::Utility::StringHelper::ExtractFileName(const std::wstrin
 
     return filename;
 }
+
+std::string MMMEngine::Utility::StringHelper::CP949ToUTF8(const std::string& cp949Str)
+{
+    if (cp949Str.empty()) return "";
+
+    // 1. CP949 -> WideChar (Unicode)
+    int nwLen = MultiByteToWideChar(949, 0, cp949Str.c_str(), -1, NULL, 0);
+    std::wstring wstr(nwLen, 0);
+    MultiByteToWideChar(949, 0, cp949Str.c_str(), -1, &wstr[0], nwLen);
+
+    // 2. WideChar -> UTF-8
+    int nLen = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
+    std::string str(nLen, 0);
+    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), -1, &str[0], nLen, NULL, NULL);
+
+    // 끝에 붙는 null terminator 제거
+    if (!str.empty() && str.back() == '\0') str.pop_back();
+
+    return str;
+}

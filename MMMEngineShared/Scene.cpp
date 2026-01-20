@@ -35,7 +35,8 @@ void MMMEngine::Scene::Clear()
 {
     for (auto& go : m_gameObjects)
     {
-        go->SetScene({ static_cast<size_t>(-1),false });
+        if(go.IsValid())
+            go->SetScene({ static_cast<size_t>(-1),false });
         Object::Destroy(go);
     }
     m_gameObjects.clear();

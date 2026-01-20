@@ -1,5 +1,6 @@
 #define NOMINMAX
 #include <iostream>
+#include <filesystem>
 
 #include "GlobalRegistry.h"
 #include "EditorRegistry.h"
@@ -14,14 +15,19 @@
 #include "ObjectManager.h"
 #include "ProjectManager.h"
 
+#include "StringHelper.h"
 #include "ImGuiEditorContext.h"
+#include "BuildManager.h"
+#include "DLLHotLoadHelper.h"
 
+namespace fs = std::filesystem;
 using namespace MMMEngine;
 using namespace MMMEngine::Utility;
 using namespace MMMEngine::Editor;
 
 void Initialize()
 {
+	SetConsoleOutputCP(CP_UTF8);
 	auto app = GlobalRegistry::g_pApp;
 	auto hwnd = app->GetWindowHandle();
 	auto windowInfo = app->GetWindowInfo();
@@ -38,10 +44,11 @@ void Initialize()
 		// 존재하는 경우 씬을 처음으로 스타트
 		auto currentProject = ProjectManager::Get().GetActiveProject();
 		SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", currentProject.lastSceneIndex, true);
+		app->SetWindowTitle(L"MMMEditor [ " + Utility::StringHelper::StringToWString(currentProject.rootPath) + L" ]");
+		ObjectManager::Get().StartUp();
+		BehaviourManager::Get().StartUp(currentProject.rootPath + "/UserScripts.dll");
+		BuildManager::Get().SetProgressCallbackString([](const std::string& progress) { std::cout << progress.c_str() << std::endl; });
 	}
-
-	ObjectManager::Get().StartUp();
-	BehaviourManager::Get().StartUp();
 
 	RenderManager::Get().StartUp(hwnd, windowInfo.width, windowInfo.height);
 	app->OnWindowSizeChanged.AddListener<RenderManager, &RenderManager::ResizeScreen>(&RenderManager::Get());
@@ -66,6 +73,12 @@ void Update_ProjectNotLoaded()
 	{
 		auto currentProject = ProjectManager::Get().GetActiveProject();
 		SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", 0, true);
+		GlobalRegistry::g_pApp->SetWindowTitle(L"MMMEditor [ " + Utility::StringHelper::StringToWString(currentProject.rootPath) + L" ]");
+
+		ObjectManager::Get().StartUp();
+		BehaviourManager::Get().StartUp(currentProject.rootPath + "/UserScripts.dll");
+
+		BuildManager::Get().SetProgressCallbackString([](const std::string& progress) { std::cout << progress << std::endl; });
 		return;
 	}
 }
@@ -131,6 +144,9 @@ void Release()
 	SceneManager::Get().ShutDown();
 	ObjectManager::Get().ShutDown();
 	BehaviourManager::Get().ShutDown();
+
+	fs::path cwd = fs::current_path();
+	DLLHotLoadHelper::CleanupHotReloadCopies(cwd);
 }
 
 int main()
