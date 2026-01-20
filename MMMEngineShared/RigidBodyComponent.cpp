@@ -1,13 +1,32 @@
 #include "RigidBodyComponent.h"
 #include "PhysXHelper.h"
+#include "Transform.h"
+#include "rttr/registration"
 
-void RigidBodyComponent::CreateActor(physx::PxPhysics* physics, const Transform& transform)
+RTTR_REGISTRATION
+{
+	using namespace rttr;
+	using namespace MMMEngine;
+
+	registration::class_<RigidBodyComponent>("RigidBodyComponent")
+		(rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<RigidBodyComponent>>()));
+
+	registration::class_<ObjPtr<RigidBodyComponent>>("ObjPtr<RigidBodyComponent>")
+		.constructor(
+			[]() {
+				return Object::NewObject<RigidBodyComponent>();
+			});
+
+	type::register_wrapper_converter_for_base_classes<MMMEngine::ObjPtr<RigidBodyComponent>>();
+}
+
+void MMMEngine::RigidBodyComponent::CreateActor(physx::PxPhysics* physics, Vector3 worldPos, Quaternion Quater)
 {
 	if (m_Actor) return;
 
 	m_Physics = physics;
 
-	physx::PxTransform px_Trans = ToPxTrans(transform.localPosition, transform.localRotation);
+	physx::PxTransform px_Trans = ToPxTrans(worldPos, Quater);
 
 	if (m_Desc.type == Type::Static)
 	{
@@ -38,7 +57,7 @@ void RigidBodyComponent::CreateActor(physx::PxPhysics* physics, const Transform&
 	}
 }
 
-void RigidBodyComponent::OnDestroy()
+void MMMEngine::RigidBodyComponent::OnDestroy()
 {
 	//for (auto* col : m_Colliders) DetachCollider(col);
 
@@ -47,10 +66,9 @@ void RigidBodyComponent::OnDestroy()
 	DestroyActor();
 
 	m_Physics = nullptr;
-	m_Tr = nullptr;
 }
 
-void RigidBodyComponent::AttachCollider(ColliderComponent* collider)
+void MMMEngine::RigidBodyComponent::AttachCollider(ColliderComponent* collider)
 {
 	if (!collider) return;
 
@@ -66,7 +84,7 @@ void RigidBodyComponent::AttachCollider(ColliderComponent* collider)
 		physx::PxRigidBodyExt::updateMassAndInertia(*d, m_Desc.mass);
 }
 
-void RigidBodyComponent::DetachCollider(ColliderComponent* collider)
+void MMMEngine::RigidBodyComponent::DetachCollider(ColliderComponent* collider)
 {
 	if (!collider) return;
 
@@ -86,14 +104,14 @@ void RigidBodyComponent::DetachCollider(ColliderComponent* collider)
 	}
 }
 
-void RigidBodyComponent::DestroyActor()
+void MMMEngine::RigidBodyComponent::DestroyActor()
 {
 	if (!m_Actor) return;
 	m_Actor->release();
 	m_Actor = nullptr;
 }
 
-void RigidBodyComponent::PushToPhysics()
+void MMMEngine::RigidBodyComponent::PushToPhysics()
 {
 	if (!m_Actor) return;
 
@@ -103,10 +121,10 @@ void RigidBodyComponent::PushToPhysics()
 	PushWakeUp();
 }
 
-void RigidBodyComponent::PullFromPhysics()
+void MMMEngine::RigidBodyComponent::PullFromPhysics()
 {
 	if (!m_Actor) return;
-	if (!m_Tr) return; // 엔진 Transform 포인터(혹은 참조)가 연결된 경우만 ( 오류방지용 )
+	//if (!m_Tr) return; // 엔진 Transform 포인터(혹은 참조)가 연결된 경우만 ( 오류방지용 )
 
 	// Static은 보통 Pull할 필요 없음 , 에디터 이동/텔레포트는 Push에서 setGlobalPose로 처리)
 	if (m_Desc.type == Type::Static) return;
@@ -127,18 +145,19 @@ void RigidBodyComponent::PullFromPhysics()
 	// PhysX -> Engine Transform
 	const physx::PxTransform pxPose = t_dynamic->getGlobalPose();
 
-	m_Tr->localPosition = ToVec(pxPose.p);
-	m_Tr->localRotation = ToQuat(pxPose.q);
+	GetTransform()->SetWorldPosition(ToVec(pxPose.p));
+	GetTransform()->SetWorldRotation(ToQuat(pxPose.q));
+
 }
 
-void RigidBodyComponent::PushPoseIfDirty()
+void MMMEngine::RigidBodyComponent::PushPoseIfDirty()
 {
 	if (!m_Actor) return;
 
 	//텔레포트/에디터 강제 이동 요청을 처리하는 분기
 	if (m_PoseDirty)
 	{
-		m_Actor->setGlobalPose(ToPxTrans(m_RequestedWorldPose.localPosition, m_RequestedWorldPose.localRotation));
+		m_Actor->setGlobalPose(ToPxTrans(m_RequestedWorldPose.position, m_RequestedWorldPose.rotation));
 
 		if (auto* t_dynamic = m_Actor->is<physx::PxRigidDynamic>())
 		{
@@ -156,13 +175,13 @@ void RigidBodyComponent::PushPoseIfDirty()
 	{
 		if (auto* t_dynamic = m_Actor->is<physx::PxRigidDynamic>())
 		{
-			t_dynamic->setKinematicTarget(ToPxTrans(m_KinematicTarget.localPosition, m_KinematicTarget.localRotation));
+			t_dynamic->setKinematicTarget(ToPxTrans(m_KinematicTarget.position, m_KinematicTarget.rotation));
 		}
 		m_HasKinematicTarget = false;
 	}
 }
 
-void RigidBodyComponent::PushForces()
+void MMMEngine::RigidBodyComponent::PushForces()
 {
 	auto* t_dynamic = m_Actor->is<physx::PxRigidDynamic>();
 	if (!t_dynamic) return;
@@ -190,20 +209,25 @@ void RigidBodyComponent::PushForces()
 	t_dynamic->wakeUp();
 }
 
-void RigidBodyComponent::Teleport(const Transform& world)
+
+
+void MMMEngine::RigidBodyComponent::Teleport(const Vector3& worldPos, const Quaternion& Quater)
 {
-	m_RequestedWorldPose = world;
+	m_RequestedWorldPose.position = worldPos;
+	m_RequestedWorldPose.rotation = Quater;
 	m_PoseDirty = true;
 	m_WakeRequested = true;
 }
 
-void RigidBodyComponent::SetKinematicTarget(const Transform& world)
+void MMMEngine::RigidBodyComponent::SetKinematicTarget(const Vector3& worldPos, const Quaternion& Quater)
 {
 	// 키네마틱 호출용 방어코드 다이나믹일경우 아웃
 	if (m_Desc.type != Type::Dynamic) return;
 
 	// 키네마틱 설정이 되었고 키네마틱좌표를 저장
-	m_KinematicTarget = world;
+	m_KinematicTarget.position = worldPos;
+	m_KinematicTarget.rotation = Quater;
+
 	m_HasKinematicTarget = true;
 	m_WakeRequested = true;
 
@@ -212,28 +236,29 @@ void RigidBodyComponent::SetKinematicTarget(const Transform& world)
 	// m_DescDirty = true;
 }
 
-void RigidBodyComponent::MoveKinematicTarget()
+void MMMEngine::RigidBodyComponent::MoveKinematicTarget()
 {
-	if (!m_Tr) return;
 	if (m_Desc.type != Type::Dynamic) return;
 	if (!m_Desc.isKinematic) return;
 
 	// mesh자체의 transform을 목표로 삼는다
-	m_KinematicTarget.localPosition = m_Tr->localPosition;
-	m_KinematicTarget.localRotation = m_Tr->localRotation;
+	m_KinematicTarget.position = GetTransform()->GetWorldPosition();
+	m_KinematicTarget.rotation = GetTransform()->GetWorldRotation();
 
 	m_HasKinematicTarget = true;
 	m_WakeRequested = true;
 }
 
-void RigidBodyComponent::Editor_changeTrans(const Transform& world)
+void MMMEngine::RigidBodyComponent::Editor_changeTrans(const Vector3& worldPos, const Quaternion& Quater)
 {
-	m_RequestedWorldPose = world;
+	m_RequestedWorldPose.position = worldPos;
+	m_RequestedWorldPose.rotation = Quater;
+
 	m_PoseDirty = true;
 	m_WakeRequested = true;
 }
 
-void RigidBodyComponent::AddForce(Vector3 f, ForceMode mod)
+void MMMEngine::RigidBodyComponent::AddForce(Vector3 f, ForceMode mod)
 {
 	//다이나믹이 아니면 힘을 줄 필요가 없음
 	if (m_Desc.type != Type::Dynamic) return;
@@ -246,7 +271,7 @@ void RigidBodyComponent::AddForce(Vector3 f, ForceMode mod)
 	m_WakeRequested = true;
 }
 
-void RigidBodyComponent::AddTorque(Vector3 tor, ForceMode mod)
+void MMMEngine::RigidBodyComponent::AddTorque(Vector3 tor, ForceMode mod)
 {
 	if (m_Desc.type != Type::Dynamic) return;
 	if (m_Desc.isKinematic) return;
@@ -255,7 +280,7 @@ void RigidBodyComponent::AddTorque(Vector3 tor, ForceMode mod)
 	m_WakeRequested = true;
 }
 
-void RigidBodyComponent::PushStateChanges()
+void MMMEngine::RigidBodyComponent::PushStateChanges()
 {
 	if (!m_DescDirty || !m_Actor) return;
 
@@ -272,7 +297,7 @@ void RigidBodyComponent::PushStateChanges()
 	m_DescDirty = false;
 }
 
-void RigidBodyComponent::PushWakeUp()
+void MMMEngine::RigidBodyComponent::PushWakeUp()
 {
 	if (!m_WakeRequested) return;
 	m_WakeRequested = false;
@@ -281,14 +306,14 @@ void RigidBodyComponent::PushWakeUp()
 	if (auto* t_dynamic = m_Actor->is<physx::PxRigidDynamic>()) t_dynamic->wakeUp();
 }
 
-void RigidBodyComponent::AddImpulse(Vector3 imp)
+void MMMEngine::RigidBodyComponent::AddImpulse(Vector3 imp)
 {
 	AddForce(imp, ForceMode::Impulse);
 	m_WakeRequested = true;
 }
 
 //선형 속도(Linear Velocity) 설정
-void RigidBodyComponent::SetLinearVelocity(Vector3 v)
+void MMMEngine::RigidBodyComponent::SetLinearVelocity(Vector3 v)
 {
 	if (!m_Actor) return;
 	if (m_Desc.type != Type::Dynamic) return;
@@ -301,7 +326,7 @@ void RigidBodyComponent::SetLinearVelocity(Vector3 v)
 	}
 }
 
-Vector3 RigidBodyComponent::GetLinearVelocity() const
+Vector3 MMMEngine::RigidBodyComponent::GetLinearVelocity() const
 {
 	if (!m_Actor) return Vector3();
 	if (m_Desc.type != Type::Dynamic) return Vector3();
@@ -315,7 +340,7 @@ Vector3 RigidBodyComponent::GetLinearVelocity() const
 	return Vector3();
 }
 
-void RigidBodyComponent::SetAngularVelocity(Vector3 w)
+void MMMEngine::RigidBodyComponent::SetAngularVelocity(Vector3 w)
 {
 	if (!m_Actor) return;
 	if (m_Desc.type != Type::Dynamic) return;
@@ -328,7 +353,7 @@ void RigidBodyComponent::SetAngularVelocity(Vector3 w)
 	}
 }
 
-Vector3 RigidBodyComponent::GetAngularVelocity() const
+Vector3 MMMEngine::RigidBodyComponent::GetAngularVelocity() const
 {
 	if (!m_Actor) return Vector3();
 	if (m_Desc.type != Type::Dynamic) return Vector3();
@@ -341,7 +366,7 @@ Vector3 RigidBodyComponent::GetAngularVelocity() const
 	return Vector3();
 }
 
-void RigidBodyComponent::WakeUp()
+void MMMEngine::RigidBodyComponent::WakeUp()
 {
 	m_WakeRequested = true;
 }
@@ -349,7 +374,7 @@ void RigidBodyComponent::WakeUp()
 
 
 //private 함수들
-physx::PxForceMode::Enum RigidBodyComponent::ToPxForceMode(ForceMode mode)
+physx::PxForceMode::Enum MMMEngine::RigidBodyComponent::ToPxForceMode(ForceMode mode)
 {
 	switch (mode)
 	{
@@ -361,26 +386,42 @@ physx::PxForceMode::Enum RigidBodyComponent::ToPxForceMode(ForceMode mode)
 	return physx::PxForceMode::eFORCE;
 }
 
-void RigidBodyComponent::SetType(Type newType)
+void MMMEngine::RigidBodyComponent::SetType(Type newType)
 {
 	if (m_Desc.type == newType)
 		return;
 
 	//현재 월드 포즈 확보
-	Transform worldPose;
+	Vector3 temp_Position = {};
+	Quaternion temp_Quarter = {};
+
+
 	if (m_Actor)
 	{
-		if (auto* d = m_Actor->is<physx::PxRigidDynamic>())
+		if (auto* t_dynamic = m_Actor->is<physx::PxRigidDynamic>())
 		{
-			auto px = d->getGlobalPose();
-			worldPose.localPosition = ToVec(px.p);
-			worldPose.localRotation = ToQuat(px.q);
+			auto px = t_dynamic->getGlobalPose();
+			temp_Position = ToVec(px.p);
+			temp_Quarter = ToQuat(px.q);
 		}
 		else
 		{
 			auto px = m_Actor->getGlobalPose();
-			worldPose.localPosition = ToVec(px.p);
-			worldPose.localRotation = ToQuat(px.q);
+			temp_Position = ToVec(px.p);
+			temp_Quarter = ToQuat(px.q);
+		}
+	}
+	else
+	{
+		if (auto tr = GetTransform())
+		{
+			temp_Position = tr->GetWorldPosition();
+			temp_Quarter = tr->GetWorldRotation();
+		}
+		else
+		{
+			temp_Position = Vector3{ 0,0,0 };
+			temp_Quarter = Quaternion::Identity;
 		}
 	}
 
@@ -389,5 +430,5 @@ void RigidBodyComponent::SetType(Type newType)
 
 	//Actor 재생성
 	DestroyActor();
-	CreateActor(m_Physics, worldPose);
+	CreateActor(m_Physics, temp_Position, temp_Quarter);
 }

@@ -201,8 +201,8 @@ namespace MMMEngine
 }
 )";
 
-        fs::path file = scriptsDir / "ExampleBehaviour.cpp";
-        std::ofstream out2(file, std::ios::binary);
+        fs::path file2 = scriptsDir / "ExampleBehaviour.cpp";
+        std::ofstream out2(file2, std::ios::binary);
         if (!out2) return;
 
         // NOTE: ScriptBehaviour.h include는 vcxproj의 AdditionalIncludeDirectories에 의해 해결된다고 가정

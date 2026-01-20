@@ -92,7 +92,7 @@ json SerializeVariant(const rttr::variant& var)
         }
         return obj;
     }
-
+    //Todo : 정의
     // 사용자 정의 타입 -> 재귀
     return SerializeObject(var);
 }
@@ -296,6 +296,7 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
         return;
     }
 
+    //Todo: desc정의 
     // 사용자 정의 객체
     if (!target.is_valid() || target.get_type() != target_type)
     {

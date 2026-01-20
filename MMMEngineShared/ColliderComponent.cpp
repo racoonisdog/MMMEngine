@@ -1,7 +1,7 @@
 #include "ColliderComponent.h"
 
 
-void ColliderComponent::ApplySceneQueryFlag()
+void MMMEngine::ColliderComponent::ApplySceneQueryFlag()
 {
     if (!m_Shape) return;
 
@@ -13,20 +13,20 @@ void ColliderComponent::ApplySceneQueryFlag()
     m_Shape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, query);
 }
 
-void ColliderComponent::ApplyFilterData()
+void MMMEngine::ColliderComponent::ApplyFilterData()
 {
     if (!m_Shape) return;
     m_Shape->setSimulationFilterData(m_SimFilter);
     m_Shape->setQueryFilterData(m_QueryFilter);
 }
 
-void ColliderComponent::ApplyLocalPose()
+void MMMEngine::ColliderComponent::ApplyLocalPose()
 {
     if (!m_Shape) return;
     m_Shape->setLocalPose(m_LocalPose);
 }
 
-void ColliderComponent::ApplyShapeModeFlags()
+void MMMEngine::ColliderComponent::ApplyShapeModeFlags()
 {
     if (!m_Shape) return;
 
@@ -55,7 +55,7 @@ void ColliderComponent::ApplyShapeModeFlags()
 }
 
 
-void ColliderComponent::SetShapeMode(ShapeMode mode)
+void MMMEngine::ColliderComponent::SetShapeMode(ShapeMode mode)
 {
     m_Mode = mode;
 
@@ -70,24 +70,33 @@ void ColliderComponent::SetShapeMode(ShapeMode mode)
     ApplyAll();
 }
 
-void ColliderComponent::SetLocalPose(const physx::PxTransform& t)
+void MMMEngine::ColliderComponent::SetLocalPose(const physx::PxTransform& t)
 {
     m_LocalPose = t; ApplyAll();
 }
 
-void ColliderComponent::SetSceneQueryEnabled(bool on)
+void MMMEngine::ColliderComponent::SetSceneQueryEnabled(bool on)
 {
     m_SceneQueryEnabled = on; ApplyAll();
 }
 
-void ColliderComponent::SetFilterData(const physx::PxFilterData& sim, const physx::PxFilterData& query)
+void MMMEngine::ColliderComponent::SetFilterData(const physx::PxFilterData& sim, const physx::PxFilterData& query)
 {
     m_SimFilter = sim; m_QueryFilter = query; ApplyAll();
 }
 
-void ColliderComponent::SetShape(physx::PxShape* shape, bool owned)
+void MMMEngine::ColliderComponent::SetShape(physx::PxShape* shape, bool owned)
 {
-    if (m_Shape && m_Owned) m_Shape->release();
+    if (m_Shape)
+    {
+        if (physx::PxRigidActor* actor = m_Shape->getActor())
+            actor->detachShape(*m_Shape);
+
+        if (m_Owned)
+            m_Shape->release();
+    }
+    //if (m_Shape && m_Owned) m_Shape->release();
+
     m_Shape = shape;
     m_Owned = owned;
 
@@ -98,7 +107,7 @@ void ColliderComponent::SetShape(physx::PxShape* shape, bool owned)
     }
 }
 
-void ColliderComponent::ApplyAll()
+void MMMEngine::ColliderComponent::ApplyAll()
 {
     ApplyShapeModeFlags();
     ApplySceneQueryFlag();
