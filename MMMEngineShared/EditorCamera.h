@@ -28,7 +28,7 @@ namespace MMMEngine {
 		DirectX::SimpleMath::Vector3 GetRight();
 
 		void Reset();
-		void Update(float elapsedTime);
+		void Update();
 		void GetViewMatrix(DirectX::SimpleMath::Matrix& out);
 		void AddInputVector(const DirectX::SimpleMath::Vector3& input);
 		void SetSpeed(float speed) { m_MoveSpeed = speed; }
