@@ -5,6 +5,7 @@
 #include "Export.h"
 #include "rttr/type"
 #include "Delegates.hpp"
+#include <iostream>
 
 
 namespace MMMEngine {
@@ -45,6 +46,8 @@ namespace MMMEngine {
 			bool useGravity = true;
 			bool isKinematic = false;
 			
+			Desc() = default;
+
 			Desc(Type _type, float _mass, float _linearDamping, float _angularDamping, bool _useGravity, bool _isKinematic) :
 			type(_type), mass(_mass) , linearDamping(_linearDamping), angularDamping(_angularDamping), useGravity(_useGravity), isKinematic(_isKinematic)
 			{}
@@ -54,7 +57,7 @@ namespace MMMEngine {
 
 	public:
 		RigidBodyComponent() = default;
-		explicit RigidBodyComponent(const Desc& desc) : m_Desc(desc) {};
+		RigidBodyComponent(const Desc& desc) : m_Desc(desc) {};
 
 		void Initialize() override;	//생성자 이후 추가 초기화용
 
@@ -112,10 +115,23 @@ namespace MMMEngine {
 
 		void WakeUp();
 
-		void SetUseGravity(bool value) { m_Desc.useGravity = value; m_DescDirty = true; m_WakeRequested = true; }
+
+		bool GetUseGravity() { return m_Desc.useGravity; }
+		bool GetKinematic() { return m_Desc.isKinematic; }
+		float GetMass() { return m_Desc.mass; }
+		float GetLineDamping() { return m_Desc.linearDamping; }
+		float GetAngularDamping() { return m_Desc.angularDamping; }
+		Type GetType() { return m_Desc.type; }
+
+
+		void SetUseGravity(bool value) { 
+			std::cout << m_Desc.mass << std::endl;
+			m_Desc.useGravity = value; m_DescDirty = true; m_WakeRequested = true; }
 		void SetKinematic(bool value) { m_Desc.isKinematic = value; m_DescDirty = true; m_WakeRequested = true; }
 		void SetMass(float mass) { m_Desc.mass = mass; m_DescDirty = true; m_WakeRequested = true; }
-		void SetDamping(float lin, float ang) { m_Desc.linearDamping = lin; m_Desc.angularDamping = ang, m_DescDirty = true; m_WakeRequested = true; }
+		void SetLineDamping(float lin) { m_Desc.linearDamping = lin; m_DescDirty = true; m_WakeRequested = true; }
+		void SetAngularDamping(float ang) { m_Desc.angularDamping = ang, m_DescDirty = true; m_WakeRequested = true; }
+		void SetType(Type newType);
 
 		physx::PxRigidActor* GetPxActor() const;
 
@@ -176,7 +192,7 @@ namespace MMMEngine {
 	private:
 		physx::PxForceMode::Enum ToPxForceMode(ForceMode mode);
 
-		void SetType(Type newType);
+
 
 
 	};

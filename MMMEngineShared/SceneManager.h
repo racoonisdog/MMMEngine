@@ -44,6 +44,7 @@ namespace MMMEngine
 		//=====================================//
 
 		Scene* GetSceneRaw(const SceneRef& ref);
+		Scene* GetCurrentSceneRaw() { return m_scenes[m_currentSceneID].get(); }
 		const SceneRef GetCurrentScene() const;
 
 		const std::wstring GetSceneListPath() const;

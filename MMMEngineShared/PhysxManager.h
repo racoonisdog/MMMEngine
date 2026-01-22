@@ -20,7 +20,6 @@ namespace MMMEngine
 		// fixed step에서 호출되는 진입점
 		void StepFixed(float dt);
 
-
 		//외부 노출함수
 		void NotifyRigidAdded(RigidBodyComponent* rb);
 		void NotifyRigidRemoved(RigidBodyComponent* rb);
@@ -31,8 +30,8 @@ namespace MMMEngine
 		// 값 변경 
 		void NotifyColliderChanged(ColliderComponent* col);
 
-
-
+		void UnbindScene();
+		
 
 	private:
 		// 내부에서만 쓰는 헬퍼
@@ -59,10 +58,11 @@ namespace MMMEngine
 		void RequestUpdateCollider(MMMEngine::ColliderComponent* col);
 
 
+		// 자동 rigid 생성 헬퍼함수
 		MMMEngine::RigidBodyComponent* GetOrCreateRigid(ObjPtr<GameObject> go);
 		bool HasAnyCollider(ObjPtr<GameObject> go) const;
 
-		// 자동 rigid 생성 헬퍼함수
+		void Shutdown();
 	private:
 		// 주입 ,바인딩
 		MMMEngine::Scene* m_Scene = nullptr;              // 현재 씬(소유 X)
@@ -97,5 +97,7 @@ namespace MMMEngine
 
 		//Unregister가 예약된 rigid만 담는 컨테이너( 제거된게 아닌 제거될 예정인 rigid )
 		std::unordered_set<RigidBodyComponent*> m_PendingUnreg;
+
+		bool m_IsInitialized = false;
 	};
 }

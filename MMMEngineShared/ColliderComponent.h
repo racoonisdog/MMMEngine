@@ -28,6 +28,7 @@ namespace MMMEngine
 		// 콜라이더 종류별로 shape 만드는 가상함수
 		virtual void BuildShape(physx::PxPhysics* physics, physx::PxMaterial* material) = 0;
 
+		void Initialize() override;
 
 		physx::PxShape* GetPxShape() const { return m_Shape; }
 		ShapeMode GetShapeMode() const { return m_Mode; }
@@ -55,7 +56,7 @@ namespace MMMEngine
 		void MarkGeometryDirty();
 
 
-		virtual bool UpdateShapeGeometry() = 0;
+		//virtual bool UpdateShapeGeometry() = 0;
 		/*
 		if (!m_scene || !col) return;
 

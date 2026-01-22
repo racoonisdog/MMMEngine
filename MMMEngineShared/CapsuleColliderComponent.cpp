@@ -1,6 +1,6 @@
 #include "CapsuleColliderComponent.h"
 #include "rttr/registration"
-#include "ModelColliderComponent.h"
+#include "PhysxManager.h"
 
 RTTR_REGISTRATION
 {
@@ -8,7 +8,10 @@ RTTR_REGISTRATION
 	using namespace MMMEngine;
 
 	registration::class_<CapsuleColliderComponent>("CapsuleCollider")
-		(rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<CapsuleColliderComponent>>()));
+		(rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<CapsuleColliderComponent>>()))
+		.property("Mass", &CapsuleColliderComponent::GetRadius, &CapsuleColliderComponent::SetRadius)
+		.property("LinearDamping", &CapsuleColliderComponent::GetHalfHeight, &CapsuleColliderComponent::SetHalfHeight)
+		;
 
 	registration::class_<ObjPtr<CapsuleColliderComponent>>("ObjPtr<CapsuleCollider>")
 		.constructor(
@@ -57,4 +60,9 @@ void MMMEngine::CapsuleColliderComponent::BuildShape(physx::PxPhysics* physics, 
 
     // Y-up 캡슐이 필요하면 아래코드로
     // SetLocalPose( physx::PxTransform(physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0,0,1))) * m_LocalPose );
+}
+
+void MMMEngine::ColliderComponent::Initialize()
+{
+	MMMEngine::PhysxManager::Get().NotifyColliderAdded(this);
 }

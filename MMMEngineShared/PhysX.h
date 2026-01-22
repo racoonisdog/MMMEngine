@@ -2,6 +2,8 @@
 #include <optional>
 #include "ExportSingleton.hpp"
 #include <physx/PxPhysicsAPI.h>
+#include <unordered_map>
+
 
 struct TolerancesScale
 {

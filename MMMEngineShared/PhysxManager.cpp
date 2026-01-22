@@ -2,15 +2,37 @@
 #include "SceneManager.h"
 #include "GameObject.h"
 
-DEFINE_SINGLETON(MMMEngine::SceneManager)
+DEFINE_SINGLETON(MMMEngine::PhysxManager)
 
 void MMMEngine::PhysxManager::BindScene(MMMEngine::Scene* scene)
 {
-	m_Scene = scene;
+    if (m_Scene == scene) return;
+
+    UnbindScene();
+
+    m_Scene = scene;
+    if (!m_Scene) return;
+
+    // 씬 설정으로 desc 구성 (임시라도)
+    PhysSceneDesc desc{};
+
+
+    if (m_PhysScene.Create(desc))
+    {
+        m_IsInitialized = true;
+        m_FilterDirty = true;
+    }
+    else
+    {
+        std::cout << "Scene create failed" << std::endl;
+        m_Scene = nullptr;
+    }
 }
 
 void MMMEngine::PhysxManager::StepFixed(float dt)
 {
+    if (!m_IsInitialized) return;
+    if (dt <= 0.f) return;
 	FlushCommands_PreStep();     // 등록/부착 등
 	ApplyFilterConfigIfDirty();  // dirty면 정책 갱신 + 전체 재적용 지시
     FlushDirtyColliders_PreStep(); //collider의 shape가 에디터 단계에서 변형되면 내부적으로 실행
@@ -336,4 +358,26 @@ void MMMEngine::PhysxManager::EraseCommandsForCollider(MMMEngine::ColliderCompon
         else
             ++it;
     }
+}
+
+void MMMEngine::PhysxManager::UnbindScene()
+{
+    m_Commands.clear();
+    m_DirtyColliders.clear();
+    m_PendingUnreg.clear();
+    m_FilterDirty = false;
+
+    if (m_IsInitialized)
+    {
+        m_PhysScene.Destroy();
+        m_IsInitialized = false;
+    }
+
+    m_Scene = nullptr;
+}
+
+
+void MMMEngine::PhysxManager::Shutdown()
+{
+    UnbindScene();
 }

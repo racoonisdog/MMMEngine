@@ -14,11 +14,13 @@
 #include "SceneManager.h"
 #include "ObjectManager.h"
 #include "ProjectManager.h"
+#include "PhysxManager.h"
 
 #include "StringHelper.h"
 #include "ImGuiEditorContext.h"
 #include "BuildManager.h"
 #include "DLLHotLoadHelper.h"
+#include "PhysX.h"
 
 namespace fs = std::filesystem;
 using namespace MMMEngine;
@@ -67,6 +69,8 @@ void Initialize()
 
 	ImGuiEditorContext::Get().Initialize(hwnd, RenderManager::Get().GetDevice(), RenderManager::Get().GetContext());
 	app->OnBeforeWindowMessage.AddListener<ImGuiEditorContext, &ImGuiEditorContext::HandleWindowMessage>(&ImGuiEditorContext::Get());
+
+	MMMEngine::PhysicX::Get().Initialize();
 }
 
 void Update_ProjectNotLoaded()
@@ -125,6 +129,7 @@ void Update()
 		ObjectManager::Get().ProcessPendingDestroy();
 		BehaviourManager::Get().AllSortBehaviours();
 		BehaviourManager::Get().AllBroadCastBehaviourMessage("OnSceneLoaded");
+		MMMEngine::PhysxManager::Get().BindScene(SceneManager::Get().GetCurrentSceneRaw());
 	}
 
 	if (EditorRegistry::g_editor_scene_playing)

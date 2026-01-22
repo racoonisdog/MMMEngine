@@ -92,7 +92,7 @@ json SerializeVariant(const rttr::variant& var)
         }
         return obj;
     }
-    //Todo : 정의
+
     // 사용자 정의 타입 -> 재귀
     return SerializeObject(var);
 }
@@ -175,7 +175,7 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type);
 
 void DeserializeObject(rttr::instance obj, const json& j)
 {
-    type t = obj.get_type();
+    type t = obj.get_derived_type();
 
     for (auto& prop : t.get_properties(
         rttr::filter_item::instance_item |
@@ -296,7 +296,6 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
         return;
     }
 
-    //Todo: desc정의 
     // 사용자 정의 객체
     if (!target.is_valid() || target.get_type() != target_type)
     {
@@ -306,31 +305,12 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
     DeserializeObject(target, j);
 }
 
-ObjPtr<Component> DeserializeComponent(const json& compJson)
+void DeserializeComponent(const json& compJson, ObjPtr<GameObject> obj)
 {
     std::string typeName = compJson["Type"].get<std::string>();
     type compType = type::get_by_name(typeName);
 
-    if (!compType.is_valid())
-        return nullptr;
-
-    rttr::type raw = compType.get_raw_type();
-
-    rttr::variant md = raw.get_metadata("wrapper_type");
-    if (!md.is_valid())
-        assert(false && "AddComponent : wrapper_type metadata가 없습니다!");
-
-    rttr::type wrapperType = md.get_value<rttr::type>();
-
-    rttr::variant compVariant = wrapperType.create();
-    if (!compVariant.is_valid())
-        assert(false && "AddComponent : 컴포넌트가 생성되지 않았습니다!");
-
-    // variant에서 ObjPtr<Component>로 변환
-    ObjPtr<Component> comp = compVariant.convert<ObjPtr<Component>>();
-    if (!comp.IsValid())
-        assert(false && "AddComponent : 변환 실패!");
-
+    auto comp = obj->AddComponent(compType);
     // Component의 MUID를 먼저 테이블에 등록
     const json& props = compJson["Props"];
     if (props.contains("MUID"))
@@ -341,8 +321,6 @@ ObjPtr<Component> DeserializeComponent(const json& compJson)
 
     // 속성 복원 (ObjPtr도 바로 처리됨)
     DeserializeObject(*comp, props);
-
-    return comp;
 }
 
 void DeserializeTransform(Transform& tr, const json& j)
@@ -462,13 +440,8 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
             if (typeName == "Transform") // 정확 일치로 스킵 권장
                 continue;
 
-            ObjPtr<Component> comp = DeserializeComponent(compJson);
-            if (comp.IsValid())
-            {
-                comp->m_gameObject = go;
-                go->RegisterComponent(comp);
-                comp->Initialize();
-            }
+            DeserializeComponent(compJson, go);
+
         }
     }
 

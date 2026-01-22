@@ -13,13 +13,33 @@ RTTR_REGISTRATION
 	using namespace MMMEngine;
 
 	registration::class_<RigidBodyComponent>("RigidBodyComponent")
-		(rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<RigidBodyComponent>>()));
+		(rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<RigidBodyComponent>>()))
+		//.property("Type", &RigidBodyComponent::GetType , &RigidBodyComponent::SetType)
+		.property("Mass", &RigidBodyComponent::GetMass , &RigidBodyComponent::SetMass)
+		.property("LinearDamping", &RigidBodyComponent::GetLineDamping , &RigidBodyComponent::SetLineDamping)
+		.property("AngularDamping", &RigidBodyComponent::GetAngularDamping , &RigidBodyComponent::SetAngularDamping)
+		.property("UseGravity", &RigidBodyComponent::GetUseGravity , &RigidBodyComponent::SetUseGravity)
+		.property("IsKinematic", &RigidBodyComponent::GetKinematic , &RigidBodyComponent::SetKinematic)
+		;
 
 	registration::class_<ObjPtr<RigidBodyComponent>>("ObjPtr<RigidBodyComponent>")
 		.constructor(
 			[]() {
 				return Object::NewObject<RigidBodyComponent>();
 			});
+	registration::enumeration<RigidBodyComponent::Type>("RigidType")
+		(
+			rttr::value("Dynamic", RigidBodyComponent::Type::Dynamic),
+			rttr::value("Static", RigidBodyComponent::Type::Static)
+			);
+	registration::class_<RigidBodyComponent::Desc>("RigidDesc")
+		//.property("Type", &RigidBodyComponent::Desc::type)
+		.property("Mass", &RigidBodyComponent::Desc::mass)
+		.property("LinearDamping", &RigidBodyComponent::Desc::linearDamping)
+		.property("AngularDamping", &RigidBodyComponent::Desc::angularDamping)
+		.property("UseGravity", &RigidBodyComponent::Desc::useGravity)
+		.property("IsKinematic", &RigidBodyComponent::Desc::isKinematic);
+
 
 	type::register_wrapper_converter_for_base_classes<MMMEngine::ObjPtr<RigidBodyComponent>>();
 }
@@ -64,10 +84,10 @@ void MMMEngine::RigidBodyComponent::CreateActor(physx::PxPhysics* physics, Vecto
 //생성했을때 이미 존재하면 등록안하도록 함
 void MMMEngine::RigidBodyComponent::Initialize()
 {
-	auto it = GetGameObject()->GetComponent<RigidBodyComponent>();
-	if (it.IsValid())
+	auto it = GetGameObject()->GetComponentsCount<RigidBodyComponent>();
+	if (it >= 2)
 	{
-		std::cout << "이미 존재하는 RigidComponent" << std::endl;
+		std::cout << u8"이미 존재하는 RigidComponent" << std::endl;
 		Destroy(SelfPtr(this));
 		return;
 	}

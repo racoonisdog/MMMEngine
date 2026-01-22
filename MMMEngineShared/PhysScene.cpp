@@ -337,18 +337,18 @@ void MMMEngine::PhysScene::UpdateColliderGeometry(MMMEngine::ColliderComponent* 
 	physx::PxShape* shape = col->GetPxShape();
 	if (!shape) return;
 
-	const bool ok = col->UpdateShapeGeometry();
-
-	if (ok)
-	{
-		col->SetGeometryDirty(false);
-	}
-#ifdef _DEBUG
-	else
-	{
-		OutputDebugStringA("[PhysScene] UpdateColliderGeometry: UpdateShapeGeometry failed.\n");
-	}
-#endif
+	//const bool ok = col->UpdateShapeGeometry();
+//
+//	if (ok)
+//	{
+//		col->SetGeometryDirty(false);
+//	}
+//#ifdef _DEBUG
+//	else
+//	{
+//		OutputDebugStringA("[PhysScene] UpdateColliderGeometry: UpdateShapeGeometry failed.\n");
+//	}
+//#endif
 }
 
 void MMMEngine::PhysScene::RebuildCollider(MMMEngine::ColliderComponent* col, const CollisionMatrix& matrix)
