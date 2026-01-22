@@ -22,6 +22,9 @@
 #include "DLLHotLoadHelper.h"
 #include "PhysX.h"
 
+//t삭제해야함
+#include "AssimpLoader.h"
+
 namespace fs = std::filesystem;
 using namespace MMMEngine;
 using namespace MMMEngine::Utility;
@@ -60,14 +63,17 @@ void Initialize()
 
 			BehaviourManager::Get().StartUp(dllPath.stem().u8string());
 		}
-
+		
 		BuildManager::Get().SetProgressCallbackString([](const std::string& progress) { std::cout << progress.c_str() << std::endl; });
 	}
 
-	RenderManager::Get().StartUp(hwnd, windowInfo.width, windowInfo.height);
+	RenderManager::Get().StartUp(&hwnd, windowInfo.width, windowInfo.height);
 	app->OnWindowSizeChanged.AddListener<RenderManager, &RenderManager::ResizeScreen>(&RenderManager::Get());
 
-	ImGuiEditorContext::Get().Initialize(hwnd, RenderManager::Get().GetDevice(), RenderManager::Get().GetContext());
+	Microsoft::WRL::ComPtr<ID3D11Device> device = RenderManager::Get().GetDevice();
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context = RenderManager::Get().GetContext();
+
+	ImGuiEditorContext::Get().Initialize(hwnd, device.Get(), context.Get());
 	app->OnBeforeWindowMessage.AddListener<ImGuiEditorContext, &ImGuiEditorContext::HandleWindowMessage>(&ImGuiEditorContext::Get());
 
 	MMMEngine::PhysicX::Get().Initialize();
@@ -104,6 +110,7 @@ void Update_ProjectNotLoaded()
 
 			BehaviourManager::Get().StartUp(dllPath.stem().u8string());
 		}
+	
 
 		BuildManager::Get().SetProgressCallbackString([](const std::string& progress) { std::cout << progress << std::endl; });
 		return;

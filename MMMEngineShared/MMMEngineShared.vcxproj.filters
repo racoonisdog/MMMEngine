@@ -361,10 +361,34 @@
       <UniqueIdentifier>{72b6886a-0c46-4ae0-8d62-ce00537cd485}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\Core\Render API">
-      <UniqueIdentifier>{4061a8ff-da13-4a20-936b-e46a125b386b}</UniqueIdentifier>
+      <UniqueIdentifier>{40b7158d-7ebd-49ac-99d6-edf8f26a4e2f}</UniqueIdentifier>
     </Filter>
     <Filter Include="헤더 파일\Core\Render API">
-      <UniqueIdentifier>{043cb42d-6ea4-4e75-85eb-9a7d6b03d0cd}</UniqueIdentifier>
+      <UniqueIdentifier>{1cec20a9-1188-40bb-9133-6ac8013e9f9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Core\Render API\Component">
+      <UniqueIdentifier>{0e59476e-dea6-4d08-88c1-25db456774a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Core\Render API\Component">
+      <UniqueIdentifier>{b49ed825-6352-4a69-b964-0fc912cadab6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Core\Render API\Resource">
+      <UniqueIdentifier>{b9f1ba23-e29a-4678-b6e5-00423f557c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Core\Render API\Tool">
+      <UniqueIdentifier>{66353a24-cf77-47fc-8356-1bc4b23e5b62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Core\Render API\Tools">
+      <UniqueIdentifier>{f84e2c2c-43b1-43c4-95ea-766be768f268}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Core\Render API\Resource">
+      <UniqueIdentifier>{6b2389a3-5afb-4b2f-ac7d-4b8c86d92fa1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Core\Render API\Renderer">
+      <UniqueIdentifier>{e46f436c-e8ee-434c-b526-196ceb6d57fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Core\Render API\Renderer">
+      <UniqueIdentifier>{284d5cdc-81e6-4563-b6e2-af7346ef182a}</UniqueIdentifier>
     </Filter>
     <Filter Include="헤더 파일\Core\Behaviour API\ScriptLoader">
       <UniqueIdentifier>{26e64790-fb4f-41a4-ab03-f82ee13aa8ad}</UniqueIdentifier>
@@ -548,17 +572,50 @@
     <ClInclude Include="RenderManager.h">
       <Filter>헤더 파일\Core\Render API</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
+    <ClInclude Include="RendererBase.h">
       <Filter>헤더 파일\Core\Render API</Filter>
     </ClInclude>
-    <ClInclude Include="RenderQueue.h">
-      <Filter>헤더 파일\Core\Render API</Filter>
+    <ClInclude Include="EditorCamera.h">
+      <Filter>헤더 파일\Core\Render API\Component</Filter>
     </ClInclude>
-    <ClInclude Include="RenderCommand.h">
-      <Filter>헤더 파일\Core\Render API</Filter>
+    <ClInclude Include="MeshRenderer.h">
+      <Filter>헤더 파일\Core\Render API\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererTools.h">
+      <Filter>헤더 파일\Core\Render API\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2D.h">
+      <Filter>헤더 파일\Core\Render API\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyboxRenderer.h">
+      <Filter>헤더 파일\Core\Render API\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="PShader.h">
+      <Filter>헤더 파일\Core\Render API\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="GeoRenderer.h">
+      <Filter>헤더 파일\Core\Render API\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="ScriptLoader.h">
       <Filter>헤더 파일\Core\Behaviour API\ScriptLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticMesh.h">
+      <Filter>헤더 파일\Core\Render API\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletalMesh.h">
+      <Filter>헤더 파일\Core\Render API\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationClip.h">
+      <Filter>헤더 파일\Core\Render API\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="VShader.h">
+      <Filter>헤더 파일\Core\Render API\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>헤더 파일\Core\Render API\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialSerializer.h">
+      <Filter>헤더 파일\Core\Render API\Tool</Filter>
     </ClInclude>
     <ClInclude Include="ScriptBehaviour.h">
       <Filter>헤더 파일\Core\Behaviour API</Filter>
@@ -571,6 +628,9 @@
     </ClInclude>
     <ClInclude Include="AssetsDatabase.h">
       <Filter>헤더 파일\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceSerializer.h">
+      <Filter>헤더 파일\Core\Render API\Tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -637,11 +697,32 @@
     <ClCompile Include="RenderManager.cpp">
       <Filter>소스 파일\Core\Render API</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
+    <ClCompile Include="RendererBase.cpp">
       <Filter>소스 파일\Core\Render API</Filter>
     </ClCompile>
-    <ClCompile Include="rttr_directxmath_registry.cpp">
-      <Filter>소스 파일\Utility\RTTRRegistry</Filter>
+    <ClCompile Include="RenderShared.h">
+      <Filter>헤더 파일\Core\Render API</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorCamera.cpp">
+      <Filter>소스 파일\Core\Render API\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshRenderer.cpp">
+      <Filter>소스 파일\Core\Render API\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererTools.cpp">
+      <Filter>소스 파일\Core\Render API\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>소스 파일\Core\Render API\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyboxRenderer.cpp">
+      <Filter>소스 파일\Core\Render API\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="VShader.cpp">
+      <Filter>소스 파일\Core\Render API\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="PShader.cpp">
+      <Filter>소스 파일\Core\Render API\Resource</Filter>
     </ClCompile>
     <ClCompile Include="ScriptBehaviour.cpp">
       <Filter>소스 파일\Core\Behaviour API</Filter>
@@ -652,8 +733,35 @@
     <ClCompile Include="MissingScriptBehaviour.cpp">
       <Filter>소스 파일\Core\Behaviour API</Filter>
     </ClCompile>
+    <ClCompile Include="rttr_directxmath_registry.cpp">
+      <Filter>소스 파일\Utility\RTTRRegistry</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticMesh.cpp">
+      <Filter>소스 파일\Core\Render API\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="GeoRenderer.cpp">
+      <Filter>소스 파일\Core\Render API\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletalMesh.cpp">
+      <Filter>소스 파일\Core\Render API\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationClip.cpp">
+      <Filter>소스 파일\Core\Render API\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>소스 파일\Core\Render API\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialSerializer.cpp">
+      <Filter>소스 파일\Core\Render API\Tools</Filter>
+    </ClCompile>
     <ClCompile Include="TextResource.cpp">
       <Filter>소스 파일\Core\Core Test</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceSerializer.cpp">
+      <Filter>소스 파일\Core\Render API\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderShared.cpp">
+      <Filter>소스 파일\Core\Render API</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -663,5 +771,10 @@
     <None Include="dxtk\Inc\SimpleMath.inl">
       <Filter>DXTK\Inc</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MMMEngineShared.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

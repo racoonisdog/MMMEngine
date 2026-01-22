@@ -1,0 +1,55 @@
+#pragma once
+
+#include "Export.h"
+#include "Resource.h"
+#include <variant>
+#include <SimpleMath.h>
+#include <wrl/client.h>
+#include <d3d11_4.h>
+#include "Texture2D.h"
+#include <filesystem>
+#include "ResourceManager.h"
+
+#include "json/json.hpp"
+#include "rttr/type"
+
+namespace MMMEngine {
+	using PropertyValue = std::variant<
+		int, float, DirectX::SimpleMath::Vector3, DirectX::SimpleMath::Matrix,
+		ResPtr<MMMEngine::Texture2D>
+	>;
+
+	class PShader;
+	class VShader;
+	class MaterialSerializer;
+	class MMMENGINE_API Material : public Resource
+	{
+		friend class MaterialSerializer;
+		RTTR_ENABLE(Resource);
+		RTTR_REGISTRATION_FRIEND
+			friend class ResourceManager;
+			friend class SceneManager;
+			friend class Scene;
+	private:
+		std::unordered_map<std::wstring, PropertyValue> m_properties;
+		ResPtr<VShader> m_pVShader;
+		ResPtr<PShader> m_pPShader;
+
+	public:
+
+		void SetProperty(const std::wstring& _name, const PropertyValue& value);
+		PropertyValue GetProperty(const std::wstring& name) const;
+		const std::unordered_map<std::wstring, PropertyValue>& GetProperties() { return m_properties; }
+
+		void SetVShader(const std::wstring& _filePath);
+		void SetPShader(const std::wstring& _filePath);
+		const ResPtr<VShader> GetVShader();
+		const ResPtr<PShader> GetPShader();
+
+		void LoadTexture(const std::wstring& _name, const std::wstring& _filePath);
+
+		bool LoadFromFilePath(const std::wstring& _filePath) override;
+	};
+}
+
+

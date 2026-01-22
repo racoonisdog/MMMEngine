@@ -49,6 +49,10 @@ Generated\ Files/
 TestResult.xml
 nunit-*.xml
 
+# UserScripts DLL
+UserScripts_copy_*.dll
+UserScripts_copy_*.pdb
+
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/

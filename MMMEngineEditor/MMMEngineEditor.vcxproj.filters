@@ -70,6 +70,12 @@
     <Filter Include="소스 파일\EditorWIndow\ImGuiHelper">
       <UniqueIdentifier>{13ca9905-ce86-4a02-bae1-02910f48d488}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Tools">
+      <UniqueIdentifier>{f5d1ba11-67c9-4d44-98a3-b2af76678253}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Tools">
+      <UniqueIdentifier>{b7bc31a0-bb47-4828-a210-a99182a22289}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorRegistry.h">
@@ -144,6 +150,9 @@
     <ClInclude Include="FilesWindow.h">
       <Filter>헤더 파일\EditorWindow</Filter>
     </ClInclude>
+    <ClInclude Include="AssimpLoader.h">
+      <Filter>헤더 파일\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -205,6 +214,9 @@
     </ClCompile>
     <ClCompile Include="FilesWindow.cpp">
       <Filter>소스 파일\EditorWIndow</Filter>
+    </ClCompile>
+    <ClCompile Include="AssimpLoader.cpp">
+      <Filter>소스 파일\Tools</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

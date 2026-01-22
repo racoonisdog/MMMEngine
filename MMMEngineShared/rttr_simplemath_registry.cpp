@@ -7,6 +7,12 @@ RTTR_REGISTRATION
 	using namespace DirectX::SimpleMath;
 	using namespace rttr;
 
+	registration::class_<DirectX::SimpleMath::Vector2>("Vector2")
+		.constructor<>()
+		.constructor<float, float>()
+		.property("x", &Vector2::x)
+		.property("y", &Vector2::y);
+
 	registration::class_<DirectX::SimpleMath::Vector3>("Vector3")
 		.constructor<>()
 		.constructor<float, float, float>()

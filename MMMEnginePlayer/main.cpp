@@ -32,7 +32,7 @@ void Update()
 
 	float dt = TimeManager::Get().GetDeltaTime();
 
-	//¾À º¯È¯ ÈÄ ÇÑ¹ø¸¸ È£Ãâ
+	//ï¿½ï¿½ ï¿½ï¿½È¯ ï¿½ï¿½ ï¿½Ñ¹ï¿½ï¿½ï¿½ È£ï¿½ï¿½
 	if (SceneManager::Get().CheckSceneIsChanged())
 	{
 		ObjectManager::Get().UpdateInternalTimer(dt);
@@ -42,7 +42,7 @@ void Update()
 		BehaviourManager::Get().AllBroadCastBehaviourMessage("OnSceneLoaded");
 	}
 
-	BehaviourManager::Get().InitializeBehaviours();    // Awake, OnEnable, Start ¸Þ½ÃÁö Àü¼Û (¼øÂ÷ÀûÀ¸·Î)
+	BehaviourManager::Get().InitializeBehaviours();    // Awake, OnEnable, Start ï¿½Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 
 	TimeManager::Get().ConsumeFixedSteps([&](float fixedDt)
 	{

@@ -1,116 +1,131 @@
 #pragma once
+#include "Export.h"
 #include "ExportSingleton.hpp"
-#include <algorithm>
-#define NOMINMAX
-#include <memory>
-#include <unordered_map>
+#include <RendererBase.h>
+#include <map>
 #include <vector>
-#include <dxgi1_3.h>
+#include <memory>
+#include <type_traits>
+#include <typeindex>
 
-//#include <directxtk/CommonStates.h>
-//#include <directxtk/Effects.h>
+#include <dxgi1_4.h>
+#include <wrl/client.h>
+#include <SimpleMath.h>
 
-#include <Windows.h>
-#include <d3d11.h>
-#include <d3d11_1.h>
-#include <wrl/client.h> // Microsoft::WRL::ComPtr
+#include <RenderShared.h>
+#include <Object.h>
+#include "json/json.hpp"
 
-#include "Renderer.h"
-#include "RenderCommand.h"
-
-
-
-#pragma comment(lib, "d3d11.lib")
+#pragma comment (lib, "d3d11.lib")
+#pragma comment (lib, "dxgi.lib")
 
 namespace MMMEngine
 {
+	class Transform;
+	class EditorCamera;
+	class Material;
+	class VShader;
+	class PShader;
 	class MMMENGINE_API RenderManager : public Utility::ExportSingleton<RenderManager>
 	{
+		friend class RendererBase;
+		friend class Material;
 	private:
-        friend class Renderer;
-        int m_screenWidth = 0;
-        int m_screenHeight = 0;
-        int m_syncInterval = 1;
+		std::map<int, std::vector<std::shared_ptr<RendererBase>>> m_Passes;
+		std::queue<std::shared_ptr<RendererBase>> m_initQueue;
 
-        // ÃÊ±âÈ­¿ë
-        D3D_DRIVER_TYPE m_driverType = D3D_DRIVER_TYPE_NULL;
-        D3D_FEATURE_LEVEL m_featureLevel = D3D_FEATURE_LEVEL_11_0;
+		void ResizeRTVs(int width, int height);
 
-        // ÇÙ½É ÀÎÇÁ¶ó
-        Microsoft::WRL::ComPtr<ID3D11Device>            m_device;
-        Microsoft::WRL::ComPtr<ID3D11Device1>           m_device1;
-        Microsoft::WRL::ComPtr<IDXGIDevice3>            m_dxgiDevice;
-        Microsoft::WRL::ComPtr<ID3D11DeviceContext>     m_context;
-        Microsoft::WRL::ComPtr<IDXGISwapChain>          m_swapChain;
-        Microsoft::WRL::ComPtr<IDXGISwapChain1>         m_swapChain1;
+	protected:
+		HWND* m_pHwnd = nullptr;	// HWND í¬ì¸í„°
+		UINT m_rClientWidth = 0;
+		UINT m_rClientHeight = 0;
+		int m_rSyncInterval = 1;
+		
+		float m_backColor[4] = { 0.0f, 0.5f, 0.5f, 1.0f };	// ë°±ê·¸ë¼ìš´ë“œ ì»¬ëŸ¬
 
-        // ·»´õ Å¸°Ù ¹× µª½º ¹öÆÛ
-        Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_renderTargetView;
-        Microsoft::WRL::ComPtr<ID3D11Texture2D>         m_depthStencilTexture;
-        Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depthStencilView;
+		// ë””ë°”ì´ìŠ¤
+		Microsoft::WRL::ComPtr<ID3D11Device5> m_pDevice;
 
-        // °ø¿ë ½ºÅ×ÀÌÆ® (ÃÊ±âÈ­ ½Ã ¹Ì¸® »ı¼º)
-        Microsoft::WRL::ComPtr<ID3D11BlendState>        m_blendStateAlpha;
-        Microsoft::WRL::ComPtr<ID3D11BlendState>        m_blendStateOpaque;
-        Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilStateLess;
-        Microsoft::WRL::ComPtr<ID3D11SamplerState>      m_samplerLinear;
+		// ê¸°ë³¸ ë Œë” ì¸í„°í˜ì´ìŠ¤
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext4> m_pDeviceContext;		// ë””ë°”ì´ìŠ¤ ì»¨í…ìŠ¤íŠ¸
+		Microsoft::WRL::ComPtr<IDXGISwapChain4> m_pSwapChain;				// ìŠ¤ì™‘ì²´ì¸
 
-        // ¾ÀÀ» Ã³À½¿¡ ±×¸± Áß°£ ¹öÆÛ (HDR Ã³¸®¸¦ À§ÇØ º¸Åë float Æ÷¸Ë »ç¿ë)
-        Microsoft::WRL::ComPtr<ID3D11Texture2D>          m_sceneTexture;
-        Microsoft::WRL::ComPtr<ID3D11RenderTargetView>   m_sceneRTV;
-        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_sceneSRV;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView1> m_pRenderTargetView;	// ë Œë”ë§ íƒ€ê²Ÿë·°
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDepthStencilView;		// ê¹Šì´ê°’ ì²˜ë¦¬ë¥¼ ìœ„í•œ ëŠìŠ¤ìŠ¤í…ì‹¤ ë·°
+		Microsoft::WRL::ComPtr<ID3D11Texture2D1> m_pDepthStencilTexture;		// ëŠìŠ¤ìŠ¤í…ì‹¤ í…ìŠ¤ì³
 
-        // ÇÊ¿äÇÏ´Ù¸é ÇÎÆş(Ping-pong) ¹öÆÛ (ºí·ë, ºí·¯ µî ´Ù´Ü°è ÈÄÃ³¸® ½Ã)
-        Microsoft::WRL::ComPtr<ID3D11RenderTargetView>   m_postProcessRTV;
-        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_postProcessSRV;
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pDafaultSamplerLinear;		// ìƒ˜í”ŒëŸ¬ ìƒíƒœ.
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState2> m_pDefaultRS;			// ê¸°ë³¸ RS
 
-        std::vector<ObjPtr<Renderer>> m_renderers;
-        void RegisterRenderer(ObjPtr<Renderer> renderer);
-        void UnRegisterRenderer(ObjPtr<Renderer> renderer);
+		Microsoft::WRL::ComPtr<ID3D11BlendState1> m_pDefaultBS;		// ê¸°ë³¸ ë¸”ëœë“œ ìŠ¤í…Œì´íŠ¸
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState2> m_DefaultRS;	// ê¸°ë³¸ ë ˆìŠ¤í„°ë¼ì´ì € ìŠ¤í…Œì´íŠ¸
+		D3D11_VIEWPORT m_defaultViewport;							// ê¸°ë³¸ ë·°í¬íŠ¸
 
-        std::vector<RenderCommand> m_commandBuffer;
+		// ì”¬ì„ ì²˜ìŒì— ê·¸ë¦´ ì¤‘ê°„ ë²„í¼ (HDR ì²˜ë¦¬ë¥¼ ìœ„í•´ ë³´í†µ float í¬ë§· ì‚¬ìš©)
+		Microsoft::WRL::ComPtr<ID3D11Texture2D1>          m_pSceneTexture;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView1>   m_pSceneRTV;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView1> m_pSceneSRV;
 
-        //void SortCommands() {
-        //    std::sort(m_commandBuffer.begin(), m_commandBuffer.end(),
-        //        [](const RenderCommand& a, const RenderCommand& b) {
-        //            // 1. Å¥ ¼ø¼­ (Shadow -> Skybox -> Opaque -> ...)
-        //            if (a.queue != b.queue) return a.queue < b.queue;
+		// ë²„í¼ ê¸°ë³¸ìƒ‰ìƒ
+		DirectX::SimpleMath::Vector4 m_ClearColor;
 
-        //            // 2. »ç¿ëÀÚ ÁöÁ¤ ¼ø¼­
-        //            if (a.renderPriority != b.renderPriority) return a.renderPriority < b.renderPriority;
+		// ì¸í’‹ ë ˆì´ì•„ì›ƒ
+		std::shared_ptr<VShader> m_pDefaultVSShader;
+		std::shared_ptr<PShader> m_pDefaultPSShader;
+		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_pDefaultInputLayout;
 
-        //            // 3. Å¥ Á¾·ù¿¡ µû¸¥ ¼¼ºÎ Á¤·Ä
-        //            if (a.queue == RenderQueue::Transparent || a.queue == RenderQueue::Particle) {
-        //                // Åõ¸í °´Ã¼: µÚ¿¡¼­ºÎÅÍ (Distance ³»¸²Â÷¼ø)
-        //                return a.distanceSq > b.distanceSq;
-        //            }
+		// ì¹´ë©”ë¼ ê´€ë ¨
+		ObjPtr<EditorCamera> m_pCamera;
+		Render_CamBuffer m_camMat;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pCambuffer = nullptr;		// íŠ¸ëœìŠ¤í¼ ë²„í¼
 
-        //            else {
-        //                // ºÒÅõ¸í °´Ã¼: ¾Õ¿¡¼­ºÎÅÍ (Early-Z ÃÖÀûÈ­)
-        //                if (std::abs(a.distanceSq - b.distanceSq) > 0.0001f)
-        //                    return a.distanceSq < b.distanceSq;
+		// ë°±ë²„í¼ í…ìŠ¤ì³
+		Microsoft::WRL::ComPtr<ID3D11Texture2D1> m_pBackBuffer = nullptr;		// ë°±ë²„í¼ í…ìŠ¤ì²˜
 
-        //                // 4. °Å¸®±îÁö °°´Ù¸é ¸ÓÅÍ¸®¾ó³¢¸® ¸ğ¾Æ¼­ »óÅÂ º¯°æ ÃÖÀûÈ­
-        //                return a.materialID < b.materialID;
-        //            }
-        //        });
-        //}
-        void ClearScreen();
-        void ResizeRTVs(int width, int height);
+		// í…ìŠ¤ì³ ë²„í¼ì¸ë±ìŠ¤ ì£¼ëŠ” ë§µ <propertyName, index>
+		std::unordered_map<std::wstring, int> m_propertyMap;
 	public:
-        // ¸®¼Ò½º »ı¼º µµ¿ì¹Ì (Renderer ÄÄÆ÷³ÍÆ®µéÀÌ »ç¿ë)
-        ID3D11Device* GetDevice() { return m_device.Get(); }
-        ID3D11DeviceContext* GetContext() { return m_context.Get(); }
+		void StartUp(HWND* _hwnd, UINT _ClientWidth, UINT _ClientHeight);
+		void InitD3D();
+		void ShutDown();
+		void Start();
+		void ResizeScreen(int width, int height);
+		void SetCamera(ObjPtr<EditorCamera> _cameraComp);
 
-        void SetSyncInterval(int interval) { m_syncInterval = interval; }
 
-        void StartUp(HWND hWnd, int width, int height);
-        void ResizeScreen(int width, int height);
-        void ShutDown();
+		void BeginFrame();
+		void Render();
+		void EndFrame();
 
-        // ·»´õ¸µ ·çÇÁ ÁøÀÔÁ¡
-        void BeginFrame();
-        void Render();
-        void EndFrame(); // Present() È£Ãâ
+		const Microsoft::WRL::ComPtr<ID3D11Device5> GetDevice() const { return m_pDevice; }
+		const Microsoft::WRL::ComPtr<ID3D11DeviceContext4> GetContext() const { return m_pDeviceContext; }
+		const std::shared_ptr<VShader> GetDefaultVS() const { return m_pDefaultVSShader; }
+		const std::shared_ptr<PShader> GetDefaultPS() const { return m_pDefaultPSShader; }
+		const Microsoft::WRL::ComPtr<ID3D11InputLayout> GetDefaultInputLayout() const { return m_pDefaultInputLayout; }
+		const int PropertyToIdx(const std::wstring& _propertyName) const;
+	public:
+		template <typename T, typename... Args>
+		std::weak_ptr<RendererBase> AddRenderer(RenderType _passType, Args&&... args) {
+			std::shared_ptr<T> temp = std::make_shared<T>(std::forward<Args>(args)...);
+			m_Passes[_passType].push_back(temp);
+			m_initQueue.push(temp);
+
+			return temp;
+		}
+
+		template <typename T>
+		bool RemoveRenderer(MMMEngine::RenderType _passType, std::shared_ptr<T>& _renderer) {
+			if (_renderer && (m_Passes.find(_passType) != m_Passes.end())) {
+				auto it = std::find(m_Passes[_passType].begin(), m_Passes[_passType].end(), _renderer);
+
+				if (it != m_Passes[_passType].end()) {
+					m_Passes[_passType].erase(it);
+					return true;
+				}
+			}
+
+			return false;
+		}
 	};
 }

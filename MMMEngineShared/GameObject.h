@@ -31,7 +31,7 @@ namespace MMMEngine
 		uint32_t m_layer = static_cast<uint32_t>(-1);
 
 		bool m_active = true;
-		bool m_activeInHierarchy = true; // Hierarchy¿¡¼­ È°¼ºÈ­ ¿©ºÎ
+		bool m_activeInHierarchy = true; // Hierarchyì—ì„œ í™œì„±í™” ì—¬ë¶€
 
 		void RegisterComponent(const ObjPtr<Component>& comp);
 		void UnRegisterComponent(const ObjPtr<Component>& comp);
@@ -65,8 +65,8 @@ namespace MMMEngine
 		template <typename T>
 		ObjPtr<T> AddComponent()
 		{
-			static_assert(!std::is_same_v<T, Transform>, "TransformÀº Addcomponent·Î »ı¼ºÇÒ ¼ö ¾ø½À´Ï´Ù.");
-			static_assert(std::is_base_of_v<Component, T>, "T´Â Component¸¦ »ó¼Ó¹Ş¾Æ¾ß ÇÕ´Ï´Ù.");
+			static_assert(!std::is_same_v<T, Transform>, "Transformì€ Addcomponentë¡œ ìƒì„±í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+			static_assert(std::is_base_of_v<Component, T>, "TëŠ” Componentë¥¼ ìƒì†ë°›ì•„ì•¼ í•©ë‹ˆë‹¤.");
 
 			auto newComponent = Object::NewObject<T>();
 			newComponent->m_gameObject = SelfPtr(this);
@@ -86,7 +86,7 @@ namespace MMMEngine
 		template <typename T>
 		ObjPtr<T> GetComponent()
 		{
-			static_assert(std::is_base_of<Component, T>::value, "GetComponent()ÀÇ T´Â Component¸¦ »ó¼Ó¹Ş¾Æ¾ß ÇÕ´Ï´Ù.");
+			static_assert(std::is_base_of<Component, T>::value, "GetComponent()ì˜ TëŠ” Componentë¥¼ ìƒì†ë°›ì•„ì•¼ í•©ë‹ˆë‹¤.");
 
 			for (auto& comp : m_components)
 			{
@@ -103,7 +103,7 @@ namespace MMMEngine
 		template <typename T>
 		std::vector<ObjPtr<T>> GetComponents()
 		{
-			static_assert(std::is_base_of<Component, T>::value, "GetComponent()ÀÇ T´Â Component¸¦ »ó¼Ó¹Ş¾Æ¾ß ÇÕ´Ï´Ù.");
+			static_assert(std::is_base_of<Component, T>::value, "GetComponent()ì˜ TëŠ” Componentë¥¼ ìƒì†ë°›ì•„ì•¼ í•©ë‹ˆë‹¤.");
 
 			std::vector<ObjPtr<T>> result;
 
@@ -122,7 +122,7 @@ namespace MMMEngine
 		template <typename T>
 		size_t GetComponentsCount()
 		{
-			static_assert(std::is_base_of<Component, T>::value, "GetComponent()ÀÇ T´Â Component¸¦ »ó¼Ó¹Ş¾Æ¾ß ÇÕ´Ï´Ù.");
+			static_assert(std::is_base_of<Component, T>::value, "GetComponent()ì˜ TëŠ” Componentë¥¼ ìƒì†ë°›ì•„ì•¼ í•©ë‹ˆë‹¤.");
 
 			size_t result = 0;
 
@@ -137,6 +137,7 @@ namespace MMMEngine
 
 			return result;
 		}
+
 
 		const std::vector<ObjPtr<Component>>& GetAllComponents() const { return m_components; }
 

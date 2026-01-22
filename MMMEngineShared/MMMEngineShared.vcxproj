@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -79,6 +79,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>$(Platform)\$(Configuration)\EngineShared\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -109,15 +112,15 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32;_WINDOWS;RTTR_DLL;MMMENGINE_EXPORTS;NV_USE_DEBUG_WINCRT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>Default</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)$(ProjectDir)rttr\..;$(ProjectDir);$(ProjectDir)dxtk\Inc;$(ProjectDir)dxtk;$(ProjectDir)physx</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)$(ProjectDir)rttr\..;$(ProjectDir);$(ProjectDir)dxtk\Inc;$(ProjectDir)dxtk;$(ProjectDir)dxtex;$(ProjectDir)DDSTextureLoader</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <TreatWChar_tAsBuiltInType />
       <ForceConformanceInForLoopScope />
@@ -134,7 +137,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);WIN32;_WINDOWS;RTTR_DLL;RTTR_DLL_EXPORTS;MMMENGINE_EXPORTS;</PreprocessorDefinitions>
       <ConformanceMode>Default</ConformanceMode>
@@ -156,13 +159,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="RigidBodyComponent.h" />
+    <ClInclude Include="AnimationClip.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="AssetsDatabase.h" />
     <ClInclude Include="Behaviour.h" />
-    <ClInclude Include="CapsuleColliderComponent.h" />
-    <ClInclude Include="ColliderComponent.h" />
-    <ClInclude Include="CollisionMatrix.h" />
+    <ClInclude Include="EditorCamera.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Delegates.hpp" />
     <ClInclude Include="DisplayMode.h" />
@@ -191,6 +192,9 @@
     <ClInclude Include="ExportSingleton.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GlobalRegistry.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialSerializer.h" />
+    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="MissingScriptBehaviour.h" />
     <ClInclude Include="MMMApplication.h" />
     <ClInclude Include="MMMResources.h" />
@@ -201,21 +205,17 @@
     <ClInclude Include="InputKeyCode.h" />
     <ClInclude Include="MMMInput.h" />
     <ClInclude Include="InputManager.h" />
-    <ClInclude Include="PhysicsEventCallback.h" />
-    <ClInclude Include="PhysicsFilter.h" />
-    <ClInclude Include="PhysScene.h" />
-    <ClInclude Include="PhysX.h" />
-    <ClInclude Include="PhysxHelper.h" />
-    <ClInclude Include="PhysxManager.h" />
-    <ClInclude Include="RenderCommand.h" />
-    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="GeoRenderer.h" />
+    <ClInclude Include="PShader.h" />
+    <ClInclude Include="RendererBase.h" />
+    <ClInclude Include="RendererTools.h" />
     <ClInclude Include="RenderManager.h" />
-    <ClInclude Include="RenderQueue.h" />
     <ClInclude Include="Resolution.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="MMMTime.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="ResourceSerializer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SceneRef.h" />
@@ -223,8 +223,13 @@
     <ClInclude Include="ScriptBehaviour.h" />
     <ClInclude Include="ScriptLoader.h" />
     <ClInclude Include="SerializableEvent.h" />
+    <ClInclude Include="SkeletalMesh.h" />
+    <ClInclude Include="StaticMesh.h" />
+    <ClInclude Include="VShader.h" />
     <ClInclude Include="Singleton.hpp" />
+    <ClInclude Include="SkyboxRenderer.h" />
     <ClInclude Include="StringHelper.h" />
+    <ClInclude Include="Texture2D.h" />
     <ClInclude Include="TextResource.h" />
     <ClInclude Include="TimeManager.h" />
     <ClInclude Include="Transform.h" />
@@ -235,52 +240,46 @@
     <ClInclude Include="BehaviourManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnimationClip.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Behaviour.cpp" />
     <ClCompile Include="BehaviourManger.cpp" />
-    <ClCompile Include="CapsuleColliderComponent.cpp" />
-    <ClCompile Include="ColliderComponent.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="CollisionMatrix.cpp" />
+    <ClCompile Include="EditorCamera.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="dxtk\Src\SimpleMath.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalRegistry.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MaterialSerializer.cpp" />
+    <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="MissingScriptBehaviour.cpp" />
     <ClCompile Include="MUID.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
-    <ClCompile Include="PhysicsEventCallback.cpp" />
-    <ClCompile Include="PhysicsFilter.cpp" />
-    <ClCompile Include="PhysScene.cpp" />
-    <ClCompile Include="PhysX.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="PhysxHelper.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="PhysxManager.cpp" />
-    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="GeoRenderer.cpp" />
+    <ClCompile Include="PShader.cpp" />
+    <ClCompile Include="RendererBase.cpp" />
+    <ClCompile Include="RendererTools.cpp" />
     <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="RenderShared.cpp" />
+    <ClCompile Include="RenderShared.h" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
-    <ClCompile Include="RigidBodyComponent.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="ResourceSerializer.cpp" />
     <ClCompile Include="rttr_directxmath_registry.cpp" />
     <ClCompile Include="rttr_simplemath_registry.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneSerializer.cpp" />
     <ClCompile Include="ScriptBehaviour.cpp" />
+    <ClCompile Include="SkeletalMesh.cpp" />
+    <ClCompile Include="StaticMesh.cpp" />
+    <ClCompile Include="VShader.cpp" />
+    <ClCompile Include="SkyboxRenderer.cpp" />
     <ClCompile Include="ScriptLoader.cpp" />
     <ClCompile Include="StringHelper.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="TextResource.cpp" />
     <ClCompile Include="TimeManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -290,6 +289,9 @@
   <ItemGroup>
     <None Include="dxtk\Inc\SimpleMath.inl" />
     <None Include="Object.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MMMEngineShared.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
