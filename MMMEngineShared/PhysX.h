@@ -14,6 +14,8 @@ namespace MMMEngine
 	class MMMENGINE_API PhysicX : public Utility::ExportSingleton<PhysicX>
 	{
 	public:
+		using MaterialID = uint32_t;
+
 		//PhysicX() : m_cookingParams(physx::PxTolerancesScale()) {};
 		PhysicX() = default;
 		~PhysicX() = default;
@@ -36,6 +38,9 @@ namespace MMMEngine
 
 		//physx::PxPvd& GetPvd() { return *m_Pvd; }
 		//const physx::PxPvd& GetPvd() const { return *m_Pvd; }
+
+		physx::PxMaterial* GetDefaultMaterial();
+		physx::PxMaterial* GetMaterial(MaterialID id);
 
 	private:
 		//PhysX SDK의 기반/코어 서비스 관리 객체, 메모리 할당/해체 정책 관리, 에러/로그 콜백 관리, 공용 리소스/내부 인프라 초기화
@@ -60,6 +65,9 @@ namespace MMMEngine
 		//physx::PxPvdTransport* transport = nullptr;
 
 
+		physx::PxMaterial* m_defaultMaterial;
+		std::unordered_map<MaterialID, physx::PxMaterial*> m_materials;
+
 		int threadCount;
 
 		bool InitTolerances(float _length, float _speed);
@@ -67,6 +75,7 @@ namespace MMMEngine
 		bool InitPhysics();
 		//bool InitDispatcher();
 		bool InitCook();
+		bool InitMaterial();
 		//bool InitPVD();
 	};
 }

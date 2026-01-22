@@ -194,7 +194,6 @@
     <ClInclude Include="MMMResources.h" />
     <ClInclude Include="MMMSceneManagement.h" />
     <ClInclude Include="MMMScreen.h" />
-    <ClInclude Include="ModelColliderComponent.h" />
     <ClInclude Include="MUID.h" />
     <ClInclude Include="InputConstant.h" />
     <ClInclude Include="InputKeyCode.h" />
@@ -377,7 +376,6 @@
     <ClCompile Include="GlobalRegistry.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="MissingScriptBehaviour.cpp" />
-    <ClCompile Include="ModelColliderComponent.cpp" />
     <ClCompile Include="MUID.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />

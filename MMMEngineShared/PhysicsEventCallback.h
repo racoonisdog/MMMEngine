@@ -2,6 +2,7 @@
 #include <physx/PxPhysicsAPI.h>
 #include <iostream>
 #include <vector>
+#include <mutex>
 
 
 namespace MMMEngine
@@ -53,23 +54,11 @@ namespace MMMEngine
 		const std::vector<ContactEvent>& GetContacts() const { return m_contacts; }
 		const std::vector<TriggerEvent>& GetTriggers() const { return m_triggers; }
 
-		void DrainContacts(std::vector<ContactEvent>& out)
-		{
-			out.insert(out.end(), m_contacts.begin(), m_contacts.end());
-			m_contacts.clear();
-		}
+		void DrainContacts(std::vector<ContactEvent>& out);
 
-		void DrainTriggers(std::vector<TriggerEvent>& out)
-		{
-			out.insert(out.end(), m_triggers.begin(), m_triggers.end());
-			m_triggers.clear();
-		}
+		void DrainTriggers(std::vector<TriggerEvent>& out);
 
-		void Clear()
-		{
-			m_contacts.clear();
-			m_triggers.clear();
-		}
+		void Clear();
 
 
 		//아래는 이번 프로젝트에서 사용 안하는 용도
@@ -84,6 +73,7 @@ namespace MMMEngine
 		//시뮬레이션 결과 pose가 준비된 시점에 결과 pose 배열을 콜백으로 넘겨주는 메커니즘
 		void onAdvance(const physx::PxRigidBody* const*, const physx::PxTransform*, const physx::PxU32) override {};
 	private:
+		std::mutex m_mtx;
 		std::vector<ContactEvent> m_contacts;
 		std::vector<TriggerEvent> m_triggers;
 	};

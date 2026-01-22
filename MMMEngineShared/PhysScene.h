@@ -57,22 +57,23 @@ namespace MMMEngine
 
 		
 		//등록/해제/부착/분리/리빌드
-		void RegisterRigid(MMMEngine::RigidBodyComponent* rb, MMMEngine::PhysicX& core);
+		void RegisterRigid(MMMEngine::RigidBodyComponent* rb);
 		void UnregisterRigid(MMMEngine::RigidBodyComponent* rb);
+
+		//void SwapRigid(RigidBodyComponent* oldRb, RigidBodyComponent* newRb, const CollisionMatrix& matrix);
 
 		void AttachCollider(MMMEngine::RigidBodyComponent* rb,
 			MMMEngine::ColliderComponent* col,
-			MMMEngine::PhysicX& core,
 			const CollisionMatrix& matrix);
 
 		void DetachCollider(MMMEngine::RigidBodyComponent* rb,
 			MMMEngine::ColliderComponent* col);
 
-		void RebuildCollider(MMMEngine::ColliderComponent* col,
-			MMMEngine::PhysicX& core,
-			const CollisionMatrix& matrix);
-
 		void ReapplyFilters(const CollisionMatrix& matrix);
+
+		void UpdateColliderGeometry(MMMEngine::ColliderComponent* col);
+
+		void RebuildCollider(MMMEngine::ColliderComponent* col, const CollisionMatrix& matrix);
 
 
 		const std::vector<MMMEngine::PhysXSimulationCallback::ContactEvent>& GetFrameContacts() const { return m_frameContacts; }
@@ -96,7 +97,7 @@ namespace MMMEngine
 		//해당 shape가 어느 actor에 붙어있는지 ( 어떤 collider가 rigid에 붙었는지 )
 		std::unordered_map< MMMEngine::ColliderComponent*, MMMEngine::RigidBodyComponent*> m_ownerByCollider;
 
-		// Rigid가 죽을때 일괄적으로 detach처리하기 위한 컨테이너
+		// Rigid가 죽거나 제거할때 일괄적으로 detach처리하기 위한 컨테이너 ( 임시 보관 컨테이너 )
 		std::unordered_map<MMMEngine::RigidBodyComponent*, std::vector<MMMEngine::ColliderComponent*>> m_collidersByRigid;
 	};
 }

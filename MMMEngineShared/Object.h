@@ -108,6 +108,7 @@ namespace MMMEngine
         friend struct std::hash;
         friend class ObjectManager;
         friend class ObjectSerializer;
+        friend class PhysxManager;
         template<typename> friend class ObjPtr;
 
         T*          m_raw               = nullptr;

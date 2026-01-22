@@ -1,5 +1,8 @@
+#include "PhysxManager.h"
 #include "ColliderComponent.h"
 #include "RigidBodyComponent.h"
+#include "Transform.h"
+#include "GameObject.h"
 
 
 void MMMEngine::ColliderComponent::ApplySceneQueryFlag()
@@ -54,6 +57,40 @@ void MMMEngine::ColliderComponent::ApplyShapeModeFlags()
         m_Shape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, false);
         break;
     }
+}
+
+void MMMEngine::ColliderComponent::SetOverrideLayer(bool enable)
+{
+    m_OverrideLayer = enable;
+}
+
+void MMMEngine::ColliderComponent::SetLayer(uint32_t layer)
+{
+    m_LayerOverride = layer;
+}
+
+uint32_t MMMEngine::ColliderComponent::GetEffectiveLayer()
+{
+    if (m_OverrideLayer) return m_LayerOverride;
+    else
+    {
+        if(GetGameObject().IsValid())
+		{
+			const auto Obj_layer = GetGameObject()->GetLayer();
+			return Obj_layer;
+		}
+        else
+        {
+            return 0;
+        }
+    }  
+}
+
+void MMMEngine::ColliderComponent::MarkGeometryDirty()
+{
+    m_geometryDirty = true;
+    //Todo Notifiycolliderchanges 로 전달 예정
+    PhysxManager::Get().NotifyColliderChanged(this);
 }
 
 

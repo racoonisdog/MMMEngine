@@ -67,7 +67,6 @@
     <ClCompile Include="TimeManager.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="CapsuleColliderComponent.cpp" />
-    <ClCompile Include="ModelColliderComponent.cpp" />
     <ClCompile Include="CollisionMatrix.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -270,7 +269,6 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="BehaviourManager.h" />
     <ClInclude Include="CapsuleColliderComponent.h" />
-    <ClInclude Include="ModelColliderComponent.h" />
     <ClInclude Include="CollisionMatrix.h" />
   </ItemGroup>
   <ItemGroup>

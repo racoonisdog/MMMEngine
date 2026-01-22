@@ -20,6 +20,7 @@ bool MMMEngine::PhysicX::Initialize()
 	if (!InitPhysics()) return false;
 	if (!InitCook()) return false;
 	//if (!InitDispatcher()) return false;
+	if (!InitMaterial()) return false;
 
 	return true;
 }
@@ -35,7 +36,18 @@ bool MMMEngine::PhysicX::UnInitialize()
 //#endif
 	//마지막에 해제
 	SAFE_RELEASE(m_foundation);
+	SAFE_RELEASE(m_defaultMaterial);
 	return true;
+}
+
+physx::PxMaterial* MMMEngine::PhysicX::GetDefaultMaterial()
+{
+	return m_defaultMaterial;
+}
+
+physx::PxMaterial* MMMEngine::PhysicX::GetMaterial(MaterialID id)
+{
+	return m_defaultMaterial;
 }
 
 bool MMMEngine::PhysicX::InitTolerances(float _length, float _speed)
@@ -78,6 +90,17 @@ bool MMMEngine::PhysicX::InitCook()
 	m_cookingParams.emplace(m_physics->getTolerancesScale());
 	m_cookingParams->meshPreprocessParams |= physx::PxMeshPreprocessingFlag::eWELD_VERTICES;
 	m_cookingParamInitialized = true;
+	return true;
+}
+
+bool MMMEngine::PhysicX::InitMaterial()
+{
+	m_defaultMaterial = m_physics->createMaterial(
+		0.5f,   // static friction
+		0.5f,   // dynamic friction
+		0.1f    // restitution
+	);
+	if (m_defaultMaterial == nullptr) return false;
 	return true;
 }
 

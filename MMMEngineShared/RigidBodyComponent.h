@@ -44,6 +44,10 @@ namespace MMMEngine {
 			float angularDamping = 0.05f;
 			bool useGravity = true;
 			bool isKinematic = false;
+			
+			Desc(Type _type, float _mass, float _linearDamping, float _angularDamping, bool _useGravity, bool _isKinematic) :
+			type(_type), mass(_mass) , linearDamping(_linearDamping), angularDamping(_angularDamping), useGravity(_useGravity), isKinematic(_isKinematic)
+			{}
 		};
 
 
@@ -103,12 +107,17 @@ namespace MMMEngine {
 
 		DirectX::SimpleMath::Vector3 GetAngularVelocity() const;
 
+		void SetisAutoRigid(bool value);
+		bool GetisAutoRigid();
+
 		void WakeUp();
 
 		void SetUseGravity(bool value) { m_Desc.useGravity = value; m_DescDirty = true; m_WakeRequested = true; }
 		void SetKinematic(bool value) { m_Desc.isKinematic = value; m_DescDirty = true; m_WakeRequested = true; }
 		void SetMass(float mass) { m_Desc.mass = mass; m_DescDirty = true; m_WakeRequested = true; }
 		void SetDamping(float lin, float ang) { m_Desc.linearDamping = lin; m_Desc.angularDamping = ang, m_DescDirty = true; m_WakeRequested = true; }
+
+		physx::PxRigidActor* GetPxActor() const;
 
 	private:
 		Desc m_Desc;
@@ -161,6 +170,8 @@ namespace MMMEngine {
 		std::vector<TorqueCmd> m_TorqueQueue;
 
 		physx::PxPhysics* m_Physics = nullptr;
+
+		bool m_IsAutoRigid = false;
 
 	private:
 		physx::PxForceMode::Enum ToPxForceMode(ForceMode mode);

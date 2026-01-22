@@ -3,6 +3,8 @@
 //물리 접촉 이벤트 수집
 void MMMEngine::PhysXSimulationCallback::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs)
 {
+    std::lock_guard<std::mutex> lock(m_mtx);
+
     physx::PxActor* actorA = pairHeader.actors[0];
     physx::PxActor* actorB = pairHeader.actors[1];
 
@@ -39,6 +41,8 @@ void MMMEngine::PhysXSimulationCallback::onContact(const physx::PxContactPairHea
 
 void MMMEngine::PhysXSimulationCallback::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
 {
+    std::lock_guard<std::mutex> lock(m_mtx);
+
     for (physx::PxU32 i = 0; i < count; ++i)
     {
         const auto& p = pairs[i];
@@ -65,4 +69,39 @@ void MMMEngine::PhysXSimulationCallback::onTrigger(physx::PxTriggerPair* pairs, 
             m_triggers.push_back(TriggerEvent{ p.triggerActor, p.otherActor, p.triggerShape, p.otherShape, false });
         }
     }
+}
+
+void MMMEngine::PhysXSimulationCallback::DrainContacts(std::vector<ContactEvent>& out)
+{
+    std::vector<ContactEvent> tmp;
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        tmp.swap(m_contacts);
+    }
+    // 락 밖에서 out에 합치기
+    out.insert(out.end(), tmp.begin(), tmp.end());
+
+    //out.insert(out.end(), m_contacts.begin(), m_contacts.end());
+    //m_contacts.clear();
+}
+
+void MMMEngine::PhysXSimulationCallback::DrainTriggers(std::vector<TriggerEvent>& out)
+{
+    std::vector<TriggerEvent> tmp;
+    {
+        std::lock_guard<std::mutex> lock(m_mtx);
+        tmp.swap(m_triggers);
+    }
+    out.insert(out.end(), tmp.begin(), tmp.end());
+
+    //out.insert(out.end(), m_triggers.begin(), m_triggers.end());
+    //m_triggers.clear();
+}
+
+
+void MMMEngine::PhysXSimulationCallback::Clear()
+{
+    std::lock_guard<std::mutex> lock(m_mtx);
+    m_contacts.clear();
+    m_triggers.clear();
 }

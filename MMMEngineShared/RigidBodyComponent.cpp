@@ -4,7 +4,7 @@
 #include "rttr/registration"
 #include "ColliderComponent.h"
 #include "GameObject.h"
-#include "SceneManager.h"
+#include "PhysxManager.h"
 #include "PhysX.h"
 
 RTTR_REGISTRATION
@@ -61,11 +61,19 @@ void MMMEngine::RigidBodyComponent::CreateActor(physx::PxPhysics* physics, Vecto
 	}
 }
 
-//component자신을 Scene를 통해 physScene에 등록하는 용도의 init
+//생성했을때 이미 존재하면 등록안하도록 함
 void MMMEngine::RigidBodyComponent::Initialize()
 {
-	//SceneManager::Get().GetSceneRaw(GetGameObject()->GetScene())->GetPhysScene().RegisterRigid(this, PhysicX::Get());
-	//physManager::Get()->GetPhysScene().RegisterRigid(this, PhysicX::Get());
+	auto it = GetGameObject()->GetComponent<RigidBodyComponent>();
+	if (it.IsValid())
+	{
+		std::cout << "이미 존재하는 RigidComponent" << std::endl;
+		Destroy(SelfPtr(this));
+		return;
+	}
+	m_Desc = { MMMEngine::RigidBodyComponent::Type::Dynamic, 1.0f, 0.05f, 0.0f, true, false };
+
+	MMMEngine::PhysxManager::Get().NotifyRigidAdded(this);
 }
 
 void MMMEngine::RigidBodyComponent::OnDestroy()
@@ -377,9 +385,24 @@ Vector3 MMMEngine::RigidBodyComponent::GetAngularVelocity() const
 	return Vector3();
 }
 
+void MMMEngine::RigidBodyComponent::SetisAutoRigid(bool value)
+{
+	m_IsAutoRigid = value;
+}
+
+bool MMMEngine::RigidBodyComponent::GetisAutoRigid()
+{
+	return m_IsAutoRigid;
+}
+
 void MMMEngine::RigidBodyComponent::WakeUp()
 {
 	m_WakeRequested = true;
+}
+
+physx::PxRigidActor* MMMEngine::RigidBodyComponent::GetPxActor() const
+{
+	return m_Actor;
 }
 
 

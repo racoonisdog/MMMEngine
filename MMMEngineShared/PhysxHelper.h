@@ -34,3 +34,16 @@ physx::PxTransform ToPxTrans(const Vector3& pos, const Quaternion& quater);
 Vector3 ToVec(const physx::PxVec3& v);
 
 Quaternion ToQuat(const physx::PxQuat& quater);
+
+template<typename T>
+bool Contains(const std::vector<T*>& v, T* target)
+{
+	return std::find(v.begin(), v.end(), target) != v.end();
+}
+
+template<typename T>
+void EraseOne(std::vector<T*>& v, T* target)
+{
+	auto it = std::find(v.begin(), v.end(), target);
+	if (it != v.end()) v.erase(it);
+}
