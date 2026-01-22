@@ -93,6 +93,13 @@ void RenderProperties(rttr::instance inst)
         {
             Vector3 v = var.get_value<Vector3>();
             float data[3] = { v.x, v.y, v.z };
+            auto SnapToZero = [](float& v, float eps = 1e-4f)
+                {
+                    if (fabsf(v) < eps) v = 0.0f; // +0·Î ¸¸µé¾îÁü
+                };
+            SnapToZero(data[0]);
+            SnapToZero(data[1]);
+            SnapToZero(data[2]);
 
             if (readOnly) ImGui::BeginDisabled(true);
             bool changed = ImGui::DragFloat3(name.c_str(), data, 0.1f);
@@ -179,6 +186,13 @@ void RenderProperties(rttr::instance inst)
             }
 
             float data[3] = { g_eulerCache.x, g_eulerCache.y, g_eulerCache.z };
+            auto SnapToZero = [](float& v, float eps = 1e-4f)
+                {
+                    if (fabsf(v) < eps) v = 0.0f; // +0·Î ¸¸µé¾îÁü
+                };
+            SnapToZero(data[0]);
+            SnapToZero(data[1]);
+            SnapToZero(data[2]);
 
             if (readOnly) ImGui::BeginDisabled(true);
             bool changed = ImGui::DragFloat3(name.c_str(), data, 0.1f);

@@ -19,6 +19,9 @@ struct ReparentCmd
 
 static std::vector<ReparentCmd> g_reparentQueue;
 
+// 하이어라키 윈도우 내부에서만 사용할 임시 선택 오브젝트
+static ObjPtr<GameObject> g_hierarchyPendingSelection = nullptr;
+
 void DrawDropLine(const char* id, float height = 4.0f)
 {
 	ImVec2 size(ImGui::GetContentRegionAvail().x, height);
@@ -72,9 +75,11 @@ void DrawHierarchyMember(ObjPtr<GameObject> obj, bool allowDrag)
 	if (!activeSelf)
 		ImGui::PopStyleColor();
 
-	// 클릭/선택은 그대로 동작
+	// 클릭 시 임시 선택 오브젝트에만 저장 (전역 레지스트리는 변경하지 않음)
 	if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-		g_selectedGameObject = obj;
+	{
+		g_hierarchyPendingSelection = obj;
+	}
 
 	if (allowDrag)
 	{
@@ -94,9 +99,9 @@ void DrawHierarchyMember(ObjPtr<GameObject> obj, bool allowDrag)
 		auto pt = obj->GetTransform();
 		auto child_size = pt->GetChildCount();
 
-		for(size_t i = 0; i < child_size; ++i)
+		for (size_t i = 0; i < child_size; ++i)
 		{
-			DrawHierarchyMember(pt->GetChild(i)->GetGameObject(),allowDrag);
+			DrawHierarchyMember(pt->GetChild(i)->GetGameObject(), allowDrag);
 		}
 		ImGui::TreePop();
 	}
@@ -117,7 +122,7 @@ void MMMEngine::Editor::HierarchyWindow::Render()
 
 	ImGui::SetNextWindowClass(&wc);
 
-  	auto sceneRef = SceneManager::Get().GetCurrentScene();
+	auto sceneRef = SceneManager::Get().GetCurrentScene();
 	auto sceneRaw = SceneManager::Get().GetSceneRaw(sceneRef);
 	auto ddolGos = SceneManager::Get().GetAllGameObjectInDDOL();
 
@@ -132,8 +137,10 @@ void MMMEngine::Editor::HierarchyWindow::Render()
 
 	auto hbuttonsize = ImVec2{ ImGui::GetContentRegionAvail().x / 2 - ImGui::GetStyle().ItemSpacing.x / 2, 0 };
 
-	if (ImGui::Button(u8"생성", hbuttonsize)) 
-	{ Object::NewObject<GameObject>(); }
+	if (ImGui::Button(u8"생성", hbuttonsize))
+	{
+		Object::NewObject<GameObject>();
+	}
 	ImGui::SameLine();
 	ImGui::BeginDisabled(g_selectedGameObject == nullptr);
 	if (ImGui::Button(u8"파괴", hbuttonsize)) { Object::Destroy(g_selectedGameObject); g_selectedGameObject = nullptr; }
@@ -150,11 +157,11 @@ void MMMEngine::Editor::HierarchyWindow::Render()
 		{
 			if (go->GetTransform()->GetParent() == nullptr)
 			{
-				DrawHierarchyMember(go,true);
+				DrawHierarchyMember(go, true);
 			}
 		}
-		
-		if(!ddolGos.empty())
+
+		if (!ddolGos.empty())
 			DrawDropLine("##drop_lastline");
 		else
 		{
@@ -175,8 +182,29 @@ void MMMEngine::Editor::HierarchyWindow::Render()
 	{
 		for (auto& go : ddolGos)
 		{
-			if (go->GetTransform()->GetParent() == nullptr) DrawHierarchyMember(go,false);
+			if (go->GetTransform()->GetParent() == nullptr) DrawHierarchyMember(go, false);
 		}
+	}
+
+	// 마우스 버튼을 뗐을 때 처리 (ImGui::End() 전에 체크해야 함)
+	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+	{
+		// 현재 마우스 위치가 하이어라키 윈도우 내부인지 직접 체크
+		ImVec2 mousePos = ImGui::GetMousePos();
+		ImVec2 winMin = ImGui::GetWindowPos();
+		ImVec2 winMax = ImVec2(winMin.x + ImGui::GetWindowSize().x, winMin.y + ImGui::GetWindowSize().y);
+
+		bool isMouseInWindow = (mousePos.x >= winMin.x && mousePos.x <= winMax.x &&
+			mousePos.y >= winMin.y && mousePos.y <= winMax.y);
+
+		// 마우스를 뗀 위치가 하이어라키 윈도우 내부인 경우에만 선택 적용
+		if (isMouseInWindow && g_hierarchyPendingSelection.IsValid())
+		{
+			g_selectedGameObject = g_hierarchyPendingSelection;
+		}
+
+		// 임시 선택 오브젝트 초기화
+		g_hierarchyPendingSelection = nullptr;
 	}
 
 	ImGui::End();
