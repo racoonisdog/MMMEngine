@@ -64,6 +64,12 @@
     <Filter Include="헤더 파일\EditorWindow\Popup">
       <UniqueIdentifier>{c08b3bc1-1c08-415a-937f-35637ba02f9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\EditorWindow\ImGuiHelper">
+      <UniqueIdentifier>{02682008-0f7d-4ca2-b282-177aa6605dac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\EditorWIndow\ImGuiHelper">
+      <UniqueIdentifier>{13ca9905-ce86-4a02-bae1-02910f48d488}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorRegistry.h">
@@ -129,6 +135,15 @@
     <ClInclude Include="ScriptBuildWindow.h">
       <Filter>헤더 파일\EditorWindow\Popup</Filter>
     </ClInclude>
+    <ClInclude Include="ConsoleWindow.h">
+      <Filter>헤더 파일\EditorWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleStreamBuf.h">
+      <Filter>헤더 파일\EditorWindow\ImGuiHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="FilesWindow.h">
+      <Filter>헤더 파일\EditorWindow</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -183,7 +198,13 @@
       <Filter>소스 파일\EditorWIndow\Popup</Filter>
     </ClCompile>
     <ClCompile Include="ScriptBuildWindow.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\EditorWIndow\Popup</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleWindow.cpp">
+      <Filter>소스 파일\EditorWIndow</Filter>
+    </ClCompile>
+    <ClCompile Include="FilesWindow.cpp">
+      <Filter>소스 파일\EditorWIndow</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

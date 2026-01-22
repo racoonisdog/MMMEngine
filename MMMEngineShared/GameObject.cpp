@@ -15,6 +15,7 @@ RTTR_REGISTRATION
 	using namespace MMMEngine;
 
 	registration::class_<GameObject>("GameObject")
+		(rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<GameObject>>()))
 		.property("Active", &GameObject::IsActiveInHierarchy, &GameObject::SetActive)
 		.property("Scene", &GameObject::GetScene, &GameObject::SetScene, registration::private_access)
 		.property("Layer", &GameObject::GetLayer, &GameObject::SetLayer)
@@ -170,6 +171,41 @@ void MMMEngine::GameObject::SetActive(bool active)
 	m_active = active;
 
 	UpdateActiveInHierarchy();
+}
+
+MMMEngine::ObjPtr<MMMEngine::Component> MMMEngine::GameObject::AddComponent(rttr::type compType)
+{
+	if (!compType.is_valid())
+		assert(false && "AddComponent : RTTR 타입이 올바르지 않습니다!");
+
+	rttr::type base = rttr::type::get<Component>();
+
+	// compType이 혹시 포인터/래퍼로 들어오더라도 raw로 정규화해서 검사
+	rttr::type raw = compType.get_raw_type();
+
+	if (!raw.is_derived_from(base))
+		assert(false && "AddComponent : 컴포넌트가 아닙니다!");
+
+	// raw 타입에서 wrapper_type(ObjPtr<Derived>) 얻기
+	rttr::variant md = raw.get_metadata("wrapper_type");
+	if (!md.is_valid())
+		assert(false && "AddComponent : wrapper_type metadata가 없습니다!");
+
+	rttr::type wrapperType = md.get_value<rttr::type>();
+
+	rttr::variant compVariant = wrapperType.create();
+	if (!compVariant.is_valid())
+		assert(false && "AddComponent : 컴포넌트가 생성되지 않았습니다!");
+
+	// 여기서부터는 항상 ObjPtr<Derived> -> ObjPtr<Component> 변환이 됨
+	ObjPtr<Component> comp = compVariant.convert<ObjPtr<Component>>();
+	if (!comp.IsValid())
+		assert(false && "AddComponent : 변환 실패!");
+
+	comp->m_gameObject = SelfPtr(this);
+	RegisterComponent(comp);
+	comp->Initialize();
+	return comp;
 }
 
 MMMEngine::ObjPtr<MMMEngine::GameObject> MMMEngine::GameObject::Find(const std::string& name)

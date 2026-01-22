@@ -109,7 +109,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RTTR_DLL;_DEBUG;_CONSOLE;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>Default</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)MMMEngineShared\rttr\..;$(SolutionDir)MMMEngineShared\dxtk\Inc;$(SolutionDir)MMMEngineShared\dxtk;$(SolutionDir)MMMEngineShared;$(ProjectDir)imgui-docking\;$(ProjectDir)imgui-docking\backends</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -122,6 +122,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>rttr_core_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Common\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,9 +144,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BuildManager.h" />
+    <ClInclude Include="ConsoleWindow.h" />
     <ClInclude Include="DLLHotLoadHelper.h" />
     <ClInclude Include="DragAndDrop.h" />
     <ClInclude Include="EditorRegistry.h" />
+    <ClInclude Include="FilesWindow.h" />
     <ClInclude Include="HierarchyWindow.h" />
     <ClInclude Include="imgui-docking\backends\imgui_impl_dx11.h" />
     <ClInclude Include="imgui-docking\backends\imgui_impl_null.h" />
@@ -155,6 +159,7 @@
     <ClInclude Include="imgui-docking\imstb_rectpack.h" />
     <ClInclude Include="imgui-docking\imstb_textedit.h" />
     <ClInclude Include="imgui-docking\imstb_truetype.h" />
+    <ClInclude Include="ConsoleStreamBuf.h" />
     <ClInclude Include="ImGuiEditorContext.h" />
     <ClInclude Include="InspectorWindow.h" />
     <ClInclude Include="Project.h" />
@@ -166,6 +171,7 @@
   <ItemGroup>
     <ClCompile Include="BuildManager.cpp" />
     <ClCompile Include="DLLHotLoadHelper.cpp" />
+    <ClCompile Include="FilesWindow.cpp" />
     <ClCompile Include="HierarchyWindow.cpp" />
     <ClCompile Include="imgui-docking\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="imgui-docking\backends\imgui_impl_null.cpp" />
@@ -175,6 +181,7 @@
     <ClCompile Include="imgui-docking\imgui_draw.cpp" />
     <ClCompile Include="imgui-docking\imgui_tables.cpp" />
     <ClCompile Include="imgui-docking\imgui_widgets.cpp" />
+    <ClCompile Include="ConsoleWindow.cpp" />
     <ClCompile Include="ImGuiEditorContext.cpp" />
     <ClCompile Include="InspectorWindow.cpp" />
     <ClCompile Include="main.cpp" />

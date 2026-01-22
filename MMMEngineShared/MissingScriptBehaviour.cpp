@@ -8,7 +8,9 @@ RTTR_REGISTRATION
 	using namespace rttr;
 	using namespace MMMEngine;
 
-	registration::class_<MissingScriptBehaviour>("MissingScriptBehaviour");
+	registration::class_<MissingScriptBehaviour>("MissingScriptBehaviour")
+		(rttr::metadata("INSPECTOR", "DONT_ADD_COMP"));
+		(rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<MissingScriptBehaviour>>()));
 
 	registration::class_<ObjPtr<MissingScriptBehaviour>>("ObjPtr<MissingScriptBehaviour>")
 		.constructor<>(

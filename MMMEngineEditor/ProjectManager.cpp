@@ -180,13 +180,17 @@ namespace MMMEngine::Editor
 
         // NOTE: ScriptBehaviour.h include는 vcxproj의 AdditionalIncludeDirectories에 의해 해결된다고 가정
         out <<
-            R"(#include "ScriptBehaviour.h"
+            R"(#include "rttr/type"
+#include "ScriptBehaviour.h"
 #include "Export.h"
 
 namespace MMMEngine
 {
     class MMMENGINE_API ExampleBehaviour : public ScriptBehaviour
     {
+    private:
+        RTTR_ENABLE(ScriptBehaviour)
+        RTTR_REGISTRATION_FRIEND
     public:
         ExampleBehaviour()
         {
@@ -218,7 +222,8 @@ RTTR_REGISTRATION
 	using namespace rttr;
 	using namespace MMMEngine;
 
-	registration::class_<ExampleBehaviour>("ExampleBehaviour");
+	registration::class_<ExampleBehaviour>("ExampleBehaviour")
+        (rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<ExampleBehaviour>>()));
 
 	registration::class_<ObjPtr<ExampleBehaviour>>("ObjPtr<ExampleBehaviour>")
 		.constructor(
@@ -257,13 +262,19 @@ void MMMEngine::ExampleBehaviour::Update()
         std::string engineSharedIncludeDXTkInc = R"($(ProjectDir)..\..\..\MMMEngineShared\dxtk\inc)";
         std::string engineSharedDebugLibDir = R"($(ProjectDir)..\..\..\X64\Debug)";
         std::string engineSharedReleaseLibDir = R"($(ProjectDir)..\..\..\X64\Release)";
+        std::string engineSharedCommonLibDir = R"($(ProjectDir)..\..\..\Common\Lib)";
         std::string engineSharedLibName = "MMMEngineShared.lib";
+        std::string rttrDebugLibName = "rttr_core_d.lib";
+        std::string rttrReleaseLibName = "rttr_core.lib";
 
         if (!engineDir.empty())
         {
             engineSharedInclude = engineDir + R"(\MMMEngineShared\)";
+            engineSharedIncludeDXTk = engineDir + R"(\MMMEngineShared\dxtk)";
+            engineSharedIncludeDXTkInc = engineDir + R"(\MMMEngineShared\dxtk\inc)";
             engineSharedDebugLibDir = engineDir + R"(\X64\Debug)";
             engineSharedReleaseLibDir = engineDir + R"(\X64\Debug)";
+            engineSharedCommonLibDir = engineDir + R"(\Common\Lib)";
         }
 
         std::ofstream out(vcxprojPath, std::ios::binary);
@@ -348,8 +359,8 @@ void MMMEngine::ExampleBehaviour::Update()
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>)xml" << engineSharedDebugLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>)xml" << engineSharedDebugLibDir << R"xml(;)xml" << engineSharedCommonLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrDebugLibName << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
@@ -366,8 +377,8 @@ void MMMEngine::ExampleBehaviour::Update()
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>)xml" << engineSharedReleaseLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>)xml" << engineSharedReleaseLibDir << R"xml(;)xml" << engineSharedCommonLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrReleaseLibName << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 

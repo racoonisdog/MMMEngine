@@ -15,7 +15,7 @@ bool MMMEngine::ScriptLoader::LoadScriptDLL(const std::string& dllName)
 
     m_pLoadedModule = std::make_unique<rttr::library>(dllName.c_str());
 
-    if (!m_pLoadedModule->is_loaded() || !m_pLoadedModule->load())
+    if (!m_pLoadedModule->load())
     {
         std::cerr << m_pLoadedModule->get_error_string() << std::endl;
         return false;

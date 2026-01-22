@@ -314,17 +314,22 @@ ObjPtr<Component> DeserializeComponent(const json& compJson)
     if (!compType.is_valid())
         return nullptr;
 
-    rttr::variant compVariant = compType.create();
-    ObjPtr<Component> comp = nullptr;
+    rttr::type raw = compType.get_raw_type();
+
+    rttr::variant md = raw.get_metadata("wrapper_type");
+    if (!md.is_valid())
+        assert(false && "AddComponent : wrapper_type metadata가 없습니다!");
+
+    rttr::type wrapperType = md.get_value<rttr::type>();
+
+    rttr::variant compVariant = wrapperType.create();
+    if (!compVariant.is_valid())
+        assert(false && "AddComponent : 컴포넌트가 생성되지 않았습니다!");
 
     // variant에서 ObjPtr<Component>로 변환
-    if (compVariant.can_convert<ObjPtr<Component>>())
-    {
-        comp = compVariant.convert<ObjPtr<Component>>();
-    }
-
+    ObjPtr<Component> comp = compVariant.convert<ObjPtr<Component>>();
     if (!comp.IsValid())
-        return nullptr;
+        assert(false && "AddComponent : 변환 실패!");
 
     // Component의 MUID를 먼저 테이블에 등록
     const json& props = compJson["Props"];

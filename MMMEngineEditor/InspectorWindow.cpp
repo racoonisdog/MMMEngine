@@ -14,37 +14,169 @@ using namespace MMMEngine::Utility;
 
 static Vector3 g_eulerCache;
 static ObjPtr<GameObject> g_lastSelected = nullptr;
+static std::vector<ObjPtr<Component>> g_pendingRemoveComponents;
+static std::vector<rttr::type> g_componentTypes;
+static std::unordered_map<std::string, std::string> g_stringEditCache;
+
+static std::string MakeStringKey(const rttr::instance& inst, const rttr::property& prop)
+{
+    // 간단히: 타입명 + 프로퍼티명 (인스턴스별 구분까지 하려면 주소/ID 추가 권장)
+    auto tname = inst.get_derived_type().get_name().to_string();
+    auto pname = prop.get_name().to_string();
+    return tname + "::" + pname;
+}
+
+void RefreshComponentTypes()
+{
+    g_componentTypes.clear();
+
+    rttr::type componentType = rttr::type::get<Component>();
+
+    for (const rttr::type& t : rttr::type::get_types())
+    {
+        // 포인터/기본형/컨테이너 등은 제외하고, "클래스/구조체(record)"만
+        if (!t.is_class())
+            continue;
+
+        rttr::variant md = t.get_metadata("INSPECTOR");
+        if (md.is_valid() && md.is_type<std::string>() && "DONT_ADD_COMP" == md.get_value<std::string>())
+            continue;
+
+        if (t != componentType && t.is_derived_from(componentType))
+        {
+            g_componentTypes.push_back(t);
+        }
+    }
+}
 
 void RenderProperties(rttr::instance inst)
 {
-    // 인스턴스의 타입 정보를 가져옴
-    rttr::type t = inst.get_derived_type();
+    static ObjPtr<GameObject> s_lastCachedObject = nullptr;
+    static std::unordered_map<std::string, std::string> cache;
+    if (s_lastCachedObject != g_selectedGameObject)
+    {
+        static std::unordered_map<std::string, std::string> emptyCache;
+        cache.swap(emptyCache); // 캐시 클리어
+        s_lastCachedObject = g_selectedGameObject;
+    }
+
+    auto t = inst.get_derived_type();
+    rttr::property p = t.get_property("MUID");
+    rttr::variant v = p.get_value(inst);
+    if (v.is_valid() && v.is_type<MMMEngine::Utility::MUID>())
+    {
+        const auto& muid = v.get_value<MMMEngine::Utility::MUID>();
+        std::string id = muid.ToStringWithoutHyphens(); // 또는 ToString()
+        ImGui::PushID(id.c_str());
+    }
+    else
+    {
+        MUID tempId = MUID::NewMUID();
+        ImGui::PushID(tempId.ToString().c_str());
+    }
 
     for (auto& prop : t.get_properties())
     {
-        rttr::variant var = prop.get_value(inst);
-        const std::string& name = prop.get_name().to_string();
+        rttr::variant md = prop.get_metadata("INSPECTOR");
+        if (md.is_valid() && md.is_type<std::string>() && "HIDDEN" == md.get_value<std::string>())
+            continue;
 
-        // 타입에 따른 ImGui 렌더링 분기
+        rttr::variant var = prop.get_value(inst);
+        if (!var.is_valid())
+            continue; // 읽기 불가(접근정책/등록문제 등)
+
+
+        const std::string name = prop.get_name().to_string();
+        const bool readOnly = prop.is_readonly();
+
         if (var.is_type<Vector3>())
         {
             Vector3 v = var.get_value<Vector3>();
             float data[3] = { v.x, v.y, v.z };
-            if (ImGui::DragFloat3(name.c_str(), data, 0.1f))
-            {
+            auto SnapToZero = [](float& v, float eps = 1e-4f)
+                {
+                    if (fabsf(v) < eps) v = 0.0f; // +0로 만들어짐
+                };
+            SnapToZero(data[0]);
+            SnapToZero(data[1]);
+            SnapToZero(data[2]);
+
+            if (readOnly) ImGui::BeginDisabled(true);
+            bool changed = ImGui::DragFloat3(name.c_str(), data, 0.1f);
+            if (readOnly) ImGui::EndDisabled();
+
+            if (changed && !readOnly)
                 prop.set_value(inst, Vector3(data[0], data[1], data[2]));
-            }
         }
         else if (var.is_type<float>())
         {
             float f = var.get_value<float>();
-            if (ImGui::DragFloat(name.c_str(), &f))
-            {
+
+            if (readOnly) ImGui::BeginDisabled(true);
+            bool changed = ImGui::DragFloat(name.c_str(), &f);
+            if (readOnly) ImGui::EndDisabled();
+
+            if (changed && !readOnly)
                 prop.set_value(inst, f);
+        }
+        else if (var.is_type<bool>())
+        {
+            bool b = var.get_value<bool>();
+
+            if (readOnly) ImGui::BeginDisabled(true);
+            bool changed = ImGui::Checkbox(name.c_str(), &b);
+            if (readOnly) ImGui::EndDisabled();
+
+            if (changed && !readOnly)
+                prop.set_value(inst, b);
+        }
+        else if (var.is_type<int>())
+        {
+            int ntger = var.get_value<int>();
+
+            if (readOnly) ImGui::BeginDisabled(true);
+            bool changed = ImGui::DragInt(name.c_str(), &ntger);
+            if (readOnly) ImGui::EndDisabled();
+
+            if (changed && !readOnly)
+                prop.set_value(inst, ntger);
+        }
+        else if (var.is_type<std::string>())
+        {
+            // MUID 가져오기
+            rttr::property muidProp = t.get_property("MUID");
+            rttr::variant muidVar = muidProp.get_value(inst);
+            std::string muidStr = "unknown";
+            if (muidVar.is_valid() && muidVar.is_type<MMMEngine::Utility::MUID>())
+            {
+                muidStr = muidVar.get_value<MMMEngine::Utility::MUID>().ToStringWithoutHyphens();
+            }
+
+            // 고유 키: MUID + 타입명 + 프로퍼티명
+            std::string key = muidStr + "::" + inst.get_type().get_name().to_string() + "::" + name;
+
+            std::string& editing = cache[key];
+
+            if (editing.empty())
+                editing = var.get_value<std::string>();
+
+            char buf[256];
+            strcpy_s(buf, editing.c_str());
+
+            if (readOnly) ImGui::BeginDisabled(true);
+            bool changed = ImGui::InputText(name.c_str(), buf, IM_ARRAYSIZE(buf));
+            if (readOnly) ImGui::EndDisabled();
+
+            if (changed && !readOnly)
+            {
+                editing = buf;
+                prop.set_value(inst, editing);
             }
         }
+
         else if (var.is_type<Quaternion>())
         {
+            // 표시용 캐시 계산은 readOnly든 아니든 가능
             if (g_lastSelected != g_selectedGameObject)
             {
                 Quaternion q = var.get_value<Quaternion>();
@@ -53,26 +185,62 @@ void RenderProperties(rttr::instance inst)
                 g_lastSelected = g_selectedGameObject;
             }
 
-            // 1. 실제 데이터 대신 '캐시된 오일러 값'을 UI에 표시
             float data[3] = { g_eulerCache.x, g_eulerCache.y, g_eulerCache.z };
+            auto SnapToZero = [](float& v, float eps = 1e-4f)
+                {
+                    if (fabsf(v) < eps) v = 0.0f; // +0로 만들어짐
+                };
+            SnapToZero(data[0]);
+            SnapToZero(data[1]);
+            SnapToZero(data[2]);
 
-            if (ImGui::DragFloat3(name.c_str(), data, 0.1f))
+            if (readOnly) ImGui::BeginDisabled(true);
+            bool changed = ImGui::DragFloat3(name.c_str(), data, 0.1f);
+            if (readOnly) ImGui::EndDisabled();
+
+            if (changed && !readOnly)
             {
-                // 2. 캐시 업데이트
                 g_eulerCache = { data[0], data[1], data[2] };
-
-                // 3. 캐시 -> 쿼터니언 변환 후 적용 (역변환 과정이 없어서 90도에서도 안전함)
                 Quaternion updatedQ = Quaternion::CreateFromYawPitchRoll(
                     g_eulerCache.y * (XM_PI / 180.f),
                     g_eulerCache.x * (XM_PI / 180.f),
                     g_eulerCache.z * (XM_PI / 180.f)
                 );
-
                 prop.set_value(inst, updatedQ);
             }
         }
-        // 추가적인 타입들(int, bool, string 등)에 대한 처리...
+        //else if (var.is_type<std::string>())
+        //{
+        //    const bool readOnly = prop.is_readonly();
+        //    const std::string name = prop.get_name().to_string();
+
+        //    std::string current = var.get_value<std::string>();
+
+        //    // 캐시에 없으면 현재 값을 넣어 초기화
+        //    std::string key = MakeStringKey(inst, prop);
+        //    auto& buf = g_stringEditCache[key];
+        //    if (buf.empty() && !current.empty())
+        //        buf = current;
+
+        //    // 값이 외부에서 바뀌었을 수도 있으니(Undo/Redo 등) 동기화 정책 선택:
+        //    // 1) 편집 중이 아니면 current로 덮어쓰기
+        //    // 2) 항상 덮어쓰기 (비추천)
+        //    // 여기서는 "선택 변경 시 cache clear"를 전제로 단순 유지
+
+        //    if (readOnly) ImGui::BeginDisabled(true);
+
+        //    // ImGui::InputText는 std::string 직접 지원(버전에 따라) 또는 callback 방식 필요
+        //    bool changed = ImGui::InputText(name.c_str(), );
+
+        //    if (readOnly) ImGui::EndDisabled();
+
+        //    if (changed && !readOnly)
+        //    {
+        //        prop.set_value(inst, buf);
+        //    }
+        //}
     }
+    ImGui::PopID();
 }
 
 void MMMEngine::Editor::InspectorWindow::Render()
@@ -91,7 +259,12 @@ void MMMEngine::Editor::InspectorWindow::Render()
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.WindowMenuButtonPosition = ImGuiDir_None;
 
-	ImGui::Begin(u8"인스펙터", &g_editor_window_inspector);
+
+    static const char* ICON_HIERARCHY = "\xef\x80\x82";
+
+    std::string title = std::string(ICON_HIERARCHY) + u8" 인스펙터";
+
+	ImGui::Begin(title.c_str(), &g_editor_window_inspector);
 
     // 1. 선택된 게임 오브젝트가 있는지 확인
     if (g_selectedGameObject.IsValid())
@@ -103,6 +276,7 @@ void MMMEngine::Editor::InspectorWindow::Render()
         {
             g_selectedGameObject->SetName(buf);
         }
+
         ImGui::SameLine();
 
         bool isActive = g_selectedGameObject->IsActiveSelf();
@@ -112,24 +286,120 @@ void MMMEngine::Editor::InspectorWindow::Render()
             g_selectedGameObject->SetActive(isActive);
         }
 
+        char buf2[256];
+        strcpy_s(buf2, g_selectedGameObject->GetTag().c_str());
+        ImGui::SetNextItemWidth(150);
+        if (ImGui::InputText(u8"태그", buf2, IM_ARRAYSIZE(buf2)))
+        {
+            g_selectedGameObject->SetTag(buf2);
+        }
+
+        ImGui::SameLine();
+
+        // 현재 오브젝트 레이어 (0~31 가정)
+        int curLayer = g_selectedGameObject->GetLayer();   // 없으면 멤버/저장값 쓰세요
+        curLayer = (curLayer < 0) ? 0 : (curLayer > 31 ? 31 : curLayer);
+
+        // 미리보기 텍스트
+        char preview[8];
+        sprintf_s(preview, "%d", curLayer);
+
+        // 폭 지정
+        ImGui::SetNextItemWidth(53);
+
+        if (ImGui::BeginCombo(u8"레이어", preview))
+        {
+            for (int n = 0; n <= 31; ++n)
+            {
+                bool selected = (n == curLayer);
+                if (ImGui::Selectable(std::to_string(n).c_str(), selected))
+                {
+                    // 선택하는 순간 즉시 반영
+                    g_selectedGameObject->SetLayer(n);
+                    curLayer = n;
+                }
+                if (selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
+
         ImGui::Separator();
 
+        g_pendingRemoveComponents.clear();
+
         // 3. 모든 컴포넌트 순회 및 렌더링
-        // GameObject에 GetComponent 리스트를 가져오는 함수가 있다고 가정합니다.
         auto& components = g_selectedGameObject->GetAllComponents();
+        int compCount = 0;
         for (auto& comp : components)
         {
             // 각 컴포넌트의 데이터를 ImGui로 출력
-            if (ImGui::CollapsingHeader(comp->get_type().get_name().to_string().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+            bool visible = true;
+
+            std::string typeName = comp->get_type().get_name().to_string();
+
+           // auto ss = comp->get_type();
+
+            std::string duplicatePrevantName = typeName + "##" + std::to_string(compCount++);
+            if (typeName != "Transform")
             {
-                RenderProperties(*comp);
+                if(ImGui::CollapsingHeader(duplicatePrevantName.c_str(), &visible, ImGuiTreeNodeFlags_DefaultOpen))
+                    RenderProperties(*comp);
             }
+            else if (ImGui::CollapsingHeader(duplicatePrevantName.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+                RenderProperties(*comp);
+
+            if (!visible)
+            {
+                visible = true;
+                g_pendingRemoveComponents.push_back(comp);
+            }
+        }
+
+        for (auto& comp : g_pendingRemoveComponents)
+        {
+            Object::Destroy(comp);
         }
 
         ImGui::Separator();
 
         float width = ImGui::GetContentRegionAvail().x;
-        if (ImGui::Button(u8"컴포넌트 추가", ImVec2{ width, 0 })) { /*ImGui.OpenPopup("ChooseComponent");*/ }
+        if (ImGui::Button(u8"컴포넌트 추가", ImVec2{ width, 0 })) { ImGui::OpenPopup(u8"컴포넌트 선택"); }
+
+        //// script drag and drop area
+        //ImGui.InvisibleButton("##", ImGui.GetContentRegionAvail());
+        //string file = DragAndDrop.GetString("file_path");
+        //if (file != null)
+        //{
+        //    string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
+        //    string extension = Path.GetExtension(relative);
+
+        //    // if file is script
+        //    if (extension == ".cs")
+        //    {
+        //        var type = ScriptManager.GetClassTypeOfScript(file);
+        //        HierarchyWindow.selectedGameObject.AddComponentOfType(type);
+        //    }
+        //}
+
+        // add component popup
+        int selectedIndex = -1;
+        if (ImGui::BeginPopup(u8"컴포넌트 선택"))
+        {
+            RefreshComponentTypes();
+            for (int i = 0; i < g_componentTypes.size(); ++i)
+            {
+                auto type = g_componentTypes[i];
+                if (ImGui::Selectable(type.get_name().to_string().c_str()))
+                {
+                    selectedIndex = i;
+                    auto selected = g_componentTypes[selectedIndex];
+                    g_selectedGameObject->AddComponent(type);
+                }
+            }
+            ImGui::EndPopup();
+        }
     }
     else
     {

@@ -46,7 +46,19 @@ void Initialize()
 		SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", currentProject.lastSceneIndex, true);
 		app->SetWindowTitle(L"MMMEditor [ " + Utility::StringHelper::StringToWString(currentProject.rootPath) + L" ]");
 		ObjectManager::Get().StartUp();
-		BehaviourManager::Get().StartUp(currentProject.rootPath + "/UserScripts.dll");
+
+		// 유저 스크립트 불러오기
+		{
+			fs::path cwd = fs::current_path();
+			DLLHotLoadHelper::CleanupHotReloadCopies(cwd);
+
+			fs::path projectPath = ProjectManager::Get().GetActiveProject().rootPath;
+
+			fs::path dllPath = DLLHotLoadHelper::CopyDllForHotReload(projectPath / "Binaries" / "Win64" / "UserScripts.dll", cwd);
+
+			BehaviourManager::Get().StartUp(dllPath.stem().u8string());
+		}
+
 		BuildManager::Get().SetProgressCallbackString([](const std::string& progress) { std::cout << progress.c_str() << std::endl; });
 	}
 
@@ -76,7 +88,18 @@ void Update_ProjectNotLoaded()
 		GlobalRegistry::g_pApp->SetWindowTitle(L"MMMEditor [ " + Utility::StringHelper::StringToWString(currentProject.rootPath) + L" ]");
 
 		ObjectManager::Get().StartUp();
-		BehaviourManager::Get().StartUp(currentProject.rootPath + "/UserScripts.dll");
+
+		// 유저 스크립트 불러오기
+		{
+			fs::path cwd = fs::current_path();
+			DLLHotLoadHelper::CleanupHotReloadCopies(cwd);
+
+			fs::path projectPath = ProjectManager::Get().GetActiveProject().rootPath;
+
+			fs::path dllPath = DLLHotLoadHelper::CopyDllForHotReload(projectPath / "Binaries" / "Win64" / "UserScripts.dll", cwd);
+
+			BehaviourManager::Get().StartUp(dllPath.stem().u8string());
+		}
 
 		BuildManager::Get().SetProgressCallbackString([](const std::string& progress) { std::cout << progress << std::endl; });
 		return;

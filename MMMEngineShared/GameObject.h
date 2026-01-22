@@ -60,6 +60,8 @@ namespace MMMEngine
 		const uint32_t&		GetLayer()		const { return m_layer; }
 		const SceneRef& GetScene() const { return m_scene; }
 
+		ObjPtr<Component> AddComponent(rttr::type compType);
+
 		template <typename T>
 		ObjPtr<T> AddComponent()
 		{

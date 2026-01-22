@@ -3,10 +3,15 @@
 #include "ProjectManager.h"
 #include "DLLHotLoadHelper.h"
 #include "BehaviourManager.h"
+#include "SceneManager.h"
+#include "SceneSerializer.h"
+#include "StringHelper.h"
+#include "EditorRegistry.h"
 
 #include <filesystem>
 
 namespace fs = std::filesystem;
+using namespace MMMEngine::Utility;
 
 namespace MMMEngine::Editor
 {
@@ -64,8 +69,29 @@ namespace MMMEngine::Editor
            
             if (!dllPath.empty())
             {
-                // todo : 현재 씬 바꾸기
-                BehaviourManager::Get().ReloadUserScripts(dllPath.u8string());
+                auto sceneRef = SceneManager::Get().GetCurrentScene();
+                auto sceneRaw = SceneManager::Get().GetSceneRaw(sceneRef);
+
+                SceneSerializer::Get().Serialize(*sceneRaw, SceneManager::Get().GetSceneListPath() + L"/" + StringHelper::StringToWString(sceneRaw->GetName()) + L".scene");
+                SceneSerializer::Get().ExtractScenesList(SceneManager::Get().GetAllSceneToRaw(), SceneManager::Get().GetSceneListPath());
+
+                EditorRegistry::g_selectedGameObject = nullptr;
+
+                // 씬 매니저를 셧다운
+                // 오브젝트 매니저를 셧다운
+                SceneManager::Get().ShutDown();
+                ObjectManager::Get().ShutDown();
+
+                BehaviourManager::Get().ReloadUserScripts(dllPath.stem().u8string());
+               
+                // 오브젝트 매니저 리부팅
+                // 씬 매니저 리부팅
+                auto currentProject = ProjectManager::Get().GetActiveProject();
+                SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", currentProject.lastSceneIndex, true);
+                ObjectManager::Get().StartUp();
+
+
+                // todo : 씬 플레이 재시작하기
             }
         }
   

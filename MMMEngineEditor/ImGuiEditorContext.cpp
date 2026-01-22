@@ -19,6 +19,8 @@ using namespace MMMEngine::Utility;
 #include "HierarchyWindow.h"
 #include "InspectorWindow.h"
 #include "ScriptBuildWindow.h"
+#include "ConsoleWindow.h"
+#include "FilesWindow.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -141,36 +143,64 @@ bool MMMEngine::Editor::ImGuiEditorContext::Initialize(HWND hWnd, ID3D11Device* 
     m_isImGuiInit = true;
 
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // 키보드 내비게이션 활성화
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;   
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-    m_defaultFont = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/malgun.ttf", 16.0f, NULL, io.Fonts->GetGlyphRangesKorean()); // 한글 폰트 설정
-    m_bigFont = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/malgun.ttf", 36.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+
+    // 중요: 기본 폰트를 먼저 추가
+    m_defaultFont = io.Fonts->AddFontFromFileTTF(
+        "C:/Windows/Fonts/malgun.ttf",
+        16.0f,
+        NULL,
+        io.Fonts->GetGlyphRangesKorean()
+    );
+
+    // Font Awesome를 MergeMode로 추가 (기본 폰트에 병합)
+    const char* engineDirEnv = std::getenv("MMMENGINE_DIR");
+    std::string engineDir = engineDirEnv ? std::string(engineDirEnv) : "";
+
+    if (!engineDir.empty())
+    {
+        std::string iconFontPath = engineDir + "/Common/Resources/fontawesome_free_solid.otf";
+
+        // 파일 존재 확인
+        if (std::filesystem::exists(iconFontPath))
+        {
+            static const ImWchar icons_ranges[] = { 0xf000, 0xf3ff, 0 };
+            ImFontConfig icons_config;
+            icons_config.MergeMode = true;  // 기존 폰트에 병합
+            icons_config.PixelSnapH = true;
+            icons_config.GlyphMinAdvanceX = 16.0f; // 아이콘 최소 너비
+
+            io.Fonts->AddFontFromFileTTF(
+                iconFontPath.c_str(),
+                16.0f,
+                &icons_config,
+                icons_ranges
+            );
+        }
+        else
+        {
+            // 폰트 파일이 없을 때 경고 로그
+            // TODO: 로그 출력
+        }
+    }
+
+    // 큰 폰트는 별도로 추가 (MergeMode 아님)
+    m_bigFont = io.Fonts->AddFontFromFileTTF(
+        "C:/Windows/Fonts/malgun.ttf",
+        36.0f,
+        NULL,
+        io.Fonts->GetGlyphRangesKorean()
+    );
 
     // 스타일 설정
     ImGui::StyleColorsDark();
     ImGuiStyle& style = ImGui::GetStyle();
-
-    // 둥근 모서리 설정
     style.FrameRounding = 6.0f;
     style.WindowRounding = 10.0f;
     style.GrabRounding = 6.0f;
     style.ScrollbarRounding = 6.0f;
-
-    //if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    //{
-    //    style.WindowRounding = 0.0f;
-    //    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    //}
-
-    // 색상 설정
-    //style.Colors[ImGuiCol_Text] = ImVec4(0.90f, 0.90f, 0.90f, 0.90f);
-    //style.Colors[ImGuiCol_WindowBg] = ImVec4(0.09f, 0.09f, 0.15f, 1.00f);
-    //style.Colors[ImGuiCol_FrameBg] = ImVec4(0.00f, 1.00f, 0.01f, 1.00f);
-    //style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.90f, 0.80f, 0.80f, 0.40f);
-    //style.Colors[ImGuiCol_Button] = ImVec4(0.48f, 0.72f, 0.89f, 0.49f);
-    //style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.50f, 0.69f, 0.99f, 0.68f);
-    //style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.80f, 0.50f, 0.50f, 1.00f);
 
     // Win32 백엔드 초기화
     if (!ImGui_ImplWin32_Init(m_hWnd)) {
@@ -187,9 +217,8 @@ bool MMMEngine::Editor::ImGuiEditorContext::Initialize(HWND hWnd, ID3D11Device* 
     }
     m_isD3D11BackendInit = true;
 
+    ConsoleWindow::Get().Init();
     return true;
-
-    return false;
 }
 
 void MMMEngine::Editor::ImGuiEditorContext::BeginFrame()
@@ -265,8 +294,10 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
         }
         if (ImGui::BeginMenu(u8"창"))
         {
+            ImGui::MenuItem(u8"콘솔", nullptr, &g_editor_window_console);
             ImGui::MenuItem(u8"하이어라키", nullptr, &g_editor_window_hierarchy);
             ImGui::MenuItem(u8"인스펙터", nullptr, &g_editor_window_inspector);
+            ImGui::MenuItem(u8"파일 뷰어", nullptr, &g_editor_window_files);
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu(u8"빌드"))
@@ -298,6 +329,8 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
     style.ScrollbarRounding = 6.0f;
     style.WindowMenuButtonPosition = ImGuiDir_None;
        
+    ConsoleWindow::Get().Render();
+    FilesWindow::Get().Render();
     ScriptBuildWindow::Get().Render();
     SceneListWindow::Get().Render();
     HierarchyWindow::Get().Render();
@@ -319,6 +352,8 @@ void MMMEngine::Editor::ImGuiEditorContext::EndFrame()
 
 void MMMEngine::Editor::ImGuiEditorContext::Uninitialize()
 {
+    ConsoleWindow::Get().Shutdown();
+
     if (m_isD3D11BackendInit)
         ImGui_ImplDX11_Shutdown();
     if (m_isWin32BackendInit)

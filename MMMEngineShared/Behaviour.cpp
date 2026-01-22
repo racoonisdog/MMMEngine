@@ -10,8 +10,9 @@ RTTR_REGISTRATION
 	using namespace MMMEngine;
 
 	registration::class_<Behaviour>("Behaviour")
+		(rttr::metadata("INSPECTOR", "DONT_ADD_COMP"))
 		.property("Enabled", &Behaviour::GetEnabled, &Behaviour::SetEnabled)
-		.property_readonly("IsActiveAndEnabled", &Behaviour::IsActiveAndEnabled);
+		.property_readonly("IsActiveAndEnabled", &Behaviour::IsActiveAndEnabled)(rttr::metadata("INSPECTOR", "HIDDEN"));
 
 	type::register_wrapper_converter_for_base_classes<MMMEngine::ObjPtr<Behaviour>>();
 }

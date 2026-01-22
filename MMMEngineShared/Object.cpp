@@ -18,10 +18,10 @@ RTTR_REGISTRATION
 	using namespace MMMEngine;
 
 	registration::class_<Object>("Object")
-		.property("Name", &Object::GetName, &Object::SetName)
+		.property("Name", &Object::GetName, &Object::SetName)(rttr::metadata("INSPECTOR", "HIDDEN"))
 		.property("MUID", &Object::GetMUID, &Object::SetMUID)
 		.property_readonly("InstanceID", &Object::GetInstanceID)
-		.property_readonly("isDestroyed", &Object::IsDestroyed);
+		.property_readonly("isDestroyed", &Object::IsDestroyed)(rttr::metadata("INSPECTOR", "HIDDEN"));
 
 	registration::class_<ObjPtrBase>("ObjPtr")
 		.method("IsValid", &ObjPtrBase::IsValid)

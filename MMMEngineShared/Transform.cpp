@@ -18,6 +18,8 @@ RTTR_REGISTRATION
 	Vec3Fn setscale = &Transform::SetLocalScale;
 
 	registration::class_<Transform>("Transform")
+		(rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<Transform>>()))
+		(rttr::metadata("INSPECTOR", "DONT_ADD_COMP"))
 		.property("Position", &Transform::GetLocalPosition, setpos)
 		.property("Rotation", &Transform::GetLocalRotation, setrot)
 		.property("Scale", &Transform::GetLocalScale, setscale)
