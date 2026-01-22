@@ -1,11 +1,9 @@
-#include "SceneSerializer.h"
+ï»¿#include "SceneSerializer.h"
 #include "GameObject.h"
 #include "Component.h"
 #include "StringHelper.h"
 #include "rttr/type"
 #include "Transform.h"
-#include "Resource.h"
-#include "ResourceManager.h"
 
 #include <fstream>
 #include <filesystem>
@@ -18,7 +16,6 @@ using namespace MMMEngine;
 using namespace rttr;
 
 std::unordered_map<std::string, rttr::variant> g_objectTable;
-std::unordered_map<std::string, rttr::variant> g_resourceTable; // { "typeName|filepath", variant }
 
 json SerializeVariant(const rttr::variant& var);
 json SerializeObject(const rttr::instance& obj)
@@ -61,7 +58,7 @@ json SerializeVariant(const rttr::variant& var)
         if (t == type::get<int>()) return var.to_int();
         if (t == type::get<unsigned int>()) return var.to_uint32();
         if (t == type::get<long long>()) return var.to_int64();
-        if (t == type::get<uint64_t>()) return var.to_uint64(); // ÇÙ½É: uint64_t Ãß°¡
+        if (t == type::get<uint64_t>()) return var.to_uint64(); // í•µì‹¬: uint64_t ì¶”ê°€
         if (t == type::get<float>()) return var.to_float();
         if (t == type::get<double>()) return var.to_double();
     }
@@ -86,32 +83,6 @@ json SerializeVariant(const rttr::variant& var)
         return arr;
     }
 
-    // ResPtr<T> Ã³¸®
-    if (var.get_type().get_name().to_string().find("ResPtr") != std::string::npos ||
-        var.get_type().get_name().to_string().find("shared_ptr") != std::string::npos)
-    {
-        // Resource* ·Î º¯È¯ ½Ãµµ
-        Resource* res = nullptr;
-
-        // shared_ptr<Resource>·Î ¸ÕÀú ½Ãµµ
-        auto sharedRes = var.get_value<std::shared_ptr<Resource>>();
-        if (sharedRes)
-            res = sharedRes.get();
-
-        if (res != nullptr)
-        {
-            json resJson;
-            resJson["FilePath"] = Utility::StringHelper::WStringToString(res->GetFilePath());
-
-            // ResourceÀÇ ½ÇÁ¦ Å¸ÀÔ ÀúÀå
-            rttr::type actualType = rttr::type::get(*res);
-            resJson["ResourceType"] = actualType.get_name().to_string();
-
-            return resJson;
-        }
-        return nullptr;
-    }
-
     if (var.get_type().get_name().to_string().find("ObjPtr") != std::string::npos)
     {
         MMMEngine::Object* obj = nullptr;
@@ -133,68 +104,68 @@ json SerializeVariant(const rttr::variant& var)
         return obj;
     }
 
-    // »ç¿ëÀÚ Á¤ÀÇ Å¸ÀÔ -> Àç±Í
+    // ì‚¬ìš©ì ì •ì˜ íƒ€ì… -> ì¬ê·€
     return SerializeObject(var);
 }
 
 json SerializeComponent(const ObjPtr<Component>& comp)
 {
-	json compJson;
-	type type = type::get(*comp);
-	compJson["Type"] = type.get_name().to_string();
+    json compJson;
+    type type = type::get(*comp);
+    compJson["Type"] = type.get_name().to_string();
 
-	for (auto& prop : type.get_properties(
+    for (auto& prop : type.get_properties(
         rttr::filter_item::instance_item |
         rttr::filter_item::public_access |
         rttr::filter_item::non_public_access))
-	{
+    {
         auto string = prop.get_name().to_string();
         if (prop.is_readonly())
             continue;
 
-		rttr::variant value = prop.get_value(*comp);
-		compJson["Props"][prop.get_name().to_string()] = SerializeVariant(value);
-	}
+        rttr::variant value = prop.get_value(*comp);
+        compJson["Props"][prop.get_name().to_string()] = SerializeVariant(value);
+    }
 
-	return compJson;
+    return compJson;
 }
 
 void MMMEngine::SceneSerializer::Serialize(const Scene& scene, std::wstring path)
 {
-	json snapshot;
+    json snapshot;
 
     auto sceneMUID = scene.GetMUID().IsEmpty() ? Utility::MUID::NewMUID() : scene.GetMUID();
 
-	snapshot["MUID"] = sceneMUID.ToString();
+    snapshot["MUID"] = sceneMUID.ToString();
     snapshot["Name"] = scene.GetName();
-        //Utility::StringHelper::WStringToString(Utility::StringHelper::ExtractFileName(path));
+    //Utility::StringHelper::WStringToString(Utility::StringHelper::ExtractFileName(path));
 
-	json goArray = json::array();
+    json goArray = json::array();
 
-	for (auto& goPtr : scene.m_gameObjects)
-	{
-		if (!goPtr.IsValid())
-			continue;
+    for (auto& goPtr : scene.m_gameObjects)
+    {
+        if (!goPtr.IsValid())
+            continue;
 
-		json goJson;
-		goJson["Name"] = goPtr->GetName();
-		goJson["MUID"] = goPtr->GetMUID().ToString();    
+        json goJson;
+        goJson["Name"] = goPtr->GetName();
+        goJson["MUID"] = goPtr->GetMUID().ToString();
         goJson["Layer"] = goPtr->GetLayer();
         goJson["Tag"] = goPtr->GetTag();
         goJson["Active"] = goPtr->IsActiveSelf();
 
-		json compArray = json::array();
-		for (auto& comp : goPtr->GetAllComponents()) // ÄÄÆ÷³ÍÆ® ¸®½ºÆ® °¡Á¤
-		{
-			compArray.push_back(SerializeComponent(comp));
-		}
-		goJson["Components"] = compArray;
+        json compArray = json::array();
+        for (auto& comp : goPtr->GetAllComponents()) // ì»´í¬ë„ŒíŠ¸ ë¦¬ìŠ¤íŠ¸ ê°€ì •
+        {
+            compArray.push_back(SerializeComponent(comp));
+        }
+        goJson["Components"] = compArray;
 
-		goArray.push_back(goJson);
-	}
+        goArray.push_back(goJson);
+    }
 
-	snapshot["GameObjects"] = goArray;
-	std::vector<uint8_t> v = json::to_msgpack(snapshot);
+    snapshot["GameObjects"] = goArray;
+    std::vector<uint8_t> v = json::to_msgpack(snapshot);
 
     fs::path p(path);
     if (p.has_parent_path() && !fs::exists(p.parent_path())) {
@@ -203,7 +174,7 @@ void MMMEngine::SceneSerializer::Serialize(const Scene& scene, std::wstring path
 
     std::ofstream file(path, std::ios::binary);
     if (!file.is_open()) {
-        throw std::runtime_error("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: " + Utility::StringHelper::WStringToString(path));
+        throw std::runtime_error("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: " + Utility::StringHelper::WStringToString(path));
     }
 
     file.write(reinterpret_cast<const char*>(v.data()), v.size());
@@ -291,7 +262,7 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
         auto view = target.create_sequential_view();
         view.clear();
 
-        // ÅÛÇÃ¸´ ÀÎÀÚ °¡Á®¿À±â
+        // í…œí”Œë¦¿ ì¸ì ê°€ì ¸ì˜¤ê¸°
         auto args = target_type.get_wrapped_type().get_template_arguments();
         auto it = args.begin();
         if (it == args.end())
@@ -313,7 +284,7 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
         auto view = target.create_associative_view();
         view.clear();
 
-        // ÅÛÇÃ¸´ ÀÎÀÚ °¡Á®¿À±â (key, value)
+        // í…œí”Œë¦¿ ì¸ì ê°€ì ¸ì˜¤ê¸° (key, value)
         auto args = target_type.get_wrapped_type().get_template_arguments();
         auto it = args.begin();
         if (it == args.end())
@@ -340,7 +311,7 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
         return;
     }
 
-    // ObjPtr<T> Å¸ÀÔ Ã³¸®
+    // ObjPtr<T> íƒ€ì… ì²˜ë¦¬
     if (target_type.get_name().to_string().find("ObjPtr") != std::string::npos)
     {
         std::string muidStr = j.get<std::string>();
@@ -348,13 +319,13 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
         auto it = g_objectTable.find(muidStr);
         if (it != g_objectTable.end())
         {
-            // º¯È¯ ½ÃµµÇÏÁö ¸»°í ±×´ë·Î ´ëÀÔ
+            // ë³€í™˜ ì‹œë„í•˜ì§€ ë§ê³  ê·¸ëŒ€ë¡œ ëŒ€ì…
             target = it->second;
         }
         return;
     }
 
-    // »ç¿ëÀÚ Á¤ÀÇ °´Ã¼
+    // ì‚¬ìš©ì ì •ì˜ ê°ì²´
     if (!target.is_valid() || target.get_type() != target_type)
     {
         target = target_type.create();
@@ -363,13 +334,13 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
     DeserializeObject(target, j);
 }
 
-void DeserializeComponent(const json& compJson, ObjPtr<GameObject> obj, ObjPtr<Component>& outComp)
+void DeserializeComponent(const json& compJson, ObjPtr<GameObject> obj)
 {
     std::string typeName = compJson["Type"].get<std::string>();
     type compType = type::get_by_name(typeName);
 
     auto comp = obj->AddComponent(compType);
-    // ComponentÀÇ MUID¸¦ ¸ÕÀú Å×ÀÌºí¿¡ µî·Ï
+    // Componentì˜ MUIDë¥¼ ë¨¼ì € í…Œì´ë¸”ì— ë“±ë¡
     const json& props = compJson["Props"];
     if (props.contains("MUID"))
     {
@@ -377,10 +348,8 @@ void DeserializeComponent(const json& compJson, ObjPtr<GameObject> obj, ObjPtr<C
         g_objectTable[muid] = comp;
     }
 
-    // ¼Ó¼º º¹¿ø (ObjPtrµµ ¹Ù·Î Ã³¸®µÊ)
+    // ì†ì„± ë³µì› (ObjPtrë„ ë°”ë¡œ ì²˜ë¦¬ë¨)
     DeserializeObject(*comp, props);
-
-    outComp = comp;
 }
 
 void DeserializeTransform(Transform& tr, const json& j)
@@ -422,8 +391,7 @@ static const json* FindTransformComp(const json& components)
 void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snapshot)
 {
     g_objectTable.clear();
-    g_resourceTable.clear();
-    std::unordered_map<std::string, std::string> pendingParent;
+    std::unordered_map<std::string, std::string> pendingParent; // childTrMUID -> parentTrMUID
 
     // Scene MUID
     if (auto parsed = Utility::MUID::Parse(snapshot["MUID"].get<std::string>()); parsed.has_value())
@@ -434,7 +402,7 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
 
     const json& gameObjects = snapshot["GameObjects"];
 
-    // 1-pass: GO + Transform MUID/°ª º¹¿ø + Å×ÀÌºí µî·Ï
+    // 1-pass: GO + Transform(ê¸°ì¡´) MUID/ê°’ ë³µì› + í…Œì´ë¸” ë“±ë¡
     for (const auto& goJson : gameObjects)
     {
         std::string goName = goJson["Name"].get<std::string>();
@@ -459,31 +427,33 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
 
         g_objectTable[goMUID] = go;
 
+        // Transform json ì°¾ê¸°
         const json& components = goJson["Components"];
         const json* trComp = FindTransformComp(components);
         if (!trComp || !trComp->contains("Props"))
-            continue;
+            continue; // ë˜ëŠ” throw
 
         const json& trProps = (*trComp)["Props"];
 
+        // ê¸°ì¡´ Transform ê°€ì ¸ì˜¤ê¸°
         auto tr = go->GetTransform();
 
+        // Transform MUIDëŠ” Props["MUID"]
         std::string trMUID = trProps["MUID"].get<std::string>();
         if (auto parsedTr = Utility::MUID::Parse(trMUID); parsedTr.has_value())
             tr->SetMUID(parsedTr.value());
 
         g_objectTable[trMUID] = tr;
 
+        // Transform ê°’ ë³µì› (Parent/MUIDëŠ” ìŠ¤í‚µ)
         DeserializeTransform(*tr, trProps);
 
+        // ParentëŠ” ë‚˜ì¤‘ì—
         if (trProps.contains("Parent") && !trProps["Parent"].is_null())
             pendingParent[trMUID] = trProps["Parent"].get<std::string>();
     }
 
-    // 2-pass: ÀÏ¹İ ÄÄÆ÷³ÍÆ® »ı¼º/º¹¿ø (Transform Á¦¿Ü)
-    // ResPtr ÇÁ·ÎÆÛÆ¼ Á¤º¸ ¼öÁı
-    std::vector<std::tuple<ObjPtr<Component>, std::string, rttr::type, std::string, std::string>> pendingResources;
-
+    // 2-pass: ì¼ë°˜ ì»´í¬ë„ŒíŠ¸ ìƒì„±/ë³µì› (Transformì€ ì œì™¸ + RectTransformë„ ì œì™¸)
     for (const auto& goJson : gameObjects)
     {
         std::string goMUID = goJson["MUID"].get<std::string>();
@@ -496,99 +466,24 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
         for (const auto& compJson : components)
         {
             std::string typeName = compJson["Type"].get<std::string>();
-            if (typeName == "Transform") // Á¤È® ÀÏÄ¡·Î ½ºÅµ ±ÇÀå
+            if (typeName == "Transform") // ì •í™• ì¼ì¹˜ë¡œ ìŠ¤í‚µ ê¶Œì¥
                 continue;
 
-            ObjPtr<Component> comp;
-            DeserializeComponent(compJson, go, comp);
+            DeserializeComponent(compJson, go);
 
-            if (comp.IsValid())
-            {
-                // ResPtr ÇÁ·ÎÆÛÆ¼ Ã£±â
-                const json& props = compJson["Props"];
-                type compType = type::get(*comp);
-
-                for (auto& prop : compType.get_properties(
-                    rttr::filter_item::instance_item |
-                    rttr::filter_item::public_access |
-                    rttr::filter_item::non_public_access))
-                {
-                    if (prop.is_readonly())
-                        continue;
-
-                    std::string propName = prop.get_name().to_string();
-                    if (!props.contains(propName))
-                        continue;
-
-                    rttr::type propType = prop.get_type();
-                    std::string propTypeName = propType.get_name().to_string();
-
-                    // ResPtrÀÎÁö È®ÀÎ
-                    if (propTypeName.find("ResPtr") != std::string::npos ||
-                        propTypeName.find("shared_ptr") != std::string::npos)
-                    {
-                        const json& resPropJson = props[propName];
-                        if (resPropJson.contains("FilePath") && resPropJson.contains("ResourceType"))
-                        {
-                            std::string filePath = resPropJson["FilePath"].get<std::string>();
-                            std::string resourceType = resPropJson["ResourceType"].get<std::string>();
-
-                            pendingResources.push_back({ comp, propName, propType, resourceType, filePath });
-                        }
-                    }
-                }
-
-                comp->Initialize();
-            }
         }
     }
 
-    // 3-pass: ResPtr ·Îµå ¹× ÇÒ´ç
-    for (auto& [comp, propName, propType, resourceTypeName, filePathStr] : pendingResources)
-    {
-        std::wstring filePath = Utility::StringHelper::StringToWString(filePathStr);
+    // 2.5-pass: RectTransformë§Œ ì°¾ì•„ì„œ ê°’íƒ€ì…ë§Œ ì—­ì§ë ¬í™” + pendingRectParentì— ê¸°ë¡í•´ë‘ê¸°
 
-        rttr::variant resVariant;
-
-        // ÀÌ¹Ì ·ÎµåµÈ ¸®¼Ò½ºÀÎÁö È®ÀÎ
-        if (g_resourceTable.find(resourceTypeName) != g_resourceTable.end())
-        {
-            resVariant = g_resourceTable[resourceTypeName];
-        }
-        else
-        {
-            // ResourceManager¸¦ ÅëÇØ ·Îµå
-            rttr::type resType = rttr::type::get_by_name(resourceTypeName);
-            if (resType.is_valid())
-            {
-                resVariant = ResourceManager::Get().Load(resType, filePath);
-                if (resVariant.is_valid())
-                {
-                    g_resourceTable[resourceTypeName] = resVariant;
-                }
-            }
-        }
-
-        // ÇÁ·ÎÆÛÆ¼¿¡ ÇÒ´ç
-        if (resVariant.is_valid())
-        {
-            type compType = type::get(*comp);
-            auto prop = compType.get_property(propName);
-            if (prop.is_valid())
-            {
-                prop.set_value(*comp, resVariant);
-            }
-        }
-    }
-
-    // 4-pass: Parent ¿¬°á
+    // 3-pass: Parent ì—°ê²° (Transform MUID ê¸°ì¤€)
     for (auto& [childTrMUID, parentTrMUID] : pendingParent)
     {
         auto itChild = g_objectTable.find(childTrMUID);
         auto itParent = g_objectTable.find(parentTrMUID);
 
         if (itChild == g_objectTable.end() || itParent == g_objectTable.end())
-            continue;
+            continue; // ë˜ëŠ” ë¡œê·¸
 
         auto childTr = itChild->second.get_value<ObjPtr<Transform>>();
         auto parentTr = itParent->second.get_value<ObjPtr<Transform>>();
@@ -596,7 +491,6 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
     }
 
     g_objectTable.clear();
-    g_resourceTable.clear();
 }
 
 void MMMEngine::SceneSerializer::SerializeToMemory(const Scene& scene, SnapShot& snapshot)
@@ -622,7 +516,7 @@ void MMMEngine::SceneSerializer::SerializeToMemory(const Scene& scene, SnapShot&
         goJson["Active"] = goPtr->IsActiveSelf();
 
         json compArray = json::array();
-        for (auto& comp : goPtr->GetAllComponents()) // ÄÄÆ÷³ÍÆ® ¸®½ºÆ® °¡Á¤
+        for (auto& comp : goPtr->GetAllComponents()) // ì»´í¬ë„ŒíŠ¸ ë¦¬ìŠ¤íŠ¸ ê°€ì •
         {
             compArray.push_back(SerializeComponent(comp));
         }
@@ -635,7 +529,7 @@ void MMMEngine::SceneSerializer::SerializeToMemory(const Scene& scene, SnapShot&
 }
 
 /// <summary>
-/// ÃÖÀûÈ­µÈ ´ÜÀÏ°æ·Î¿ë ¹ÙÀÌ³Ê¸® ÆÄÀÏÀ» ¸¸µé¾îÁİ´Ï´Ù.
+/// ìµœì í™”ëœ ë‹¨ì¼ê²½ë¡œìš© ë°”ì´ë„ˆë¦¬ íŒŒì¼ì„ ë§Œë“¤ì–´ì¤ë‹ˆë‹¤.
 /// </summary>
 /// <param name="scenes"></param>
 /// <param name="rootPath"></param>
@@ -658,7 +552,7 @@ void MMMEngine::SceneSerializer::ExtractScenesList(const std::vector<Scene*>& sc
 
         nlohmann::json sceneEntry;
         sceneEntry["index"] = i;
-        sceneEntry["filepath"] = sceneFileName; // ¸®½ºÆ®¿¡´Â »ó´ë°æ·Î(ÆÄÀÏ¸í)¸¸ ÀúÀå
+        sceneEntry["filepath"] = sceneFileName; // ë¦¬ìŠ¤íŠ¸ì—ëŠ” ìƒëŒ€ê²½ë¡œ(íŒŒì¼ëª…)ë§Œ ì €ì¥
         sceneListJson.push_back(sceneEntry);
     }
 
