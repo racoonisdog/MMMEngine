@@ -154,7 +154,9 @@
     <ClInclude Include="DLLHotLoadHelper.h" />
     <ClInclude Include="DragAndDrop.h" />
     <ClInclude Include="EditorCamera.h" />
+    <ClInclude Include="EditorGridRenderer.h" />
     <ClInclude Include="EditorRegistry.h" />
+    <ClInclude Include="EditorShader.h" />
     <ClInclude Include="FilesWindow.h" />
     <ClInclude Include="GameViewWindow.h" />
     <ClInclude Include="HierarchyWindow.h" />
@@ -184,6 +186,7 @@
     <ClCompile Include="BuildManager.cpp" />
     <ClCompile Include="DLLHotLoadHelper.cpp" />
     <ClCompile Include="EditorCamera.cpp" />
+    <ClCompile Include="EditorGridRenderer.cpp" />
     <ClCompile Include="FilesWindow.cpp" />
     <ClCompile Include="GameViewWindow.cpp" />
     <ClCompile Include="HierarchyWindow.cpp" />

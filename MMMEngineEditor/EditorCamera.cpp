@@ -64,6 +64,7 @@ void MMMEngine::Editor::EditorCamera::MarkProjectionMatrixDirty()
 void MMMEngine::Editor::EditorCamera::MarkTransformMatrixDirty()
 {
     m_isTransformMatrixDirty = true;
+    m_isViewMatrixDirty = true;
 }
 
 void MMMEngine::Editor::EditorCamera::InputUpdate()
@@ -93,8 +94,8 @@ void MMMEngine::Editor::EditorCamera::InputUpdate()
             if (deltaX != 0 || deltaY != 0)
             {
                 // 마우스 델타로 회전 적용
-                targetYaw -= deltaX * rotSpeed;
-                targetPitch -= deltaY * rotSpeed; // Y는 반대 방향
+                targetYaw += deltaX * rotSpeed;
+                targetPitch += deltaY * rotSpeed; // Y는 반대 방향
 
                 // Pitch 제한
                 //targetPitch = std::max( -89.0f, std::min(89.0f, targetPitch));

@@ -220,6 +220,7 @@ bool MMMEngine::Editor::ImGuiEditorContext::Initialize(HWND hWnd, ID3D11Device* 
     m_isD3D11BackendInit = true;
 
     ConsoleWindow::Get().Init();
+    SceneViewWindow::Get().Initialize(pDevice, pContext, 800, 600);
     return true;
 }
 
