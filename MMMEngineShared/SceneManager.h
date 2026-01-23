@@ -42,6 +42,7 @@ namespace MMMEngine
 		std::vector<ObjPtr<GameObject>> GetAllGameObjectInDDOL();
 		SceneRef GetSceneRef(const Scene* pScene);
 		std::vector<Scene*> GetAllSceneToRaw();
+		Scene* GetCurrentSceneRaw() { return m_scenes[m_currentSceneID].get(); }
 		//=====================================//
 		Scene* GetCurrentSceneRaw() { return m_scenes[m_currentSceneID].get(); }
 

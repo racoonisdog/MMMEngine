@@ -88,13 +88,11 @@ json SerializeVertex(const std::vector<Mesh_Vertex>& _vertices)
 {
 	json meshJson;
 	type subt = type::get(_vertices);
-	meshJson["Type"] = subt.get_name().to_string();
 
 	for (auto& vertex : _vertices)
 	{
 		type vert = type::get(vertex);
 		json vertJson;
-		vertJson["Type"] = vert.get_name().to_string();
 
 		for (auto& prop : vert.get_properties(
 			rttr::filter_item::instance_item |
@@ -108,7 +106,7 @@ json SerializeVertex(const std::vector<Mesh_Vertex>& _vertices)
 			rttr::variant var = prop.get_value(vertex);
 			vertJson[prop.get_name().to_string()] = SerializeMeshVariant(var);
 		}
-		meshJson["SubMesh"].push_back(vertJson);
+		meshJson.push_back(vertJson);
 	}
 
 	return meshJson;
@@ -116,19 +114,31 @@ json SerializeVertex(const std::vector<Mesh_Vertex>& _vertices)
 
 json SerializeMesh(const MeshData& _meshData)
 {
-	json submeshJson = json::array();
-	for (auto& subMesh : _meshData.vertices) {
-		submeshJson.push_back(SerializeVertex(subMesh));
+	json meshJson;
+
+	json vertexJson = json::array();
+	for (auto& vSubMesh : _meshData.vertices) {
+		vertexJson.push_back(SerializeVertex(vSubMesh));
 	}
 
-	return submeshJson;
+	json indexJson = json::array();
+	for (const auto& iSubMesh : _meshData.indices) {
+		json arr = json::array();
+		for (UINT val : iSubMesh)
+			arr.push_back(val);
+		indexJson.push_back(arr);
+	}
+	
+	meshJson["Vertices"] = vertexJson;
+	meshJson["Indices"] = indexJson;
+
+	return meshJson;
 }
 
 json SerializeMeshGroup(const std::unordered_map<UINT, std::vector<UINT>>& meshGroupData)
 {
 	json out;
 	type subt = type::get(meshGroupData);
-	out["Type"] = subt.get_name().to_string();
 	for (const auto& [mat, meshArr] : meshGroupData) {
 		out[std::to_string(mat)] = meshArr;
 	}
@@ -203,96 +213,8 @@ void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std
 	// MUID 복원 ( 아직 안씀)
 	/*if (snapshot.contains("MUID"))
 	{
-		const_cast<StaticMesh*>(_out)->SetMUID(muid);
+		const_cast<StaticMesh*>(_out)->SetMUID(muid);ss
 	}*/
-
-	// Mesh 복원
-	if (snapshot.contains("Mesh"))
-	{
-		auto& meshJson = snapshot["Mesh"];
-		MeshData meshData;
-
-		for (auto& submeshJson : meshJson)
-		{
-			std::vector<Mesh_Vertex> subMesh;
-
-			for (auto& vertJson : submeshJson["SubMesh"])
-			{
-				Mesh_Vertex v;
-				rttr::type t = rttr::type::get<Mesh_Vertex>();
-
-				for (auto& prop : t.get_properties())
-				{
-					std::string name = prop.get_name().to_string();
-					if (!vertJson.contains(name))
-						continue;
-
-					// JSON → variant 변환
-					rttr::variant newVal;
-					auto& jval = vertJson[name];
-
-					if (jval.is_number_integer())
-						newVal = jval.get<int>();
-					else if (jval.is_number_float())
-						newVal = jval.get<float>();
-					else if (jval.is_string())
-						newVal = jval.get<std::string>();
-					else if (jval.is_array() && jval.size() == 3) {
-						DirectX::SimpleMath::Vector3 vec;
-						vec.x = jval[0].get<float>();
-						vec.y = jval[1].get<float>();
-						vec.z = jval[2].get<float>();
-						newVal = vec;
-					}
-					else if (jval.is_array() && jval.size() == 2) {
-						DirectX::SimpleMath::Vector2 vec;
-						vec.x = jval[0].get<float>();
-						vec.y = jval[1].get<float>();
-						newVal = vec;
-					}
-					else if (jval.is_array() && (name == "BoneIndices" || name == "BoneWeights"))
-					{
-						// 배열 처리 (BoneIndices, BoneWeights)
-						std::vector<int> arr;
-						for (auto& elem : jval)
-							arr.push_back(elem.get<int>());
-						newVal = arr;
-					}
-					else if (jval.is_object())
-					{
-						// Vector2/Vector3 처리
-						if (jval.contains("x") && jval.contains("y"))
-						{
-							if (jval.contains("z"))
-							{
-								DirectX::SimpleMath::Vector3 vec;
-								vec.x = jval["x"].get<float>();
-								vec.y = jval["y"].get<float>();
-								vec.z = jval["z"].get<float>();
-								newVal = vec;
-							}
-							else
-							{
-								DirectX::SimpleMath::Vector2 vec;
-								vec.x = jval["x"].get<float>();
-								vec.y = jval["y"].get<float>();
-								newVal = vec;
-							}
-						}
-					}
-
-					if (newVal.is_valid())
-						prop.set_value(v, newVal);
-				}
-
-				subMesh.push_back(v);
-			}
-
-			meshData.vertices.push_back(subMesh);
-		}
-
-		_out->meshData = std::move(meshData);
-	}
 
 	// Materials 복원
 	if (snapshot.contains("Materials"))
@@ -308,15 +230,97 @@ void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std
 		_out->materials = std::move(mats);
 	}
 
+	// Mesh 복원
+	if (snapshot.contains("Mesh")) {
+		auto& meshJsonArr = snapshot["Mesh"];
+		if (!meshJsonArr.empty()) {
+			auto& meshJson = meshJsonArr[0];
+			MeshData meshData;
+
+			// Vertices 복원
+			if (meshJson.contains("Vertices")) {
+				for (auto& subMeshJson : meshJson["Vertices"]) {
+					std::vector<Mesh_Vertex> subMesh;
+					for (auto& vertJson : subMeshJson) {
+						Mesh_Vertex vertex;
+
+						type vertType = type::get<Mesh_Vertex>();
+						for (auto& prop : vertType.get_properties()) {
+							if (prop.is_readonly())
+								continue;
+
+							std::string name = prop.get_name().to_string();
+							if (!vertJson.contains(name))
+								continue;
+
+							auto& jval = vertJson[name];
+							rttr::variant newVal;
+
+							// 숫자/문자/배열 처리
+							if (jval.is_number_integer())
+								newVal = jval.get<int>();
+							else if (jval.is_number_float())
+								newVal = jval.get<float>();
+							else if (jval.is_string())
+								newVal = jval.get<std::string>();
+							else if (jval.is_array() && jval.size() == 3) {
+								DirectX::SimpleMath::Vector3 vec;
+								vec.x = jval[0].get<float>();
+								vec.y = jval[1].get<float>();
+								vec.z = jval[2].get<float>();
+								newVal = vec;
+							}
+							else if (jval.is_array() && jval.size() == 2) {
+								DirectX::SimpleMath::Vector2 vec;
+								vec.x = jval[0].get<float>();
+								vec.y = jval[1].get<float>();
+								newVal = vec;
+							}
+							else if (jval.is_array()) {
+								std::vector<int> arr;
+								for (auto& elem : jval)
+									arr.push_back(elem.get<int>());
+								newVal = arr;
+							}
+
+							if (newVal.is_valid())
+								prop.set_value(vertex, newVal);
+						}
+						subMesh.push_back(vertex);
+					}
+					meshData.vertices.push_back(subMesh);
+				}
+			}
+
+			// Indices 복원
+			if (meshJson.contains("Indices")) {
+				for (auto& iSubMeshJson : meshJson["Indices"]) {
+					std::vector<UINT> indices;
+					for (auto& elem : iSubMeshJson) {
+						indices.push_back(elem.get<UINT>());
+					}
+					meshData.indices.push_back(indices);
+				}
+			}
+
+			_out->meshData = std::move(meshData);
+		}
+	}
+
+
 	// MeshGroup 복원
 	if (snapshot.contains("MeshGroup"))
 	{
-		auto& meshGroupJson = snapshot["MeshGroup"];
-		std::unordered_map<UINT, std::vector<UINT>> data;
-		for (auto& [key, value] : meshGroupJson.items()) {
-			UINT matId = static_cast<UINT>(std::stoul(key));
-			data[matId] = value.get<std::vector<UINT>>();
+		auto& meshGroupJsonArr = snapshot["MeshGroup"];
+		if (!meshGroupJsonArr.empty()) {
+			auto& meshGroupJson = meshGroupJsonArr[0];
+			std::unordered_map<UINT, std::vector<UINT>> data;
+			for (auto& [key, value] : meshGroupJson.items()) {
+				if (key == "Type") continue;
+				UINT matId = static_cast<UINT>(std::stoul(key));
+				data[matId] = value.get<std::vector<UINT>>();
+			}
+			_out->meshGroupData = std::move(data);
 		}
-		_out->meshGroupData = std::move(data);
 	}
 }

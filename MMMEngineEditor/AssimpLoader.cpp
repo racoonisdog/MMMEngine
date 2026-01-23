@@ -716,7 +716,6 @@ void MMMEngine::AssimpLoader::RegisterModel(const std::wstring path, ModelType t
 	case MMMEngine::ModelType::Static:
 		staticMesh = ConvertStaticMesh(&model);
 		currentProjectFS = currentProjectFS / fs::path(m_exportPath);
-
 		ResourceSerializer::Get().Serialize_StaticMesh(staticMesh.get(), currentProjectFS.wstring(), filename);
 		break;
 	case MMMEngine::ModelType::Animated:

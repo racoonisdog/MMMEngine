@@ -21,6 +21,9 @@ namespace MMMEngine {
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext4> m_pDeviceContext;	// 디바이스 컨텍스트 참조
 		DirectX::SimpleMath::Matrix m_worldMat = DirectX::SimpleMath::Matrix::Identity;
 
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> GetDefaultVS();
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> GetDefaultPS();
+
 	public:
 		RendererBase();
 

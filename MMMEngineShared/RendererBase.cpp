@@ -1,5 +1,17 @@
 #include "RendererBase.h"
 #include "RenderManager.h"
+#include "VShader.h"
+#include "PShader.h"
+
+Microsoft::WRL::ComPtr<ID3D11VertexShader> MMMEngine::RendererBase::GetDefaultVS()
+{
+	return RenderManager::Get().m_pDefaultVSShader->m_pVShader;
+}
+
+Microsoft::WRL::ComPtr<ID3D11PixelShader> MMMEngine::RendererBase::GetDefaultPS()
+{
+	return RenderManager::Get().m_pDefaultPSShader->m_pPShader;
+}
 
 MMMEngine::RendererBase::RendererBase() {
 	m_IndicesSize = 0;

@@ -76,6 +76,12 @@
     <Filter Include="헤더 파일\Tools">
       <UniqueIdentifier>{b7bc31a0-bb47-4828-a210-a99182a22289}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\EditorCamera">
+      <UniqueIdentifier>{4261ed5f-169b-4788-af8b-09bc1a8c1f91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\EditorCamera">
+      <UniqueIdentifier>{bee8b106-bde9-4ffa-9315-07b901dba3c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorRegistry.h">
@@ -153,6 +159,9 @@
     <ClInclude Include="AssimpLoader.h">
       <Filter>헤더 파일\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="EditorCamera.h">
+      <Filter>헤더 파일\EditorCamera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -217,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="AssimpLoader.cpp">
       <Filter>소스 파일\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorCamera.cpp">
+      <Filter>소스 파일\EditorCamera</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

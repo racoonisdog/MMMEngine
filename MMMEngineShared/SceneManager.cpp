@@ -59,7 +59,7 @@ void MMMEngine::SceneManager::LoadScenes(bool allowEmptyScene)
 				m_scenes.pop_back();
 				m_scenes[index] = std::move(emptyScene);
 				m_sceneNameToID[sceneName] = index;
-				std::cout << "씬 리스트에 등록된 씬파일을 찾지 못했습니다. -> Scene File : " << sceneName << ".scene \n임시 씬을 생성합니다." << std::endl;
+				std::cout << u8"씬 리스트에 등록된 씬파일을 찾지 못했습니다. -> Scene File : " << sceneName << u8".scene \n임시 씬을 생성합니다." << std::endl;
 			}
 			else
 			{
@@ -223,8 +223,8 @@ void MMMEngine::SceneManager::UpdateAndReloadScenes(std::vector<std::string> sce
 	}
 	else
 	{
-		std::cout << "경고! : 열려있던 씬의 정보가 씬 리스트에서 사라졌습니다. "
-			<< "0번째 씬을 로드합니다." << std::endl;
+		std::cout << u8"경고! : 열려있던 씬의 정보가 씬 리스트에서 사라졌습니다. "
+			<< u8"0번째 씬을 로드합니다." << std::endl;
 		m_currentSceneID = 0;
 		m_nextSceneID = 0;
 	}

@@ -15,6 +15,11 @@ namespace MMMEngine
     private:
         HWND m_hWnd; // 윈도우 핸들
         POINT m_mouseClient; // 마우스 좌표
+        POINT m_prevMouseClient;  // 이전 프레임 마우스 좌표
+#pragma warning(push)
+#pragma warning(disable: 4251)
+        DirectX::SimpleMath::Vector2 m_mouseDelta;
+#pragma warning(pop)
         SHORT m_prevState[256] = { 0 };
         SHORT m_currState[256] = { 0 };
 
@@ -34,6 +39,7 @@ namespace MMMEngine
         bool GetKey(KeyCode keyCode);
         bool GetKeyDown(KeyCode keyCode);
         bool GetKeyUp(KeyCode keyCode);
+        DirectX::SimpleMath::Vector2 GetMouseDelta();
 
         void StartUp(HANDLE windowHandle);
         void ShutDown();

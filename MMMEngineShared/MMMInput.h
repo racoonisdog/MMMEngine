@@ -5,7 +5,8 @@
 namespace MMMEngine::Input
 {
     // === 키보드 및 마우스 입력 ===
-    inline DirectX::SimpleMath::Vector2 GetMousePos() { return InputManager::Get().GetMousePos(); } ;
+    inline DirectX::SimpleMath::Vector2 GetMousePos() { return InputManager::Get().GetMousePos(); } 
+    inline DirectX::SimpleMath::Vector2 GetMouseDelta() { return InputManager::Get().GetMouseDelta(); }
     inline bool GetKey(KeyCode keyCode) { return InputManager::Get().GetKey(keyCode); }
     inline bool GetKeyDown(KeyCode keyCode) { return InputManager::Get().GetKeyDown(keyCode); }
     inline bool GetKeyUp(KeyCode keyCode) { return InputManager::Get().GetKeyUp(keyCode); }

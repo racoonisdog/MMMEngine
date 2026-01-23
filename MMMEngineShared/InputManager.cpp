@@ -16,9 +16,16 @@ void MMMEngine::InputManager::ShutDown()
 
 void MMMEngine::InputManager::Update()
 {
+    // 이전 마우스 위치 저장
+    m_prevMouseClient = m_mouseClient;
+
     // 마우스 좌표
     ::GetCursorPos(&m_mouseClient);
     ::ScreenToClient(m_hWnd, &m_mouseClient);
+
+    // 마우스 델타 계산
+    m_mouseDelta.x = static_cast<float>(m_mouseClient.x - m_prevMouseClient.x);
+    m_mouseDelta.y = static_cast<float>(m_mouseClient.y - m_prevMouseClient.y);
 
     // 키보드 상태 업데이트
     memcpy_s(m_prevState, sizeof(m_prevState), m_currState, sizeof(m_currState));
@@ -68,4 +75,9 @@ bool MMMEngine::InputManager::GetKeyUp(KeyCode keyCode)
     auto nativeKeyCode = static_cast<unsigned char>(keyCode);
     if (nativeKeyCode == -1) return false;
     return ((m_prevState[nativeKeyCode] & KEY_PRESSED) && !(m_currState[nativeKeyCode] & KEY_PRESSED));
+}
+
+Vector2 MMMEngine::InputManager::GetMouseDelta()
+{
+    return m_mouseDelta;
 }

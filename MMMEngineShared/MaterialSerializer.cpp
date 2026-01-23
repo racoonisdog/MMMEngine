@@ -36,8 +36,9 @@ MMMEngine::PropertyValue MMMEngine::MaterialSerializer::property_from_json(const
 	}
 	else if (type == "Texture2D")
 	{
-		std::wstring filePath = j.at("file").get<std::wstring>();
-		auto tex = ResourceManager::Get().Load<Texture2D>(filePath);
+		std::string filePath = j.at("file").get<std::string>();
+		fs::path fsPath(filePath);
+		auto tex = ResourceManager::Get().Load<Texture2D>(fsPath.wstring());
 		return tex;
 	}
 

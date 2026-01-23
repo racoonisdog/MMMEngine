@@ -92,8 +92,8 @@ bool MMMEngine::StaticMesh::LoadFromFilePath(const std::wstring& filePath)
 
 	// CPU 데이터 정리
 	// WARNING::필요하면 지우거나 주석처리할것 (런타임 메모리 최적화용)
-	meshData.vertices.clear();
-	meshData.indices.clear();
+	//meshData.vertices.clear();
+	//meshData.indices.clear();
 
 	return true;
 }

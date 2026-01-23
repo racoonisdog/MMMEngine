@@ -238,7 +238,6 @@ void MMMEngine::Transform::SetWorldRotation(const Quaternion& rot)
 	{
 		Quaternion parentInvQuater = Quaternion::Identity;
 		m_parent->GetWorldRotation().Inverse(parentInvQuater);
-		m_parent->onMatrixUpdate.Invoke(&(*m_parent));
 		m_localRotation = parentInvQuater * rot;
 	}
 	else

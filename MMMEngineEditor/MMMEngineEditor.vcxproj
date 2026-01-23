@@ -151,6 +151,7 @@
     <ClInclude Include="ConsoleWindow.h" />
     <ClInclude Include="DLLHotLoadHelper.h" />
     <ClInclude Include="DragAndDrop.h" />
+    <ClInclude Include="EditorCamera.h" />
     <ClInclude Include="EditorRegistry.h" />
     <ClInclude Include="FilesWindow.h" />
     <ClInclude Include="HierarchyWindow.h" />
@@ -178,6 +179,7 @@
     </ClCompile>
     <ClCompile Include="BuildManager.cpp" />
     <ClCompile Include="DLLHotLoadHelper.cpp" />
+    <ClCompile Include="EditorCamera.cpp" />
     <ClCompile Include="FilesWindow.cpp" />
     <ClCompile Include="HierarchyWindow.cpp" />
     <ClCompile Include="imgui-docking\backends\imgui_impl_dx11.cpp" />

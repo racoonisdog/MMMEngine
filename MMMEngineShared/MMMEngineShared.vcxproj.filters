@@ -452,9 +452,6 @@
     <ClInclude Include="RendererBase.h">
       <Filter>헤더 파일\Core\Render API</Filter>
     </ClInclude>
-    <ClInclude Include="EditorCamera.h">
-      <Filter>헤더 파일\Core\Render API\Component</Filter>
-    </ClInclude>
     <ClInclude Include="MeshRenderer.h">
       <Filter>헤더 파일\Core\Render API\Component</Filter>
     </ClInclude>
@@ -579,9 +576,6 @@
     </ClCompile>
     <ClCompile Include="RenderShared.h">
       <Filter>헤더 파일\Core\Render API</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorCamera.cpp">
-      <Filter>소스 파일\Core\Render API\Component</Filter>
     </ClCompile>
     <ClCompile Include="MeshRenderer.cpp">
       <Filter>소스 파일\Core\Render API\Component</Filter>

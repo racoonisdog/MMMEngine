@@ -38,8 +38,10 @@ void MMMEngine::GeoRenderer::Render()
 	m_pDeviceContext->IASetVertexBuffers(0, 1, m_pVertexBuffer.GetAddressOf(), &stride, &offset);
 	m_pDeviceContext->IASetIndexBuffer(m_pIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, offset);
 
-	m_pDeviceContext->VSSetShader(m_pMaterial->GetVShader()->m_pVShader.Get(), nullptr, 0);
-	m_pDeviceContext->PSSetShader(m_pMaterial->GetPShader()->m_pPShader.Get(), nullptr, 0);
+	auto VS = m_pMaterial->GetVShader()->m_pVShader;
+	auto PS = m_pMaterial->GetPShader()->m_pPShader;
+	m_pDeviceContext->VSSetShader(VS.Get(), nullptr, 0);
+	m_pDeviceContext->PSSetShader(PS.Get(), nullptr, 0);
 
 	// 트랜스폼 등록
 	Render_TransformBuffer transformBuffer;

@@ -96,6 +96,24 @@ std::wstring MMMEngine::Utility::StringHelper::ExtractFileFormat(const std::wstr
     return filepath.substr(dotPos + 1);
 }
 
+std::string MMMEngine::Utility::StringHelper::ExtractFileFormat(const std::string& filepath)
+{
+    size_t dotPos = filepath.find_last_of(".");
+
+    if (dotPos == std::string::npos)
+    {
+        return "";
+    }
+
+    size_t lastSeparator = filepath.find_last_of("\\/");
+    if (lastSeparator != std::string::npos && lastSeparator > dotPos)
+    {
+        return "";
+    }
+
+    return filepath.substr(dotPos + 1);
+}
+
 std::wstring MMMEngine::Utility::StringHelper::ExtractFileName(const std::wstring& filepath)
 {
     if (filepath.empty())
@@ -109,6 +127,26 @@ std::wstring MMMEngine::Utility::StringHelper::ExtractFileName(const std::wstrin
 
     size_t dotPos = filename.find_last_of(L'.');
     if (dotPos != std::wstring::npos)
+    {
+        return filename.substr(0, dotPos);
+    }
+
+    return filename;
+}
+
+std::string MMMEngine::Utility::StringHelper::ExtractFileName(const std::string& filepath)
+{
+    if (filepath.empty())
+        return "";
+
+    size_t slashPos = filepath.find_last_of("/\\");
+    std::string filename =
+        (slashPos == std::string::npos)
+        ? filepath
+        : filepath.substr(slashPos + 1);
+
+    size_t dotPos = filename.find_last_of('.');
+    if (dotPos != std::string::npos)
     {
         return filename.substr(0, dotPos);
     }

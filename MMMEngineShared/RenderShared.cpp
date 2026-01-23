@@ -20,6 +20,5 @@ RTTR_REGISTRATION
 		.property("BoneMat", &Mesh_BoneBuffer::BoneMat);
 
 	registration::class_<MMMEngine::MeshData>("MeshData")
-		.property("vertices", &MeshData::vertices)
-		.property("indices", &MeshData::indices);
+		.property("vertices", &MeshData::vertices);
 }

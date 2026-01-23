@@ -5,7 +5,7 @@
 
 namespace MMMEngine::Editor
 {
-	std::string GetString(const char* type)
+	static std::string GetString(const char* type)
 	{
 		std::string result;
 
@@ -24,7 +24,7 @@ namespace MMMEngine::Editor
 		return result;
 	}
 
-	Utility::MUID GetMuid(const std::string& type)
+	static Utility::MUID GetMuid(const std::string& type)
 	{
 		Utility::MUID result = Utility::MUID::Empty();
 
@@ -42,7 +42,7 @@ namespace MMMEngine::Editor
 		return result;
 	}
 
-	void GiveString(const char* type, const std::string& info, const std::string& display)
+	static void GiveString(const char* type, const std::string& info, const std::string& display)
 	{
 		if (ImGui::BeginDragDropSource())
 		{
@@ -52,7 +52,7 @@ namespace MMMEngine::Editor
 		}
 	}
 
-	void GiveMuid(std::string type, Utility::MUID muid, std::string display)
+	static void GiveMuid(std::string type, Utility::MUID muid, std::string display)
 	{
 		if (ImGui::BeginDragDropSource())
 		{
