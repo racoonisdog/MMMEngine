@@ -44,7 +44,6 @@ namespace MMMEngine
 		std::vector<Scene*> GetAllSceneToRaw();
 		Scene* GetCurrentSceneRaw() { return m_scenes[m_currentSceneID].get(); }
 		//=====================================//
-		Scene* GetCurrentSceneRaw() { return m_scenes[m_currentSceneID].get(); }
 
 		Scene* GetSceneRaw(const SceneRef& ref);
 		const SceneRef GetCurrentScene() const;

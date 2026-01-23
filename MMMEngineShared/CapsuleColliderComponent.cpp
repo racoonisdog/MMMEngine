@@ -9,8 +9,9 @@ RTTR_REGISTRATION
 
 	registration::class_<CapsuleColliderComponent>("CapsuleCollider")
 		(rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<CapsuleColliderComponent>>()))
-		.property("Mass", &CapsuleColliderComponent::GetRadius, &CapsuleColliderComponent::SetRadius)
-		.property("LinearDamping", &CapsuleColliderComponent::GetHalfHeight, &CapsuleColliderComponent::SetHalfHeight)
+		.property("Radius", &CapsuleColliderComponent::GetRadius, &CapsuleColliderComponent::SetRadius)
+		.property("Height", &CapsuleColliderComponent::GetHalfHeight, &CapsuleColliderComponent::SetHalfHeight)
+		.property("Center", &ColliderComponent::GetLocalCenter, &ColliderComponent::SetLocalCenter)
 		;
 
 	registration::class_<ObjPtr<CapsuleColliderComponent>>("ObjPtr<CapsuleCollider>")

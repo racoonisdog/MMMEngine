@@ -39,7 +39,7 @@ void MMMEngine::PhysxManager::StepFixed(float dt)
 	ApplyFilterConfigIfDirty();  // dirty면 정책 갱신 + 전체 재적용 지시
     FlushDirtyColliders_PreStep(); //collider의 shape가 에디터 단계에서 변형되면 내부적으로 실행
 
-    m_PhysScene.PushRigidsToPhysics(); //엔진 -> physx쓰도록
+    m_PhysScene.PushRigidsToPhysics(); //등록된 rb목록을 순회하면서 pushtoPhysics를 호출
 	m_PhysScene.Step(dt);       // simulate/fetch
     m_PhysScene.PullRigidsFromPhysics();   // PhysX->엔진 읽기 (pose)
     m_PhysScene.DrainEvents();             // 이벤트 drain
@@ -110,7 +110,12 @@ void MMMEngine::PhysxManager::NotifyColliderRemoved(ColliderComponent* col)
 void MMMEngine::PhysxManager::NotifyColliderChanged(ColliderComponent* col)
 {
     if (!col) return;
-    RequestUpdateCollider(col);
+
+    if (col->IsGeometryDirty())
+        m_DirtyColliders.insert(col);
+
+    if (col->IsFilterDirty())
+        m_FilterDirtyColliders.insert(col);
 }
 
 
@@ -215,12 +220,6 @@ void MMMEngine::PhysxManager::RequestReapplyFilters()
     m_FilterDirty = true;
 }
 
-void MMMEngine::PhysxManager::RequestUpdateCollider(MMMEngine::ColliderComponent* col)
-{
-    if (!col) return;
-    m_DirtyColliders.insert(col);
-}
-
 void MMMEngine::PhysxManager::RequestChangeRigidType(MMMEngine::RigidBodyComponent* rb)
 {
     if (!rb) return;
@@ -265,6 +264,10 @@ bool MMMEngine::PhysxManager::HasAnyCollider(ObjPtr<GameObject> go) const
 }
 
 
+void MMMEngine::PhysxManager::SetSceneGravity(float x, float y, float z)
+{
+    m_PhysScene.SetGravity(x, y, z);
+}
 
 //물리 시뮬레이션을 돌리기 직전(simulate하기전)에 큐에 쌓인 명령 중 지금 해도 안전한것을 physScene에 실행함
 // actor생성 및 acotr를 추가하는 작업 / shape생성 밑 붙이는 작업 / shape 교체등을 여기서 한다
@@ -393,6 +396,27 @@ void MMMEngine::PhysxManager::FlushDirtyColliders_PreStep()
         m_PhysScene.UpdateColliderGeometry(col);
     }
     m_DirtyColliders.clear();
+}
+
+void MMMEngine::PhysxManager::FlushDirtyColliderFilters_PreStep()
+{
+    if (m_FilterDirtyColliders.empty()) return;
+
+    for (auto* col : m_FilterDirtyColliders)
+    {
+        if (!col) continue;
+        if (!col->GetPxShape()) { col->ClearFilterDirty(); continue; } // 아직 생성 전이면 스킵
+
+        const uint32_t layer = col->GetEffectiveLayer();
+        col->SetFilterData(m_CollisionMatrix.MakeSimFilter(layer),
+            m_CollisionMatrix.MakeQueryFilter(layer));
+
+        // 필터 데이터 변경을 PhysX pair에 반영
+        m_PhysScene.ResetFilteringFor(col);
+
+        col->ClearFilterDirty();
+    }
+    m_FilterDirtyColliders.clear();
 }
 
 

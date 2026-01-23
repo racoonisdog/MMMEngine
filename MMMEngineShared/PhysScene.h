@@ -89,6 +89,11 @@ namespace MMMEngine
 		const std::vector<MMMEngine::PhysXSimulationCallback::ContactEvent>& GetFrameContacts() const { return m_frameContacts; }
 		const std::vector<PhysXSimulationCallback::TriggerEvent>& GetFrameTriggers() const { return m_frameTriggers; }
 
+		//¸Ê Áß·Â ¼ÂÆÃ
+		void SetGravity(float x, float y, float z);
+
+		void ResetFilteringFor(MMMEngine::ColliderComponent* col);
+
 	private:
 		PhysSceneDesc m_desc;
 

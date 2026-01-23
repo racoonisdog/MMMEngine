@@ -473,3 +473,37 @@ void MMMEngine::PhysScene::ChangeRigidType(MMMEngine::RigidBodyComponent* rb, co
 	rb->OffPendingType();
 }
 
+void MMMEngine::PhysScene::SetGravity(float x, float y, float z)
+{
+	m_desc.gravity[0] = x;
+	m_desc.gravity[1] = y;
+	m_desc.gravity[2] = z;
+
+	if (m_scene)
+	{
+		m_scene->setGravity(ToPxVec(m_desc.gravity));
+	}
+}
+
+void MMMEngine::PhysScene::ResetFilteringFor(MMMEngine::ColliderComponent* col)
+{
+	if (!m_scene || !col) return;
+
+	// shape가 없으면 아직 PhysX에 붙어있지 않거나 생성 전
+	physx::PxShape* shape = col->GetPxShape();
+	if (!shape) return;
+
+	// 이 콜라이더가 붙어있는 rb 찾기
+	auto it = m_ownerByCollider.find(col);
+	if (it == m_ownerByCollider.end()) return;
+
+	MMMEngine::RigidBodyComponent* rb = it->second;
+	if (!rb) return;
+
+	physx::PxRigidActor* actor = rb->GetPxActor();
+	if (!actor) return;
+
+	// PhysX에 "필터링 다시 계산" 요청
+	m_scene->resetFiltering(*actor);
+}
+

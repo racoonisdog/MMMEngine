@@ -3,6 +3,7 @@
 #include "RigidBodyComponent.h"
 #include "Transform.h"
 #include "GameObject.h"
+#include "PhysxHelper.h"
 
 
 
@@ -66,17 +67,18 @@ void MMMEngine::ColliderComponent::SetOverrideLayer(bool enable)
     m_OverrideLayer = enable;
     if (m_Shape)
     {
-        // PhysxManager를 통해 필터 재적용 요청
-        //PhysxManager::Get().RequestReapplyFilters();
+        MarkFilterDirty();
+        
     }
 }
 
 void MMMEngine::ColliderComponent::SetLayer(uint32_t layer)
 {
+    if (m_LayerOverride == layer) return;
     m_LayerOverride = layer;
     if (m_Shape)
     {
-        //PhysxManager::Get().RequestReapplyFilters();
+        MarkFilterDirty();
     }
 }
 
@@ -144,10 +146,37 @@ void MMMEngine::ColliderComponent::SetShapeMode(ShapeMode mode)
     ApplyAll();
 }
 
-void MMMEngine::ColliderComponent::SetLocalPose(const physx::PxTransform& t)
+//void MMMEngine::ColliderComponent::SetLocalPose(const physx::PxTransform& t)
+//{
+//    m_LocalPose = t; ApplyAll();
+//}
+
+void MMMEngine::ColliderComponent::SetLocalCenter(Vector3 pos)
 {
-    m_LocalPose = t; ApplyAll();
+    m_LocalCenter = pos;
+    auto pxPos = ToPxVec(m_LocalCenter);
+    m_LocalPose.p = pxPos;
+    ApplyLocalPose();
 }
+
+void MMMEngine::ColliderComponent::SetLocalRotation(Quaternion quater)
+{
+    m_LocalQuater = quater;
+    auto pxQuat = ToPxQuat(m_LocalQuater);
+    m_LocalPose.q = pxQuat;
+    ApplyLocalPose();
+}
+
+Vector3 MMMEngine::ColliderComponent::GetLocalCenter()
+{
+    return m_LocalCenter;
+}
+
+Quaternion MMMEngine::ColliderComponent::GetLocalQuater()
+{
+    return m_LocalQuater;
+}
+
 
 void MMMEngine::ColliderComponent::SetSceneQueryEnabled(bool on)
 {
@@ -157,6 +186,14 @@ void MMMEngine::ColliderComponent::SetSceneQueryEnabled(bool on)
 void MMMEngine::ColliderComponent::SetFilterData(const physx::PxFilterData& sim, const physx::PxFilterData& query)
 {
     m_SimFilter = sim; m_QueryFilter = query; ApplyAll();
+}
+
+void MMMEngine::ColliderComponent::MarkFilterDirty()
+{
+    m_filterDirty = true;
+
+    // 콜라이더는 "내가 바뀌었다"만 알림
+    PhysxManager::Get().NotifyColliderChanged(this);
 }
 
 void MMMEngine::ColliderComponent::SetShape(physx::PxShape* shape, bool owned)
