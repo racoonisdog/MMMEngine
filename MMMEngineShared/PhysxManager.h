@@ -17,32 +17,32 @@ namespace MMMEngine
 {
 	enum class P_EvenType
 	{
-		C_enter,		//contact ÁøÀÔ
-		C_stay,			//contact Áß
-		C_out,			//contact Á¾·á
-		T_enter,		//trigger ÁøÀÔ
-		T_out			//trigger Á¾·á
+		C_enter,		//contact ì§„ì…
+		C_stay,			//contact ì¤‘
+		C_out,			//contact ì¢…ë£Œ
+		T_enter,		//trigger ì§„ì…
+		T_out			//trigger ì¢…ë£Œ
 	};
 	class MMMENGINE_API PhysxManager : public Utility::ExportSingleton<PhysxManager>
 	{
 	public:
-		// ÇöÀç ¾À ¹ÙÀÎµù (SceneÀÌ PhysSceneÀ» º¸À¯ÇÔ)
+		// í˜„ì¬ ì”¬ ë°”ì¸ë”© (Sceneì´ PhysSceneì„ ë³´ìœ í•¨)
 		void BindScene(MMMEngine::Scene* scene);
 
-		// fixed step¿¡¼­ È£ÃâµÇ´Â ÁøÀÔÁ¡
+		// fixed stepì—ì„œ í˜¸ì¶œë˜ëŠ” ì§„ì…ì 
 		void StepFixed(float dt);
 
-		//¿ÜºÎ ³ëÃâÇÔ¼ö
+		//ì™¸ë¶€ ë…¸ì¶œí•¨ìˆ˜
 		void NotifyRigidAdded(RigidBodyComponent* rb);
 		void NotifyRigidRemoved(RigidBodyComponent* rb);
 
 		void NotifyColliderAdded(ColliderComponent* col);
 		void NotifyColliderRemoved(ColliderComponent* col);
 
-		// °ª º¯°æ 
+		// ê°’ ë³€ê²½ 
 		void NotifyColliderChanged(ColliderComponent* col);
 
-		// Å¸ÀÔ º¯°æ
+		// íƒ€ì… ë³€ê²½
 		void NotifyRigidTypeChanged(RigidBodyComponent* rb);
 
 		void UnbindScene();
@@ -56,19 +56,19 @@ namespace MMMEngine
 		void SetSceneGravity(float x, float y, float z);
 
 	private:
-		// ³»ºÎ¿¡¼­¸¸ ¾²´Â ÇïÆÛ
+		// ë‚´ë¶€ì—ì„œë§Œ ì“°ëŠ” í—¬í¼
 		void FlushCommands_PreStep();
 		void FlushCommands_PostStep();
 		void ApplyFilterConfigIfDirty();
 		void FlushDirtyColliders_PreStep();
 		void FlushDirtyColliderFilters_PreStep();
 
-		//ÇïÆÛÇÔ¼ö
+		//í—¬í¼í•¨ìˆ˜
 		void EraseCommandsForRigid(MMMEngine::RigidBodyComponent* rb);
 		void EraseAttachDetachForRigid(MMMEngine::RigidBodyComponent* rb);
 		void EraseCommandsForCollider(MMMEngine::ColliderComponent* col);
 
-		// µî·Ï/ÇØÁ¦ ¿äÃ» ( ³ëÃâ x ³»ºÎ¿¡¼­ »ç¿ë )
+		// ë“±ë¡/í•´ì œ ìš”ì²­ ( ë…¸ì¶œ x ë‚´ë¶€ì—ì„œ ì‚¬ìš© )
 		void RequestRegisterRigid(MMMEngine::RigidBodyComponent* rb);
 		void RequestUnregisterRigid(MMMEngine::RigidBodyComponent* rb);
 
@@ -76,35 +76,35 @@ namespace MMMEngine
 		void RequestDetachCollider(MMMEngine::RigidBodyComponent* rb, MMMEngine::ColliderComponent* col);
 
 		void RequestRebuildCollider(MMMEngine::RigidBodyComponent* rb, MMMEngine::ColliderComponent* col);
-		void RequestReapplyFilters(); // ¾À ¼³Á¤ ¹Ù²î¾úÀ» ¶§(Dirty)
+		void RequestReapplyFilters(); // ì”¬ ì„¤ì • ë°”ë€Œì—ˆì„ ë•Œ(Dirty)
 
 		void RequestChangeRigidType(MMMEngine::RigidBodyComponent* rb);
 
-		// ÀÚµ¿ rigid »ı¼º ÇïÆÛÇÔ¼ö
+		// ìë™ rigid ìƒì„± í—¬í¼í•¨ìˆ˜
 		MMMEngine::RigidBodyComponent* GetOrCreateRigid(ObjPtr<GameObject> go);
 		bool HasAnyCollider(ObjPtr<GameObject> go) const;
 
-		//ÀÌº¥Æ®º¸°üÇÔ¼ö
+		//ì´ë²¤íŠ¸ë³´ê´€í•¨ìˆ˜
 		std::vector<std::tuple<ObjPtr<GameObject>, ObjPtr<GameObject>, P_EvenType>> Callback_Que;
 
 		void Shutdown();
 	private:
-		// ÁÖÀÔ ,¹ÙÀÎµù
-		MMMEngine::Scene* m_Scene = nullptr;              // ÇöÀç ¾À(¼ÒÀ¯ X)
+		// ì£¼ì… ,ë°”ì¸ë”©
+		MMMEngine::Scene* m_Scene = nullptr;              // í˜„ì¬ ì”¬(ì†Œìœ  X)
 
-		//ÇÊÅÍ Á¤Ã¥
-		MMMEngine::CollisionMatrix m_CollisionMatrix;     // ·¹ÀÌ¾î/¸¶½ºÅ© Á¤Ã¥
-		bool m_FilterDirty = false;            // ¿¡µğÅÍ¿¡¼­ ¼³Á¤ º¯°æ ½Ã true
+		//í•„í„° ì •ì±…
+		MMMEngine::CollisionMatrix m_CollisionMatrix;     // ë ˆì´ì–´/ë§ˆìŠ¤í¬ ì •ì±…
+		bool m_FilterDirty = false;            // ì—ë””í„°ì—ì„œ ì„¤ì • ë³€ê²½ ì‹œ true
 
-		//¸í·É Å¥
+		//ëª…ë ¹ í
 		enum class CmdType : uint8_t
 		{
-			RegRigid,       //RigidBody¸¦ physScene¿¡ µî·ÏÇÏ´Â ¸í·É //scene->addActor(actor)
-			UnregRigid,     //RigidBody¸¦ physScene¿¡ Á¦°ÅÇÏ´Â ¸í·É //scene->removeActor(actor)
-			AttachCol,      //ÀÌ RigidBody¿¡ ÀÌ Collider¿¡ ºÙ¿©¶ó  //actor->attachShape(shape)
-			DetachCol,      //ÀÌ Collider¸¦ actor¿¡¼­ ¶¼¾î¶ó       //actor->detachShape(shape)
-			RebuildCol,     //ÀÌ ColliderÀÇ shape¸¦ ´Ù½Ã ¸¸µé¾î¶ó //»õ geometry·Î BuildShape -> ´Ù½Ã attach
-			ChangeRigid		//RigidBodyÀÇ Å¸ÀÔÀº º¯°æÇÏ¶ó
+			RegRigid,       //RigidBodyë¥¼ physSceneì— ë“±ë¡í•˜ëŠ” ëª…ë ¹ //scene->addActor(actor)
+			UnregRigid,     //RigidBodyë¥¼ physSceneì— ì œê±°í•˜ëŠ” ëª…ë ¹ //scene->removeActor(actor)
+			AttachCol,      //ì´ RigidBodyì— ì´ Colliderì— ë¶™ì—¬ë¼  //actor->attachShape(shape)
+			DetachCol,      //ì´ Colliderë¥¼ actorì—ì„œ ë–¼ì–´ë†”ë¼       //actor->detachShape(shape)
+			RebuildCol,     //ì´ Colliderì˜ shapeë¥¼ ë‹¤ì‹œ ë§Œë“¤ì–´ë¼ //ìƒˆ geometryë¡œ BuildShape -> ë‹¤ì‹œ attach
+			ChangeRigid		//RigidBodyì˜ íƒ€ì…ì€ ë³€ê²½í•˜ë¼
 		};
 
 		struct Command
@@ -118,10 +118,10 @@ namespace MMMEngine
 
 		MMMEngine::PhysScene m_PhysScene;
 
-		//ÇüÅÂ°¡ º¯ÇÑ Äİ¸®´õ¸¦ ´ã¾ÆµÎ´Â º¤ÅÍ
+		//í˜•íƒœê°€ ë³€í•œ ì½œë¦¬ë”ë¥¼ ë‹´ì•„ë‘ëŠ” ë²¡í„°
 		std::unordered_set<MMMEngine::ColliderComponent*> m_DirtyColliders;
 
-		//Unregister°¡ ¿¹¾àµÈ rigid¸¸ ´ã´Â ÄÁÅ×ÀÌ³Ê( Á¦°ÅµÈ°Ô ¾Æ´Ñ Á¦°ÅµÉ ¿¹Á¤ÀÎ rigid )
+		//Unregisterê°€ ì˜ˆì•½ëœ rigidë§Œ ë‹´ëŠ” ì»¨í…Œì´ë„ˆ( ì œê±°ëœê²Œ ì•„ë‹Œ ì œê±°ë  ì˜ˆì •ì¸ rigid )
 		std::unordered_set<RigidBodyComponent*> m_PendingUnreg;
 
 		bool m_IsInitialized = false;

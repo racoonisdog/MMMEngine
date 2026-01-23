@@ -39,17 +39,17 @@ void Initialize()
 	
 	TimeManager::Get().StartUp();
 
-	// ÀÌÀü¿¡ Ä×´ø ÇÁ·ÎÁ§Æ® ¿ì¼± È®ÀÎ
+	// ì´ì „ì— ì¼°ë˜ í”„ë¡œì íŠ¸ ìš°ì„  í™•ì¸
 	EditorRegistry::g_editor_project_loaded = ProjectManager::Get().Boot();
 	if (EditorRegistry::g_editor_project_loaded)
 	{
-		// Á¸ÀçÇÏ´Â °æ¿ì ¾ÀÀ» Ã³À½À¸·Î ½ºÅ¸Æ®
+		// ì¡´ì¬í•˜ëŠ” ê²½ìš° ì”¬ì„ ì²˜ìŒìœ¼ë¡œ ìŠ¤íƒ€íŠ¸
 		auto currentProject = ProjectManager::Get().GetActiveProject();
 		SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", currentProject.lastSceneIndex, true);
 		app->SetWindowTitle(L"MMMEditor [ " + Utility::StringHelper::StringToWString(currentProject.rootPath) + L" ]");
 		ObjectManager::Get().StartUp();
 
-		// À¯Àú ½ºÅ©¸³Æ® ºÒ·¯¿À±â
+		// ìœ ì € ìŠ¤í¬ë¦½íŠ¸ ë¶ˆëŸ¬ì˜¤ê¸°
 		{
 			fs::path cwd = fs::current_path();
 			DLLHotLoadHelper::CleanupHotReloadCopies(cwd);
@@ -99,7 +99,7 @@ void Update_ProjectNotLoaded()
 
 		ObjectManager::Get().StartUp();
 
-		// À¯Àú ½ºÅ©¸³Æ® ºÒ·¯¿À±â
+		// ìœ ì € ìŠ¤í¬ë¦½íŠ¸ ë¶ˆëŸ¬ì˜¤ê¸°
 		{
 			fs::path cwd = fs::current_path();
 			DLLHotLoadHelper::CleanupHotReloadCopies(cwd);

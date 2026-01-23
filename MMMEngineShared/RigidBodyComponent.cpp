@@ -83,13 +83,13 @@ void MMMEngine::RigidBodyComponent::CreateActor(physx::PxPhysics* physics, Vecto
 	m_Actor->userData = this;
 }
 
-//»ı¼ºÇßÀ»¶§ ÀÌ¹Ì Á¸ÀçÇÏ¸é µî·Ï¾ÈÇÏµµ·Ï ÇÔ
+//ìƒì„±í–ˆì„ë•Œ ì´ë¯¸ ì¡´ì¬í•˜ë©´ ë“±ë¡ì•ˆí•˜ë„ë¡ í•¨
 void MMMEngine::RigidBodyComponent::Initialize()
 {
 	auto it = GetGameObject()->GetComponentsCount<RigidBodyComponent>();
 	if (it >= 2)
 	{
-		std::cout << u8"ÀÌ¹Ì Á¸ÀçÇÏ´Â RigidComponent" << std::endl;
+		std::cout << u8"ì´ë¯¸ ì¡´ì¬í•˜ëŠ” RigidComponent" << std::endl;
 		Destroy(SelfPtr(this));
 		return;
 	}
@@ -144,12 +144,12 @@ void MMMEngine::RigidBodyComponent::DetachCollider(ColliderComponent* collider)
 {
 	if (!collider) return;
 
-	// ºÙ¾îÀÖ´Â ¸ñ·Ï¿¡¼­ Á¦°Å
+	// ë¶™ì–´ìˆëŠ” ëª©ë¡ì—ì„œ ì œê±°
 	auto it = std::find(m_Colliders.begin(), m_Colliders.end(), collider);
 	if (it != m_Colliders.end())
 		m_Colliders.erase(it);
 
-	// actor°¡ ÀÖÀ¸¸é PhysX shapeµµ detach
+	// actorê°€ ìˆìœ¼ë©´ PhysX shapeë„ detach
 	if (m_Actor)
 	{
 		if (auto* shape = collider->GetPxShape())
@@ -180,21 +180,21 @@ void MMMEngine::RigidBodyComponent::PushToPhysics()
 void MMMEngine::RigidBodyComponent::PullFromPhysics()
 {
 	if (!m_Actor) return;
-	//if (!m_Tr) return; // ¿£Áø Transform Æ÷ÀÎÅÍ(È¤Àº ÂüÁ¶)°¡ ¿¬°áµÈ °æ¿ì¸¸ ( ¿À·ù¹æÁö¿ë )
+	//if (!m_Tr) return; // ì—”ì§„ Transform í¬ì¸í„°(í˜¹ì€ ì°¸ì¡°)ê°€ ì—°ê²°ëœ ê²½ìš°ë§Œ ( ì˜¤ë¥˜ë°©ì§€ìš© )
 
 
-	// StaticÀº º¸Åë PullÇÒ ÇÊ¿ä ¾øÀ½ , ¿¡µğÅÍ ÀÌµ¿/ÅÚ·¹Æ÷Æ®´Â Push¿¡¼­ setGlobalPose·Î Ã³¸®)
+	// Staticì€ ë³´í†µ Pullí•  í•„ìš” ì—†ìŒ , ì—ë””í„° ì´ë™/í…”ë ˆí¬íŠ¸ëŠ” Pushì—ì„œ setGlobalPoseë¡œ ì²˜ë¦¬)
 	if (m_Desc.type == Type::Static) return;
 
 	auto* t_dynamic = m_Actor->is<physx::PxRigidDynamic>();
 	if (!t_dynamic) return;
 
-	//Å°³×¸¶Æ½Àº ÄÚµå Æ÷Áö¼Ç ±âÁØÀÌ¶ó Pull·Î µ¤¾î¾²Áö ¾ÊÀ½
-	//µ¿±âÈ­ ¿É¼ÇÀ» µÎ°í ÄÓ ¼öÀÖµµ·Ï °¡´É
-	//Áö±İÀº Å°³×¸¶Æ½ÀÌ¸é µ¤¾î¾²Áö ¾Êµµ·Ï 
+	//í‚¤ë„¤ë§ˆí‹±ì€ ì½”ë“œ í¬ì§€ì…˜ ê¸°ì¤€ì´ë¼ Pullë¡œ ë®ì–´ì“°ì§€ ì•ŠìŒ
+	//ë™ê¸°í™” ì˜µì…˜ì„ ë‘ê³  ì¼¤ ìˆ˜ìˆë„ë¡ ê°€ëŠ¥
+	//ì§€ê¸ˆì€ í‚¤ë„¤ë§ˆí‹±ì´ë©´ ë®ì–´ì“°ì§€ ì•Šë„ë¡ 
 	if (m_Desc.isKinematic)
 	{
-		// const physx::PxTransform pxPose = t_dynamic->getGlobalPose(); µ¿±âÈ­ ¿É¼Ç¿ë
+		// const physx::PxTransform pxPose = t_dynamic->getGlobalPose(); ë™ê¸°í™” ì˜µì…˜ìš©
 		// ApplyPoseToEngine(pxPose);
 		return;
 	}
@@ -211,7 +211,7 @@ void MMMEngine::RigidBodyComponent::PushPoseIfDirty()
 {
 	if (!m_Actor) return;
 
-	//ÅÚ·¹Æ÷Æ®/¿¡µğÅÍ °­Á¦ ÀÌµ¿ ¿äÃ»À» Ã³¸®ÇÏ´Â ºĞ±â
+	//í…”ë ˆí¬íŠ¸/ì—ë””í„° ê°•ì œ ì´ë™ ìš”ì²­ì„ ì²˜ë¦¬í•˜ëŠ” ë¶„ê¸°
 	if (m_PoseDirty)
 	{
 		m_Actor->setGlobalPose(ToPxTrans(m_RequestedWorldPose.position, m_RequestedWorldPose.rotation));
@@ -227,7 +227,7 @@ void MMMEngine::RigidBodyComponent::PushPoseIfDirty()
 		m_PoseDirty = false;
 	}
 
-	//Å°³×¸¶Æ½ ÀÌµ¿ ¿äÃ»ÀÌ ÀÖÀ»¶§ Ã³¸®ÇÏ´Â ºĞ±â
+	//í‚¤ë„¤ë§ˆí‹± ì´ë™ ìš”ì²­ì´ ìˆì„ë•Œ ì²˜ë¦¬í•˜ëŠ” ë¶„ê¸°
 	if (m_Desc.isKinematic && m_HasKinematicTarget)
 	{
 		if (auto* t_dynamic = m_Actor->is<physx::PxRigidDynamic>())
@@ -259,7 +259,7 @@ void MMMEngine::RigidBodyComponent::PushForces()
 
 	m_ForceQueue.clear();
 	m_TorqueQueue.clear();
-	//8Å©±â·Î ¹Ù·Î ÀçÇÒ´ç
+	//8í¬ê¸°ë¡œ ë°”ë¡œ ì¬í• ë‹¹
 	m_ForceQueue.reserve(8);
 	m_TorqueQueue.reserve(8);
 
@@ -278,17 +278,17 @@ void MMMEngine::RigidBodyComponent::Teleport(const Vector3& worldPos, const Quat
 
 void MMMEngine::RigidBodyComponent::SetKinematicTarget(const Vector3& worldPos, const Quaternion& Quater)
 {
-	// Å°³×¸¶Æ½ È£Ãâ¿ë ¹æ¾îÄÚµå ´ÙÀÌ³ª¹ÍÀÏ°æ¿ì ¾Æ¿ô
+	// í‚¤ë„¤ë§ˆí‹± í˜¸ì¶œìš© ë°©ì–´ì½”ë“œ ë‹¤ì´ë‚˜ë¯¹ì¼ê²½ìš° ì•„ì›ƒ
 	if (m_Desc.type != Type::Dynamic) return;
 
-	// Å°³×¸¶Æ½ ¼³Á¤ÀÌ µÇ¾ú°í Å°³×¸¶Æ½ÁÂÇ¥¸¦ ÀúÀå
+	// í‚¤ë„¤ë§ˆí‹± ì„¤ì •ì´ ë˜ì—ˆê³  í‚¤ë„¤ë§ˆí‹±ì¢Œí‘œë¥¼ ì €ì¥
 	m_KinematicTarget.position = worldPos;
 	m_KinematicTarget.rotation = Quater;
 
 	m_HasKinematicTarget = true;
 	m_WakeRequested = true;
 
-	// ¸¸¾à È£Ãâ ½ÃÁ¡¿¡ Å°³×¸¶Æ½ ÀüÈ¯±îÁö °°ÀÌ º¸ÀåÇÏ°í ½ÍÀ¸¸é (±î¸Ô¾ùÀ»¼öµµ ÀÖÀ¸´Ï±ñ)
+	// ë§Œì•½ í˜¸ì¶œ ì‹œì ì— í‚¤ë„¤ë§ˆí‹± ì „í™˜ê¹Œì§€ ê°™ì´ ë³´ì¥í•˜ê³  ì‹¶ìœ¼ë©´ (ê¹Œë¨¹ì—‡ì„ìˆ˜ë„ ìˆìœ¼ë‹ˆê¹)
 	// m_Desc.isKinematic = true; 
 	// m_DescDirty = true;
 }
@@ -298,7 +298,7 @@ void MMMEngine::RigidBodyComponent::MoveKinematicTarget()
 	if (m_Desc.type != Type::Dynamic) return;
 	if (!m_Desc.isKinematic) return;
 
-	// meshÀÚÃ¼ÀÇ transformÀ» ¸ñÇ¥·Î »ï´Â´Ù
+	// meshìì²´ì˜ transformì„ ëª©í‘œë¡œ ì‚¼ëŠ”ë‹¤
 	m_KinematicTarget.position = GetTransform()->GetWorldPosition();
 	m_KinematicTarget.rotation = GetTransform()->GetWorldRotation();
 
@@ -317,12 +317,12 @@ void MMMEngine::RigidBodyComponent::Editor_changeTrans(const Vector3& worldPos, 
 
 void MMMEngine::RigidBodyComponent::AddForce(Vector3 f, ForceMode mod)
 {
-	//´ÙÀÌ³ª¹ÍÀÌ ¾Æ´Ï¸é ÈûÀ» ÁÙ ÇÊ¿ä°¡ ¾øÀ½
+	//ë‹¤ì´ë‚˜ë¯¹ì´ ì•„ë‹ˆë©´ í˜ì„ ì¤„ í•„ìš”ê°€ ì—†ìŒ
 	if (m_Desc.type != Type::Dynamic) return;
-	//Å°³×¸¶Æ½ÀÌ true¶ó¸é ÈûÀ» ÁÙ ÇÊ¿ä°¡ ¾øÀ½
+	//í‚¤ë„¤ë§ˆí‹±ì´ trueë¼ë©´ í˜ì„ ì¤„ í•„ìš”ê°€ ì—†ìŒ
 	if (m_Desc.isKinematic) return;
 
-	//¹Ù·Î Ã³¸®ÇÏ´Â°Ô ¾Æ´Ï¶ó vector¿¡ ³ÖÀ½
+	//ë°”ë¡œ ì²˜ë¦¬í•˜ëŠ”ê²Œ ì•„ë‹ˆë¼ vectorì— ë„£ìŒ
 	m_ForceQueue.push_back({ f, mod });
 
 	m_WakeRequested = true;
@@ -369,7 +369,7 @@ void MMMEngine::RigidBodyComponent::AddImpulse(Vector3 imp)
 	m_WakeRequested = true;
 }
 
-//¼±Çü ¼Óµµ(Linear Velocity) ¼³Á¤
+//ì„ í˜• ì†ë„(Linear Velocity) ì„¤ì •
 void MMMEngine::RigidBodyComponent::SetLinearVelocity(Vector3 v)
 {
 	if (!m_Actor) return;
@@ -390,7 +390,7 @@ Vector3 MMMEngine::RigidBodyComponent::GetLinearVelocity() const
 
 	if (auto* d = m_Actor->is<physx::PxRigidDynamic>())
 	{
-		// Å°³×¸¶Æ½ÀÌ¸é 0 ¹İÈ¯
+		// í‚¤ë„¤ë§ˆí‹±ì´ë©´ 0 ë°˜í™˜
 		if (m_Desc.isKinematic) return Vector3();
 		return ToVec(d->getLinearVelocity());
 	}
@@ -473,7 +473,7 @@ void MMMEngine::RigidBodyComponent::BindTeleport()
 	SetKinematicTarget(temptrans->GetWorldPosition(), temptrans->GetWorldRotation());
 }
 
-//private ÇÔ¼öµé
+//private í•¨ìˆ˜ë“¤
 physx::PxForceMode::Enum MMMEngine::RigidBodyComponent::ToPxForceMode(ForceMode mode)
 {
 	switch (mode)
@@ -507,7 +507,7 @@ void MMMEngine::RigidBodyComponent::SetType(Type newType)
 	if (m_Desc.type == newType)
 		return;
 
-	//ÇöÀç ¿ùµå Æ÷Áî È®º¸
+	//í˜„ì¬ ì›”ë“œ í¬ì¦ˆ í™•ë³´
 	Vector3 temp_Position = {};
 	Quaternion temp_Quarter = {};
 
@@ -534,9 +534,9 @@ void MMMEngine::RigidBodyComponent::SetType(Type newType)
 	m_RequestedRot = temp_Quarter;
 	m_TypeChangePending = true;
 
-	// wake´Â '³ªÁß¿¡' ¾À¿¡ µé¾î°£ µÚ¿¡ Ã³¸®µÇ°Ô ÇÃ·¡±×¸¸
+	// wakeëŠ” 'ë‚˜ì¤‘ì—' ì”¬ì— ë“¤ì–´ê°„ ë’¤ì— ì²˜ë¦¬ë˜ê²Œ í”Œë˜ê·¸ë§Œ
 	m_WakeRequested = true;
 
-	// ¸Å´ÏÀú¿¡ Ã³¸® ¿äÃ»
+	// ë§¤ë‹ˆì €ì— ì²˜ë¦¬ ìš”ì²­
 	MMMEngine::PhysxManager::Get().NotifyRigidTypeChanged(this);
 }

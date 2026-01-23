@@ -20,14 +20,14 @@ namespace MMMEngine {
 		RTTR_ENABLE(Component)
 		RTTR_REGISTRATION_FRIEND
 	public:
-		//¹°Ã¼ÀÇ Å¸ÀÔ
+		//ë¬¼ì²´ì˜ íƒ€ì…
 		enum class Type
 		{
 			Static,
 			Dynamic
 		};
 
-		//°¡ÇÏ´Â ÈûÀÇ Á¾·ù
+		//ê°€í•˜ëŠ” í˜ì˜ ì¢…ë¥˜
 		enum class ForceMode
 		{
 			Force,
@@ -40,9 +40,9 @@ namespace MMMEngine {
 		{
 			Type type = Type::Dynamic;
 			float mass = 1.0f;
-			//¼±Çü°¨¼è¼öÄ¡ , °ø±âÀúÇ×, ¼Óµµ¿¡ ºñ·ÊÇØ¼­ °¨¼Ò
+			//ì„ í˜•ê°ì‡ ìˆ˜ì¹˜ , ê³µê¸°ì €í•­, ì†ë„ì— ë¹„ë¡€í•´ì„œ ê°ì†Œ
 			float linearDamping = 0.0f;
-			//°¢¼Óµµ °¨¼è ¼öÄ¡, È¸Àü °ü¼ºÀ» ÁÙÀÓ(È¸ÀüÀÌ Á¡Á¡ ´À·ÁÁö°í ¸ØÃá´Ù)
+			//ê°ì†ë„ ê°ì‡  ìˆ˜ì¹˜, íšŒì „ ê´€ì„±ì„ ì¤„ì„(íšŒì „ì´ ì ì  ëŠë ¤ì§€ê³  ë©ˆì¶˜ë‹¤)
 			float angularDamping = 0.05f;
 			bool useGravity = true;
 			bool isKinematic = false;
@@ -60,14 +60,14 @@ namespace MMMEngine {
 		RigidBodyComponent() = default;
 		RigidBodyComponent(const Desc& desc) : m_Desc(desc) {};
 
-		void Initialize() override;	//»ı¼ºÀÚ ÀÌÈÄ Ãß°¡ ÃÊ±âÈ­¿ë
+		void Initialize() override;	//ìƒì„±ì ì´í›„ ì¶”ê°€ ì´ˆê¸°í™”ìš©
 		void UnInitialize()override;
 
 		void OnDestroy();
-		//Scene¿¡ µî·Ï
+		//Sceneì— ë“±ë¡
 		void CreateActor(physx::PxPhysics* physics, DirectX::SimpleMath::Vector3 worldPos, DirectX::SimpleMath::Quaternion Quater);
 
-		//Shape ºÙÀÌ±â
+		//Shape ë¶™ì´ê¸°
 		void AttachCollider(ColliderComponent* collider);
 
 		void DetachCollider(ColliderComponent* collider);
@@ -76,12 +76,12 @@ namespace MMMEngine {
 
 		void DestroyActor();
 
-		//physics¿¡ ¹°¸®Á¤º¸¸¦ ´øÁ®ÁÖ´Â ¿ëµµ
+		//physicsì— ë¬¼ë¦¬ì •ë³´ë¥¼ ë˜ì ¸ì£¼ëŠ” ìš©ë„
 		void PushToPhysics();
-		//simulateÀÌÈÄ getGlobalPose()ÀÏ¾î¼­ m_Tr¿¡ ¹İ¿µÇÏ±â À§ÇÑ ÇÔ¼ö
+		//simulateì´í›„ getGlobalPose()ì¼ì–´ì„œ m_Trì— ë°˜ì˜í•˜ê¸° ìœ„í•œ í•¨ìˆ˜
 		void PullFromPhysics();
 
-		//ÁÂÇ¥¸¦ °­Á¦·Î ¹Ù²åÀ»¶§ dirty¼³Á¤ ( ¿ÜºÎÀû ¿äÀÎÀ¸·Î ÀÎÇØ º¯°æÇßÀ»¶§¸¸ È£Ãâ )
+		//ì¢Œí‘œë¥¼ ê°•ì œë¡œ ë°”ê¿¨ì„ë•Œ dirtyì„¤ì • ( ì™¸ë¶€ì  ìš”ì¸ìœ¼ë¡œ ì¸í•´ ë³€ê²½í–ˆì„ë•Œë§Œ í˜¸ì¶œ )
 		void PushPoseIfDirty();
 
 		void PushForces();
@@ -92,14 +92,14 @@ namespace MMMEngine {
 		void MoveKinematicTarget();
 		void Editor_changeTrans(const DirectX::SimpleMath::Vector3& worldPos, const DirectX::SimpleMath::Quaternion& Quater);
 
-		//Èû, ¼Óµµ µî Á¶ÀÛ¿ë API
+		//í˜, ì†ë„ ë“± ì¡°ì‘ìš© API
 		void AddForce(DirectX::SimpleMath::Vector3 f, ForceMode mod);
 		void AddTorque(DirectX::SimpleMath::Vector3 tor, ForceMode mod);
 
-		//rigid°ª ¼³Á¤½Ã physx¿¡ ¹İ¿µÇÏ´Â ÇÔ¼ö
+		//rigidê°’ ì„¤ì •ì‹œ physxì— ë°˜ì˜í•˜ëŠ” í•¨ìˆ˜
 		void PushStateChanges();
 
-		//sleep/wake ½Ã½ºÅÛ
+		//sleep/wake ì‹œìŠ¤í…œ
 		void PushWakeUp();
 
 		void AddImpulse(DirectX::SimpleMath::Vector3 imp);
@@ -146,38 +146,38 @@ namespace MMMEngine {
 	private:
 		Desc m_Desc;
 
-		//³»ºÎÀûÀ¸·Î¸¸ ¾µ À§Ä¡°´Ã¼
+		//ë‚´ë¶€ì ìœ¼ë¡œë§Œ ì“¸ ìœ„ì¹˜ê°ì²´
 		struct Pose
 		{
 			DirectX::SimpleMath::Vector3 position;
 			DirectX::SimpleMath::Quaternion rotation;
 		};
 
-		//Actorº¯¼ö
+		//Actorë³€ìˆ˜
 		physx::PxRigidActor* m_Actor = nullptr;
-		//collider ¸®½ºÆ®
+		//collider ë¦¬ìŠ¤íŠ¸
 		//std::vector<ColliderComponent*> m_PendingColliders;
 		std::vector<ColliderComponent*> m_Colliders;
 
-		//TransformÀÌ ¹Ù²î¾ú´Ù´Â flag¿ëµµ ( ÅÚ·¹Æ÷Æ®, ¿ÀºêÁ§Æ®¸¦ Á÷Á¢ ²ø¾î¼­ ÀÌµ¿, Å°³×¸¶Æ½ ÀÌµ¿( ÇÃ·¡Æû, ÄÆ¾À °æ·Î ÀÌµ¿ µî ), ½ºÅ©¸³Æ®¿¡ ÀÇÇÑ ÀÌµ¿)
+		//Transformì´ ë°”ë€Œì—ˆë‹¤ëŠ” flagìš©ë„ ( í…”ë ˆí¬íŠ¸, ì˜¤ë¸Œì íŠ¸ë¥¼ ì§ì ‘ ëŒì–´ì„œ ì´ë™, í‚¤ë„¤ë§ˆí‹± ì´ë™( í”Œë˜í¼, ì»·ì”¬ ê²½ë¡œ ì´ë™ ë“± ), ìŠ¤í¬ë¦½íŠ¸ì— ì˜í•œ ì´ë™)
 		bool m_PoseDirty = false;
-		//ÅÚ·¹Æ÷Æ®, ¿£ÁøÀÌ °­Á¦·Î ¹Ù²Û trans¿ëµµ
+		//í…”ë ˆí¬íŠ¸, ì—”ì§„ì´ ê°•ì œë¡œ ë°”ê¾¼ transìš©ë„
 		Pose m_RequestedWorldPose;
 
-		//Å°³×¸¶Æ½ ÀÌµ¿¿ë
+		//í‚¤ë„¤ë§ˆí‹± ì´ë™ìš©
 		bool m_HasKinematicTarget = false;
-		//setKinematictargetÀ¸·Î º¸³¾°ª
+		//setKinematictargetìœ¼ë¡œ ë³´ë‚¼ê°’
 		Pose m_KinematicTarget;
 
 
-		// »óÅÂ ÇÃ·¡±× ( desc¸¦ ·±Å¸ÀÓÀÌ³ª ¿¡µğÅÍ¿¡¼­ º¯°æ½Ã true·ÎµÊ)
+		// ìƒíƒœ í”Œë˜ê·¸ ( descë¥¼ ëŸ°íƒ€ì„ì´ë‚˜ ì—ë””í„°ì—ì„œ ë³€ê²½ì‹œ trueë¡œë¨)
 		bool m_DescDirty = false;
-		// ¹°Ã¼¸¦ ²ø¾î´Ù ³õ°Å³ª ÅÚ·¹Æ÷Æ®ÇßÀ»¶§ wake ¾Ë·ÁÁÖµµ·Ï ¼³Á¤ÇÏ´Â flag°ª
+		// ë¬¼ì²´ë¥¼ ëŒì–´ë‹¤ ë†“ê±°ë‚˜ í…”ë ˆí¬íŠ¸í–ˆì„ë•Œ wake ì•Œë ¤ì£¼ë„ë¡ ì„¤ì •í•˜ëŠ” flagê°’
 		bool m_WakeRequested = false;
 
 
-		//force, torque ¼³Á¤ º¯¼ö
-		//¹Ù·Î Ã³¸®ÇÏ´Â°Ô ¾Æ´Ï¶ó ÄÁÅ×ÀÌ³Ê¿¡ ´ã¾ÆµÎ°í ÇÔ¼ö¸¦ ÅëÇØ ¼øÂ÷ÀûÀ¸·Î ½ÇÇàÇÏµµ·Ï
+		//force, torque ì„¤ì • ë³€ìˆ˜
+		//ë°”ë¡œ ì²˜ë¦¬í•˜ëŠ”ê²Œ ì•„ë‹ˆë¼ ì»¨í…Œì´ë„ˆì— ë‹´ì•„ë‘ê³  í•¨ìˆ˜ë¥¼ í†µí•´ ìˆœì°¨ì ìœ¼ë¡œ ì‹¤í–‰í•˜ë„ë¡
 		struct ForceCmd
 		{
 			DirectX::SimpleMath::Vector3 vec;
@@ -199,7 +199,7 @@ namespace MMMEngine {
 
 		void BindTeleport();
 
-		//settype¿ëÇÔ¼ö
+		//settypeìš©í•¨ìˆ˜
 		bool m_TypeChangePending = false;
 		Type m_RequestedType = Type::Dynamic;
 		Vector3 m_RequestedPos{};
