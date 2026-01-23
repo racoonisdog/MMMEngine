@@ -162,6 +162,9 @@
     <ClInclude Include="EditorCamera.h">
       <Filter>헤더 파일\EditorCamera</Filter>
     </ClInclude>
+    <ClInclude Include="SceneViewWindow.h">
+      <Filter>헤더 파일\EditorWindow</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -229,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="EditorCamera.cpp">
       <Filter>소스 파일\EditorCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneViewWindow.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

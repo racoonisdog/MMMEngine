@@ -240,13 +240,22 @@ void RenderProperties(rttr::instance inst)
 
                             try
                             {
-                                rttr::variant loadedResource = ResourceManager::Get().Load(
-                                    innerType, wRelativePath);
+                                rttr::variant loadedResource = ResourceManager::Get().Load(innerType, wRelativePath);
 
                                 if (loadedResource.is_valid())
                                 {
                                     if (!readOnly)
-                                        prop.set_value(inst, loadedResource);
+                                    {
+                                        if (loadedResource.convert(prop.get_type()))                  // v를 내부적으로 target type으로 변환 (bool 리턴)
+                                        {
+                                            prop.set_value(inst, loadedResource);                     // v는 이제 shared_ptr<StaticMesh> 타입 variant
+                                        }
+                                        else
+                                        {
+                                            // 변환 실패 처리
+                                        }
+
+                                    }
                                 }
                             }
                             catch (const std::exception& e)

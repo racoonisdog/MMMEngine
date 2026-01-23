@@ -83,7 +83,7 @@ namespace MMMEngine
 					return std::dynamic_pointer_cast<T>(sp);
 
 			auto res = std::make_shared<T>();
-			res->SetFilePath(truePath);
+			res->SetFilePath(filePath);
 			if (!res->LoadFromFilePath(truePath))
 			{
 				std::cout << u8"파일 패스가 잘못되었어용" << std::endl;
@@ -131,7 +131,7 @@ namespace MMMEngine
 				return rttr::variant();  // shared_ptr이 아니면 실패
 
 			// 파일 로드
-			resPtr->SetFilePath(truePath);
+			resPtr->SetFilePath(filePath);
 			if (!resPtr->LoadFromFilePath(truePath))
 				return rttr::variant();
 

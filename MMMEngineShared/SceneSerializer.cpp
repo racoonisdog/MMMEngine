@@ -356,7 +356,15 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
                 rttr::variant loadedResource = ResourceManager::Get().Load(
                     innerType, filePath);
 
-                target = loadedResource;
+                if (loadedResource.convert(target.get_type()))                  // v를 내부적으로 target type으로 변환 (bool 리턴)
+                {
+                    target = loadedResource;               // v는 이제 shared_ptr<StaticMesh> 타입 variant
+                }
+
+          
+
+
+
                 return;
             }
         }

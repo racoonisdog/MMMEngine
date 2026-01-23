@@ -18,6 +18,15 @@ RTTR_REGISTRATION
 		.property("receiveShadows", &StaticMesh::receiveShadows)
 		.property("meshData", &StaticMesh::meshData)
 		.property("meshGroupData", &StaticMesh::meshGroupData);
+
+	type::register_converter_func(
+		[](std::shared_ptr<Resource> from, bool& ok) -> std::shared_ptr<StaticMesh>
+		{
+			auto result = std::dynamic_pointer_cast<StaticMesh>(from);
+			ok = (result != nullptr);
+			return result;
+		}
+	);
 }
 
 Microsoft::WRL::ComPtr<ID3D11Buffer> CreateVertexBuffer(const std::vector<MMMEngine::Mesh_Vertex>& _vertices)
