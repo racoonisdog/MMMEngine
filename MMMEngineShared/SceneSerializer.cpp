@@ -41,6 +41,17 @@ json SerializeVariant(const rttr::variant& var)
 {
     rttr::type t = var.get_type();
 
+    if (t.is_enumeration())
+    {
+        rttr::enumeration enumType = t.get_enumeration();
+        std::string enumName = enumType.value_to_name(var).to_string();
+
+        json enumJson;
+        enumJson["EnumType"] = t.get_name().to_string();
+        enumJson["EnumValue"] = enumName;
+        return enumJson;
+    }
+
     if (t.is_arithmetic())
     {
         if (t == type::get<bool>()) return var.to_bool();
@@ -200,6 +211,24 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
     if (j.is_null())
     {
         target = rttr::variant();
+        return;
+    }
+
+    if (target_type.is_enumeration())
+    {
+        if (j.contains("EnumType") && j.contains("EnumValue"))
+        {
+            std::string enumTypeName = j["EnumType"].get<std::string>();
+            std::string enumValueName = j["EnumValue"].get<std::string>();
+
+            rttr::enumeration enumType = target_type.get_enumeration();
+            rttr::variant enumValue = enumType.name_to_value(enumValueName);
+
+            if (enumValue.is_valid())
+            {
+                target = enumValue;
+            }
+        }
         return;
     }
 

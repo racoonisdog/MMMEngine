@@ -60,6 +60,8 @@ void RenderProperties(rttr::instance inst)
         s_lastCachedObject = g_selectedGameObject;
     }
 
+
+
     auto t = inst.get_derived_type();
     rttr::property p = t.get_property("MUID");
     rttr::variant v = p.get_value(inst);
@@ -88,6 +90,7 @@ void RenderProperties(rttr::instance inst)
 
         const std::string name = prop.get_name().to_string();
         const bool readOnly = prop.is_readonly();
+        rttr::type propType = prop.get_type();
 
         if (var.is_type<Vector3>())
         {
@@ -108,6 +111,42 @@ void RenderProperties(rttr::instance inst)
             if (changed && !readOnly)
                 prop.set_value(inst, Vector3(data[0], data[1], data[2]));
         }
+        else if (propType.is_enumeration())
+        {
+            rttr::enumeration enumType = propType.get_enumeration();
+            std::string currentName = enumType.value_to_name(var).to_string();
+
+            if (readOnly) ImGui::BeginDisabled(true);
+
+            if (ImGui::BeginCombo(name.c_str(), currentName.c_str()))
+            {
+                auto enumNames = enumType.get_names();
+                for (const auto& enumName : enumNames)
+                {
+                    std::string enumNameStr = enumName.to_string();
+                    bool isSelected = (enumNameStr == currentName);
+
+                    if (ImGui::Selectable(enumNameStr.c_str(), isSelected))
+                    {
+                        if (!readOnly)
+                        {
+                            rttr::variant newValue = enumType.name_to_value(enumName);
+                            if (newValue.is_valid())
+                            {
+                                prop.set_value(inst, newValue);
+                            }
+                        }
+                    }
+
+                    if (isSelected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
+            if (readOnly) ImGui::EndDisabled();
+        }
+
         else if (var.is_type<float>())
         {
             float f = var.get_value<float>();
