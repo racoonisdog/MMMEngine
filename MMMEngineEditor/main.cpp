@@ -142,10 +142,11 @@ void Update()
 		BehaviourManager::Get().AllBroadCastBehaviourMessage("OnSceneLoaded");
 	}
 
-	if (EditorRegistry::g_editor_scene_playing)
-	{
-		BehaviourManager::Get().InitializeBehaviours();
-	}
+	//if (EditorRegistry::g_editor_scene_playing)
+	//{
+	//	BehaviourManager::Get().InitializeBehaviours();
+	//}
+	BehaviourManager::Get().InitializeBehaviours();
 
 	TimeManager::Get().ConsumeFixedSteps([&](float fixedDt)
 		{
@@ -155,6 +156,8 @@ void Update()
 			MMMEngine::PhysxManager::Get().StepFixed(fixedDt);
 			BehaviourManager::Get().BroadCastBehaviourMessage("FixedUpdate");
 		});
+
+	BehaviourManager::Get().BroadCastBehaviourMessage("Update");
 
 	RenderManager::Get().BeginFrame();
 	RenderManager::Get().Render();

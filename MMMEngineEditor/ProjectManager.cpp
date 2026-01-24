@@ -244,38 +244,37 @@ void MMMEngine::ExampleBehaviour::Update()
 )";
     }
 
-    std::string ProjectManager::ToProjectRelativePath(const std::string& absolutePath)
+    std::string ProjectManager::ToProjectRelativePath(const std::string& pathStr)
     {
         if (!HasActiveProject())
-            return absolutePath;
+            return pathStr;
 
         const auto& project = GetActiveProject();
+        namespace fs = std::filesystem;
 
-        try
+        fs::path root = fs::path(project.rootPath);              // e.g. C:\Users\...\murasaki
+        fs::path in = fs::path(pathStr);
+
+        // "absolutePath"라고 들어오지만 실제로는 상대경로일 수 있음
+        fs::path absCandidate = in.is_absolute() ? in : (root / in);
+
+        std::error_code ec;
+        fs::path rootCan = fs::weakly_canonical(root, ec);
+        if (ec) return pathStr;
+
+        fs::path absCan = fs::weakly_canonical(absCandidate, ec);
+        if (ec) return pathStr;
+
+        // 프로젝트 내부인지 확인
+        auto [rootEnd, absEnd] = std::mismatch(rootCan.begin(), rootCan.end(), absCan.begin());
+        if (rootEnd == rootCan.end())
         {
-            fs::path root = fs::canonical(fs::path(project.rootPath));
-            fs::path abs = fs::canonical(fs::path(absolutePath));
-
-            // 프로젝트 내부 파일인지 확인
-            auto [rootEnd, absEnd] = std::mismatch(root.begin(), root.end(), abs.begin());
-
-            if (rootEnd == root.end())  // 프로젝트 내부 파일
-            {
-                fs::path relative = fs::relative(abs, root);
-                std::string result = relative.string();
-
-                // 경로 구분자 통일
-                std::replace(result.begin(), result.end(), '\\', '/');
-                return result;
-            }
-        }
-        catch (const fs::filesystem_error&)
-        {
-            // canonical 실패 시 (파일이 존재하지 않는 경우 등)
+            fs::path rel = absCan.lexically_relative(rootCan);
+            std::string result = rel.generic_string(); // '/'로 통일
+            return result;
         }
 
-        // 프로젝트 외부 파일이거나 에러 발생 시 절대 경로 반환
-        return absolutePath;
+        return absCan.string(); // 외부면 정규화된 절대경로 반환 (원하면 원본 유지)
     }
 
     bool ProjectManager::GenerateUserScriptsVcxproj(const fs::path& projectRootDir) const

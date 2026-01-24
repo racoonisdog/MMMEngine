@@ -88,6 +88,12 @@
     <Filter Include="소스 파일\EditorWIndow\CustomRenderer">
       <UniqueIdentifier>{02cc79c3-2dd4-4317-bec7-70685a0741d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\ImGuizmo">
+      <UniqueIdentifier>{6afa6a8d-eb5f-4e3e-98e5-207958df34b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\ImGuizmo">
+      <UniqueIdentifier>{d1df62e8-7996-4171-9c42-b66dc185b68c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorRegistry.h">
@@ -180,6 +186,9 @@
     <ClInclude Include="EditorShader.h">
       <Filter>헤더 파일\EditorRegistry</Filter>
     </ClInclude>
+    <ClInclude Include="ImGuizmo\ImGuizmo.h">
+      <Filter>헤더 파일\ImGuizmo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -256,6 +265,9 @@
     </ClCompile>
     <ClCompile Include="EditorGridRenderer.cpp">
       <Filter>소스 파일\EditorWIndow\CustomRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuizmo\ImGuizmo.cpp">
+      <Filter>소스 파일\ImGuizmo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

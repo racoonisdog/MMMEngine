@@ -219,6 +219,7 @@
     <ClInclude Include="RendererBase.h" />
     <ClInclude Include="RendererTools.h" />
     <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="RenderStateGuard.h" />
     <ClInclude Include="Resolution.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="MMMTime.h" />
@@ -226,6 +227,7 @@
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="ResourceSerializer.h" />
     <ClInclude Include="RigidBodyComponent.h" />
+    <ClInclude Include="SafeRelease.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SceneRef.h" />
@@ -285,6 +287,7 @@
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="RenderShared.cpp" />
     <ClCompile Include="RenderShared.h" />
+    <ClCompile Include="RenderStateGuard.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="ResourceSerializer.cpp" />

@@ -339,36 +339,57 @@ void RenderProperties(rttr::instance inst)
 
         else if (var.is_type<Quaternion>())
         {
-            // 표시용 캐시 계산은 readOnly든 아니든 가능
-            if (g_lastSelected != g_selectedGameObject)
-            {
-                Quaternion q = var.get_value<Quaternion>();
-                Vector3 e = q.ToEuler();
-                g_eulerCache = { e.x * (180.f / XM_PI), e.y * (180.f / XM_PI), e.z * (180.f / XM_PI) };
-                g_lastSelected = g_selectedGameObject;
-            }
+            // 고유 키 (string 캐시처럼)
+            rttr::property muidProp = t.get_property("MUID");
+            rttr::variant muidVar = muidProp.get_value(inst);
+            std::string muidStr = (muidVar.is_valid() && muidVar.is_type<MMMEngine::Utility::MUID>())
+                ? muidVar.get_value<MMMEngine::Utility::MUID>().ToStringWithoutHyphens()
+                : "unknown";
 
-            float data[3] = { g_eulerCache.x, g_eulerCache.y, g_eulerCache.z };
-            auto SnapToZero = [](float& v, float eps = 1e-4f)
-                {
-                    if (fabsf(v) < eps) v = 0.0f; // +0로 만들어짐
-                };
-            SnapToZero(data[0]);
-            SnapToZero(data[1]);
-            SnapToZero(data[2]);
+            std::string key = muidStr + "::" + inst.get_type().get_name().to_string() + "::" + name;
+
+            // Quaternion용 캐시를 별도로 두는게 깔끔 (static map)
+            static std::unordered_map<std::string, Vector3> eulerCache;
+
+            // 1) 실제 값에서 Euler 계산 (도 단위)
+            auto q = var.get_value<Quaternion>();
+            Vector3 eRad = q.ToEuler(); // (SimpleMath는 보통 rad 반환)
+            Vector3 eDeg = { eRad.x * (180.f / XM_PI), eRad.y * (180.f / XM_PI), eRad.z * (180.f / XM_PI) };
+
+            // 2) 캐시 없으면 초기화
+            if (eulerCache.find(key) == eulerCache.end())
+                eulerCache[key] = eDeg;
+
+            // 3) 인스펙터에서 "현재 이 항목을 편집 중"인지 판별하려면
+            //    DragFloat3 호출 후 IsItemActive를 볼 수 있으니,
+            //    호출 전에는 "이전 프레임의 상태"가 없어서 보통 이렇게 처리합니다:
+            //    - 일단 data를 캐시로 세팅
+            //    - DragFloat3 호출 후, Active가 아니고 changed도 아니면 실제 값으로 캐시를 동기화
+            float data[3] = { eulerCache[key].x, eulerCache[key].y, eulerCache[key].z };
 
             if (readOnly) ImGui::BeginDisabled(true);
             bool changed = ImGui::DragFloat3(name.c_str(), data, 0.1f);
+            bool active = ImGui::IsItemActive();
             if (readOnly) ImGui::EndDisabled();
 
+            // 4) 사용자가 편집하지 않는 동안엔 gizmo 등 외부 변경을 반영
+            if (!active && !changed)
+            {
+                eulerCache[key] = eDeg; // 외부 변경 반영(= gizmo 최신화)
+            }
+
+            // 5) 사용자가 인스펙터에서 편집한 경우만 set_value
             if (changed && !readOnly)
             {
-                g_eulerCache = { data[0], data[1], data[2] };
+                eulerCache[key] = { data[0], data[1], data[2] };
+
                 Quaternion updatedQ = Quaternion::CreateFromYawPitchRoll(
-                    g_eulerCache.y * (XM_PI / 180.f),
-                    g_eulerCache.x * (XM_PI / 180.f),
-                    g_eulerCache.z * (XM_PI / 180.f)
+                    eulerCache[key].y * (XM_PI / 180.f),
+                    eulerCache[key].x * (XM_PI / 180.f),
+                    eulerCache[key].z * (XM_PI / 180.f)
                 );
+
+                updatedQ.Normalize();
                 prop.set_value(inst, updatedQ);
             }
         }
@@ -389,37 +410,7 @@ void RenderProperties(rttr::instance inst)
 
             // Drag & Drop 지원
             // None으로 설정 버튼 (X)
-            }
-        //else if (var.is_type<std::string>())
-        //{
-        //    const bool readOnly = prop.is_readonly();
-        //    const std::string name = prop.get_name().to_string();
-
-        //    std::string current = var.get_value<std::string>();
-
-        //    // 캐시에 없으면 현재 값을 넣어 초기화
-        //    std::string key = MakeStringKey(inst, prop);
-        //    auto& buf = g_stringEditCache[key];
-        //    if (buf.empty() && !current.empty())
-        //        buf = current;
-
-        //    // 값이 외부에서 바뀌었을 수도 있으니(Undo/Redo 등) 동기화 정책 선택:
-        //    // 1) 편집 중이 아니면 current로 덮어쓰기
-        //    // 2) 항상 덮어쓰기 (비추천)
-        //    // 여기서는 "선택 변경 시 cache clear"를 전제로 단순 유지
-
-        //    if (readOnly) ImGui::BeginDisabled(true);
-
-        //    // ImGui::InputText는 std::string 직접 지원(버전에 따라) 또는 callback 방식 필요
-        //    bool changed = ImGui::InputText(name.c_str(), );
-
-        //    if (readOnly) ImGui::EndDisabled();
-
-        //    if (changed && !readOnly)
-        //    {
-        //        prop.set_value(inst, buf);
-        //    }
-        //}
+        }
     }
     ImGui::PopID();
 }

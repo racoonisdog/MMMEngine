@@ -26,6 +26,9 @@ namespace MMMEngine
 		virtual ~Component() = default;
 
 		inline ObjPtr<GameObject> GetGameObject() { return m_gameObject; };
+
+		template <typename T>
+		ObjPtr<T> GetComponent() { return m_gameObject->GetComponent<T>(); }
 		ObjPtr<Transform> GetTransform();
 	};
 }

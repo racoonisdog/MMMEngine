@@ -4,6 +4,7 @@
 #include <imgui_internal.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
+#include <ImGuizmo.h>
 
 #include "SceneManager.h"
 #include "SceneSerializer.h"
@@ -241,6 +242,7 @@ void MMMEngine::Editor::ImGuiEditorContext::BeginFrame()
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+    ImGuizmo::BeginFrame();
 }
 
 void MMMEngine::Editor::ImGuiEditorContext::Render()

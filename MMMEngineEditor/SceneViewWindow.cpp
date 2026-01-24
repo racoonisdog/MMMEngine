@@ -1,12 +1,16 @@
 #include "imgui.h"
 #include "SceneViewWindow.h"
 #include "EditorRegistry.h"
+#include "RenderStateGuard.h"
+#include "RenderManager.h"
+#include <ImGuizmo.h>
+#include "Transform.h"
+#include <imgui_internal.h>
 
 using namespace MMMEngine::Editor;
 using namespace MMMEngine;
+using namespace MMMEngine::Utility;
 using namespace MMMEngine::EditorRegistry;
-
-
 
 void MMMEngine::Editor::SceneViewWindow::Initialize(ID3D11Device* device, ID3D11DeviceContext* context, int initWidth, int initHeight)
 {
@@ -45,15 +49,11 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 		return;
 
 	ResizeRenderTarget(m_cachedDevice, m_lastWidth, m_lastHeight);
-
 	RenderSceneToTexture(m_cachedContext);
 
 	ImGuiWindowClass wc;
-	// 핵심: 메인 뷰포트에 이 윈도우를 종속시킵니다.
-	// 이렇게 하면 메인 창을 클릭해도 이 창이 '메인 창의 일부'로서 취급되어 우선순위를 가집니다.
 	wc.ParentViewportId = ImGui::GetMainViewport()->ID;
-	wc.ViewportFlagsOverrideSet = ImGuiViewportFlags_NoFocusOnAppearing; // 필요 시 설정
-
+	wc.ViewportFlagsOverrideSet = ImGuiViewportFlags_NoFocusOnAppearing;
 	ImGui::SetNextWindowClass(&wc);
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -74,12 +74,10 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 
 	// 사용 가능한 영역 크기 가져오기
 	ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-
 	m_lastWidth = viewportSize.x;
 	m_lastHeight = viewportSize.y;
 
-	// 크기가 변경되었으면 렌더 타겟 리사이즈 필요
-	// 실제 리사이즈는 다음 프레임의 Render에서 수행
+	auto scenecornerpos = ImGui::GetCursorPos();
 
 	// ImGui에 텍스처 렌더링
 	if (m_pSceneSRV)
@@ -91,12 +89,121 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 			ImVec2(1, 1)
 		);
 	}
+	// ImGuizmo는 별도의 DrawList에 그려짐
+	if (g_selectedGameObject.IsValid())
+	{
+		ImVec2 imagePos = ImGui::GetItemRectMin();  // 방금 그린 Image의 좌상단 (화면 좌표)
+		ImVec2 imageMax = ImGui::GetItemRectMax();
+		ImVec2 imageSize = ImVec2(imageMax.x - imagePos.x, imageMax.y - imagePos.y);
 
+		ImGuizmo::SetRect(imagePos.x, imagePos.y, imageSize.x, imageSize.y);
+
+		ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+		ImGuizmo::SetOrthographic(false);
+
+		auto viewMat = m_pCam->GetViewMatrix();
+		auto projMat = m_pCam->GetProjMatrix();
+		auto modelMat = g_selectedGameObject->GetTransform()->GetWorldMatrix(); // 값이라도 로컬에 저장
+
+		float* viewPtr = &viewMat.m[0][0];
+		float* projPtr = &projMat.m[0][0];
+		float* modelPtr = &modelMat.m[0][0];
+
+		ImGuizmo::Manipulate(viewPtr, projPtr, m_guizmoOperation, m_guizmoMode, modelPtr);
+
+		if (ImGuizmo::IsUsing())
+		{
+			Vector3 t, s;
+			Quaternion r;
+			modelMat.Decompose(s, r, t);
+
+			auto tr = g_selectedGameObject->GetTransform();
+
+			// 회전 중에는 scale 드리프트를 막기 위해 기존 스케일 유지
+			if (m_guizmoOperation == ImGuizmo::ROTATE)
+				s = tr->GetWorldScale();
+
+			r.Normalize(); // 쿼터니언도 정규화 추천
+
+			tr->SetWorldPosition(t);
+			tr->SetWorldRotation(r);
+			tr->SetWorldScale(s);
+		}
+	}
+
+	{
+		auto buttonsize = ImVec2(0, 0);
+		auto padding = ImVec2{ 10,10 };
+		auto moving = m_guizmoOperation == ImGuizmo::OPERATION::TRANSLATE;
+		auto rotating = m_guizmoOperation == ImGuizmo::OPERATION::ROTATE;
+		auto scaling = m_guizmoOperation == ImGuizmo::OPERATION::SCALE;
+		auto local = m_guizmoMode == ImGuizmo::MODE::LOCAL;
+		auto world = m_guizmoMode == ImGuizmo::MODE::WORLD;
+
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.7f, 0.7f, 0.7f, 1.0f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.9f, 0.9f, 0.9f, 1.0f));
+
+		ImGui::SetCursorPos(scenecornerpos + padding);
+		// Move 버튼
+		ImGui::BeginDisabled(moving);
+		if (ImGui::Button(u8"\uf047 move", buttonsize))
+		{
+			m_guizmoOperation = ImGuizmo::TRANSLATE;
+		}
+		ImGui::EndDisabled();
+
+		ImGui::SameLine();
+
+		// Rotate 버튼
+		ImGui::BeginDisabled(rotating);
+		if (ImGui::Button(u8"\uf2f1 rotate", buttonsize))
+		{
+			m_guizmoOperation = ImGuizmo::ROTATE;
+		}
+		ImGui::EndDisabled();
+
+		ImGui::SameLine();
+
+		// Scale 버튼
+		ImGui::BeginDisabled(scaling);
+		if (ImGui::Button(u8"\uf31e scale", buttonsize))
+		{
+			m_guizmoOperation = ImGuizmo::SCALE;
+		}
+		ImGui::EndDisabled();
+
+		ImGui::SameLine();
+
+		// 구분선
+		ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+
+		ImGui::SameLine();
+
+		// Local 버튼
+		ImGui::BeginDisabled(local);
+		if (ImGui::Button(u8"\uf1b2 local", buttonsize))
+		{
+			m_guizmoMode = ImGuizmo::LOCAL;
+		}
+		ImGui::EndDisabled();
+
+		ImGui::SameLine();
+
+		// World 버튼
+		ImGui::BeginDisabled(world);
+		if (ImGui::Button(u8"\uf0ac world", buttonsize))
+		{
+			m_guizmoMode = ImGuizmo::WORLD;
+		}
+		ImGui::EndDisabled();
+
+		ImGui::PopStyleColor(3);
+	}
 
 	ImGui::End();
 	ImGui::PopStyleVar();
 }
-
 bool MMMEngine::Editor::SceneViewWindow::CreateRenderTargets(ID3D11Device* device, int width, int height)
 {
 	// 기존 리소스 해제
@@ -204,25 +311,19 @@ void MMMEngine::Editor::SceneViewWindow::ResizeRenderTarget(ID3D11Device* device
 		CreateRenderTargets(device, width, height);
 	}
 }
-
 void MMMEngine::Editor::SceneViewWindow::RenderSceneToTexture(ID3D11DeviceContext* context)
 {
 	ID3D11ShaderResourceView* nullSRV = nullptr;
 	context->PSSetShaderResources(0, 1, &nullSRV);
 
-	// Render Target과 Depth Stencil 설정
-	ID3D11RenderTargetView* oldRTV = nullptr;
-	ID3D11DepthStencilView* oldDSV = nullptr;
-	context->OMGetRenderTargets(1, &oldRTV, &oldDSV);
-	UINT numViewports = 1;
-	D3D11_VIEWPORT oldViewport;
-	context->RSGetViewports(&numViewports, &oldViewport);
+	RenderStateGuard guard(context); // 백업/복원만 담당
 
-	context->OMSetRenderTargets(1, m_pSceneRTV.GetAddressOf(), m_pSceneDSV.Get());
+	ID3D11RenderTargetView* rtv = m_pSceneRTV.Get();
+	ID3D11DepthStencilView* dsv = m_pSceneDSV.Get();
+	context->OMSetRenderTargets(1, &rtv, dsv);
 
-
-	// Viewport 설정
-	D3D11_VIEWPORT viewport = {};
+	// Viewport
+	D3D11_VIEWPORT viewport{};
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
 	viewport.Width = static_cast<float>(m_width);
@@ -231,27 +332,22 @@ void MMMEngine::Editor::SceneViewWindow::RenderSceneToTexture(ID3D11DeviceContex
 	viewport.MaxDepth = 1.0f;
 	context->RSSetViewports(1, &viewport);
 
-	// Clear
+	// Clear (RTV/DSV가 바인딩된 뒤에 하는 게 안전)
 	float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
-	context->ClearRenderTargetView(m_pSceneRTV.Get(), clearColor);
-	context->ClearDepthStencilView(m_pSceneDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	context->ClearRenderTargetView(rtv, clearColor);
+	context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	// 카메라 입력 업데이트 (윈도우가 focused일 때만)
 	if (m_isFocused)
-	{
 		m_pCam->InputUpdate();
-	}
 
-	// 그리드 렌더링
 	m_pGridRenderer->Render(context, *m_pCam);
 
-	// TODO: 여기에 다른 씬 오브젝트들 렌더링
+	auto view = m_pCam->GetViewMatrix();
+	auto proj = m_pCam->GetProjMatrix();
 
-	// 3. 원래 상태로 복구
-	context->OMSetRenderTargets(1, &oldRTV, oldDSV);
-	context->RSSetViewports(1, &oldViewport);
+	RenderManager::Get().SetViewMatrix(view);
+	RenderManager::Get().SetProjMatrix(proj);
+	RenderManager::Get().RenderOnlyRenderer();
 
-	// 4. OMGet으로 올라간 참조 카운트 해제 (메모리 누수 방지)
-	if (oldRTV) oldRTV->Release();
-	if (oldDSV) oldDSV->Release();
+	// 여기서 함수 끝나면 guard 소멸자에서 원래 RT/Viewport/Blend 등 자동 복원됨
 }

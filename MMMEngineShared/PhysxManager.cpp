@@ -235,33 +235,6 @@ void MMMEngine::PhysxManager::RequestChangeRigidType(MMMEngine::RigidBodyCompone
 {
     if (!rb) return;
 
-    // Unregister �����̸� Ÿ�� �ٲ� �ǹ̰� ���� (������ �����)
-    if (m_PendingUnreg.find(rb) != m_PendingUnreg.end())
-        return;
-
-    //���� rb�� ���� ���� ChangeRigidType ��û�� ������ ���� (������ ��û�� ����)
-    for (auto it = m_Commands.begin(); it != m_Commands.end(); )
-    {
-        if (it->type == CmdType::ChangeRigid && it->new_rb == rb)
-            it = m_Commands.erase(it);
-        else
-            ++it;
-    }
-
-    // ��å: Ÿ�� ������ "actor �����"�̶�, ���� Attach/Detach�� �ڼ��̸� ����
-    //    - ���� ������ ��å��: Ÿ�� ���� ��û ������ rb ���� Attach/Detach�� �����ϰų�
-    //    - Ȥ�� Flush ������ ChangeRigidType -> Attach/Detach�� �����ϴ� ��
-    //
-    // ���⼭�� "Flush ���� ����"�� ���� �� ���� �� ����.
-    // ���� ���⼭�� ������ �ʰ�, FlushCommands_PreStep���� ChangeRigidType�� ���� ó���ϰ� �����.
-
-    m_Commands.push_back({ CmdType::ChangeRigid, rb, nullptr });
-}
-
-void MMMEngine::PhysxManager::RequestChangeRigidType(MMMEngine::RigidBodyComponent* rb)
-{
-    if (!rb) return;
-
     // Unregister 예정이면 타입 바꿀 의미가 없음 (어차피 사라짐)
     if (m_PendingUnreg.find(rb) != m_PendingUnreg.end())
         return;

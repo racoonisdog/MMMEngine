@@ -444,6 +444,39 @@ namespace MMMEngine {
 		m_pDeviceContext->OMSetRenderTargets(1, reinterpret_cast<ID3D11RenderTargetView* const*>(m_pRenderTargetView.GetAddressOf()), nullptr);
 	}
 
+	void RenderManager::RenderOnlyRenderer()
+	{
+		// Init Queue 처리
+		while (!m_initQueue.empty()) {
+			auto& renderer = m_initQueue.front();
+
+			renderer->Initialize();
+			m_initQueue.pop();
+		}
+
+		// 캠 버퍼 업데이트
+		m_camMat.camPos = XMMatrixInverse(nullptr, m_viewMatrix).r[3];
+		m_camMat.mView = m_viewMatrix;
+		m_camMat.mProjection = m_projMatrix;
+
+		// 리소스 업데이트
+		m_pDeviceContext->UpdateSubresource1(m_pCambuffer.Get(), 0, nullptr, &m_camMat, 0, 0, D3D11_COPY_DISCARD);
+
+		// 기본 렌더셋팅
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_pDeviceContext->VSSetConstantBuffers(0, 1, m_pCambuffer.GetAddressOf());
+		m_pDeviceContext->PSSetConstantBuffers(0, 1, m_pCambuffer.GetAddressOf());
+
+		m_pDeviceContext->RSSetState(m_pDefaultRS.Get());
+
+		// RenderPass
+		for (const auto& pass : m_Passes) {
+			for (const auto& renderer : pass.second) {
+				renderer->Render();
+			}
+		}
+	}
+
 	void RenderManager::EndFrame()
 	{
 		// Present our back buffer to our front buffer

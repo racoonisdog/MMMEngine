@@ -2,6 +2,7 @@
 #include "Singleton.hpp"
 #include "EditorCamera.h"
 #include "EditorGridRenderer.h"
+#include "ImGuizmo.h"
 
 #include <memory>
 
@@ -39,6 +40,9 @@ namespace MMMEngine::Editor
 
 		bool m_isHovered = false;
 		bool m_isFocused = false;
+
+		ImGuizmo::OPERATION m_guizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
+		ImGuizmo::MODE m_guizmoMode = ImGuizmo::MODE::LOCAL;
 
 		bool CreateRenderTargets(ID3D11Device* device, int width, int height);
 		void ResizeRenderTarget(ID3D11Device* device, int width, int height);

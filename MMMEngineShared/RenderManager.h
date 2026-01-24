@@ -115,6 +115,7 @@ namespace MMMEngine
 
 		void BeginFrame();
 		void Render();
+		void RenderOnlyRenderer();
 		void EndFrame();
 
 		const Microsoft::WRL::ComPtr<ID3D11Device5> GetDevice() const { return m_pDevice; }
