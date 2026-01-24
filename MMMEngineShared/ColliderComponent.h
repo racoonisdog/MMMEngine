@@ -1,7 +1,10 @@
 #pragma once
 #include <physx/PxPhysicsAPI.h>
 #include "Component.h"
+#include "SimpleMath.h"
 
+
+using namespace DirectX::SimpleMath;
 
 namespace MMMEngine
 {
@@ -36,7 +39,14 @@ namespace MMMEngine
 
 		// 공통 설정(Shape 생성 전/후 둘 다 안전하게 동작)
 		void SetShapeMode(ShapeMode mode);
-		void SetLocalPose(const physx::PxTransform& t);
+		//void SetLocalPose(const physx::PxTransform& t);
+
+		void SetLocalCenter(Vector3 pos);
+		void SetLocalRotation(Quaternion quater);
+		Vector3 GetLocalCenter();
+		Quaternion GetLocalQuater();
+
+		
 		void SetSceneQueryEnabled(bool on);
 		void SetFilterData(const physx::PxFilterData& sim, const physx::PxFilterData& query);
 
@@ -53,27 +63,25 @@ namespace MMMEngine
 		//shape 값 변경시 flag용 bool
 		bool IsGeometryDirty() const { return m_geometryDirty; }
 		void SetGeometryDirty(bool value) { m_geometryDirty = value; }
+		bool IsFilterDirty()   const { return m_filterDirty; }
+
 		void MarkGeometryDirty();
+		void MarkFilterDirty();
+
+		void ClearGeometryDirty() { m_geometryDirty = false; }
+		void ClearFilterDirty() { m_filterDirty = false; }
 
 		bool ApplyGeometryIfDirty();
 
 
 		virtual bool UpdateShapeGeometry() = 0;
-		/*
-		if (!m_scene || !col) return;
-
-		 attach 안 된 상태에서도 shape만 있으면 갱신은 가능.
-		 attach 상태에서 갱신하는 게 일반적.
-		if (!col->GetPxShape())
-        return; // 정책: shape 없으면 여기서 만들지 않음(Attach/초기화에서만 생성)
-
-		const bool ok = col->UpdateShapeGeometry();
-		#ifdef _DEBUG
-		if (!ok) OutputDebugStringA("[PhysScene] UpdateColliderGeometry failed.\n");
-		#endif
-		*/
 
 		void RefreshCommonProps() { ApplyAll(); }
+
+		//디버그를 찍기위한 함수
+		//월드 pose 얻기
+		physx::PxTransform GetWorldPosPx() const;
+
 
 	protected:
 		// 파생 클래스가 shape 생성 후 반드시 호출
@@ -107,6 +115,10 @@ namespace MMMEngine
 
 		//오프셋
 		physx::PxTransform m_LocalPose = physx::PxTransform(physx::PxIdentity);
+		Vector3 m_LocalCenter;
+		Quaternion m_LocalQuater;
+
+
 
 		//충돌 레이어 / 마스크
 		physx::PxFilterData m_SimFilter{};
@@ -116,5 +128,7 @@ namespace MMMEngine
 		uint32_t m_LayerOverride = 0;
 
 		bool m_geometryDirty = true;
+
+		bool m_filterDirty = true;
 	};
 }

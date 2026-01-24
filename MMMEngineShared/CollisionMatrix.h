@@ -73,5 +73,6 @@ namespace MMMEngine
 
 	private:
 		std::array<uint32_t, kMaxLayers> m_CollideMask{}; // layer -> allowed mask
+
 	};
 }

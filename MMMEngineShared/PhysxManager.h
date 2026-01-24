@@ -53,12 +53,18 @@ namespace MMMEngine
 
 		std::vector<std::tuple<ObjPtr<GameObject>, ObjPtr<GameObject>, P_EvenType>>& GetCallbackQue() { return Callback_Que; }
 
+		void SetSceneGravity(float x, float y, float z);
+
+
+		void SetLayerCollision(uint32_t layerA, uint32_t layerB, bool canCollide);
+
 	private:
 		// 내부에서만 쓰는 헬퍼
 		void FlushCommands_PreStep();
 		void FlushCommands_PostStep();
 		void ApplyFilterConfigIfDirty();
 		void FlushDirtyColliders_PreStep();
+		void FlushDirtyColliderFilters_PreStep();
 
 		//헬퍼함수
 		void EraseCommandsForRigid(MMMEngine::RigidBodyComponent* rb);
@@ -74,8 +80,6 @@ namespace MMMEngine
 
 		void RequestRebuildCollider(MMMEngine::RigidBodyComponent* rb, MMMEngine::ColliderComponent* col);
 		void RequestReapplyFilters(); // 씬 설정 바뀌었을 때(Dirty)
-
-		void RequestUpdateCollider(MMMEngine::ColliderComponent* col);
 
 		void RequestChangeRigidType(MMMEngine::RigidBodyComponent* rb);
 
@@ -101,7 +105,7 @@ namespace MMMEngine
 			RegRigid,       //RigidBody를 physScene에 등록하는 명령 //scene->addActor(actor)
 			UnregRigid,     //RigidBody를 physScene에 제거하는 명령 //scene->removeActor(actor)
 			AttachCol,      //이 RigidBody에 이 Collider에 붙여라  //actor->attachShape(shape)
-			DetachCol,      //이 Collider를 actor에서 때어라       //actor->detachShape(shape)
+			DetachCol,      //이 Collider를 actor에서 떼어놔라       //actor->detachShape(shape)
 			RebuildCol,     //이 Collider의 shape를 다시 만들어라 //새 geometry로 BuildShape -> 다시 attach
 			ChangeRigid		//RigidBody의 타입은 변경하라
 		};
@@ -124,5 +128,8 @@ namespace MMMEngine
 		std::unordered_set<RigidBodyComponent*> m_PendingUnreg;
 
 		bool m_IsInitialized = false;
+
+
+		std::unordered_set<ColliderComponent*> m_FilterDirtyColliders;
 	};
 }

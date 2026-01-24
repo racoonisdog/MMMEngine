@@ -16,7 +16,14 @@ void MMMEngine::PhysxManager::BindScene(MMMEngine::Scene* scene)
 
     // 씬 설정으로 desc 구성 (임시라도)
     PhysSceneDesc desc{};
-
+    
+    for (uint32_t i = 0; i <= 4; ++i)
+    {
+        for (uint32_t j = 0; j <= 4; ++j)
+        {
+            m_CollisionMatrix.SetCanCollide(i, j, true);
+        }
+    }
 
     if (m_PhysScene.Create(desc))
     {
@@ -39,7 +46,7 @@ void MMMEngine::PhysxManager::StepFixed(float dt)
 	ApplyFilterConfigIfDirty();  // dirty면 정책 갱신 + 전체 재적용 지시
     FlushDirtyColliders_PreStep(); //collider의 shape가 에디터 단계에서 변형되면 내부적으로 실행
 
-    m_PhysScene.PushRigidsToPhysics(); //엔진 -> physx쓰도록
+    m_PhysScene.PushRigidsToPhysics(); //��ϵ� rb����� ��ȸ�ϸ鼭 pushtoPhysics�� ȣ��
 	m_PhysScene.Step(dt);       // simulate/fetch
     m_PhysScene.PullRigidsFromPhysics();   // PhysX->엔진 읽기 (pose)
     m_PhysScene.DrainEvents();             // 이벤트 drain
@@ -59,20 +66,24 @@ void MMMEngine::PhysxManager::NotifyRigidAdded(RigidBodyComponent* rb)
 void MMMEngine::PhysxManager::NotifyRigidRemoved(RigidBodyComponent* rb)
 {
     if (!rb) return;
+    //auto go = rb->GetGameObject();
+    //if (!go.IsValid()) return;
+    ////�ߺ� rigid ���� �� ��� destroy�Ǵ� ���̽� ��� (����)
+    ////���� GO�� ��ǥ rigid�� rb�� �ƴ϶��, �� rb�� �������忡 ��ϵ��� ���ɼ��� ����.
+    ////�׷��� �����ϰ� Unregister�� ��û(Ȥ�� ��ϵ������� ���ŵǰ�).
+    //auto currentRbPtr = go->GetComponent<RigidBodyComponent>();
+    //RigidBodyComponent* currentRb = currentRbPtr.IsValid()
+    //    ? static_cast<RigidBodyComponent*>(currentRbPtr.GetRaw())
+    //    : nullptr;
 
-    auto go = rb->GetGameObject();
-    if (HasAnyCollider(go))
-    {
-        auto checkcollider = rb->GetGameObject()->GetComponent<ColliderComponent>();
-        if (checkcollider.IsValid()) {
-            std::cout << u8"콜리더존재함 삭제불가" << std::endl;
-            return;
-        }
-        // 정책: collider 있으면 rigid 제거 불가
-        // (여기서 로그/에디터 메시지 추천)
-        return;
-    }
+    //if (currentRb && currentRb != rb)
+    //{
+    //    // "��ǥ rigid"�� �ƴ� �ߺ� rigid ����: collider �ǵ帱 �ʿ� ����
+    //    RequestUnregisterRigid(rb);
+    //    return;
+    //}
 
+    ////���������� rigid ����(PhysX unregister) ����
     RequestUnregisterRigid(rb);
 }
 
@@ -110,7 +121,12 @@ void MMMEngine::PhysxManager::NotifyColliderRemoved(ColliderComponent* col)
 void MMMEngine::PhysxManager::NotifyColliderChanged(ColliderComponent* col)
 {
     if (!col) return;
-    RequestUpdateCollider(col);
+
+    if (col->IsGeometryDirty())
+        m_DirtyColliders.insert(col);
+
+    if (col->IsFilterDirty())
+        m_FilterDirtyColliders.insert(col);
 }
 
 
@@ -189,7 +205,7 @@ void MMMEngine::PhysxManager::RequestDetachCollider(MMMEngine::RigidBodyComponen
             ++it;
     }
 
-    //attachcol했던 파일을 detach로 넣어서 없앰
+    //attachcol�ߴ� ������ detach�� �־ ����
     m_Commands.push_back({ CmdType::DetachCol, rb, col });
 }
 
@@ -215,10 +231,31 @@ void MMMEngine::PhysxManager::RequestReapplyFilters()
     m_FilterDirty = true;
 }
 
-void MMMEngine::PhysxManager::RequestUpdateCollider(MMMEngine::ColliderComponent* col)
+void MMMEngine::PhysxManager::RequestChangeRigidType(MMMEngine::RigidBodyComponent* rb)
 {
-    if (!col) return;
-    m_DirtyColliders.insert(col);
+    if (!rb) return;
+
+    // Unregister �����̸� Ÿ�� �ٲ� �ǹ̰� ���� (������ �����)
+    if (m_PendingUnreg.find(rb) != m_PendingUnreg.end())
+        return;
+
+    //���� rb�� ���� ���� ChangeRigidType ��û�� ������ ���� (������ ��û�� ����)
+    for (auto it = m_Commands.begin(); it != m_Commands.end(); )
+    {
+        if (it->type == CmdType::ChangeRigid && it->new_rb == rb)
+            it = m_Commands.erase(it);
+        else
+            ++it;
+    }
+
+    // ��å: Ÿ�� ������ "actor �����"�̶�, ���� Attach/Detach�� �ڼ��̸� ����
+    //    - ���� ������ ��å��: Ÿ�� ���� ��û ������ rb ���� Attach/Detach�� �����ϰų�
+    //    - Ȥ�� Flush ������ ChangeRigidType -> Attach/Detach�� �����ϴ� ��
+    //
+    // ���⼭�� "Flush ���� ����"�� ���� �� ���� �� ����.
+    // ���� ���⼭�� ������ �ʰ�, FlushCommands_PreStep���� ChangeRigidType�� ���� ó���ϰ� �����.
+
+    m_Commands.push_back({ CmdType::ChangeRigid, rb, nullptr });
 }
 
 void MMMEngine::PhysxManager::RequestChangeRigidType(MMMEngine::RigidBodyComponent* rb)
@@ -265,12 +302,22 @@ bool MMMEngine::PhysxManager::HasAnyCollider(ObjPtr<GameObject> go) const
 }
 
 
+void MMMEngine::PhysxManager::SetSceneGravity(float x, float y, float z)
+{
+    m_PhysScene.SetGravity(x, y, z);
+}
+
+void MMMEngine::PhysxManager::SetLayerCollision(uint32_t layerA, uint32_t layerB, bool canCollide)
+{
+    m_CollisionMatrix.SetCanCollide(layerA, layerB, canCollide);
+    m_FilterDirty = true;
+}
 
 //물리 시뮬레이션을 돌리기 직전(simulate하기전)에 큐에 쌓인 명령 중 지금 해도 안전한것을 physScene에 실행함
 // actor생성 및 acotr를 추가하는 작업 / shape생성 밑 붙이는 작업 / shape 교체등을 여기서 한다
 void MMMEngine::PhysxManager::FlushCommands_PreStep()
 {
-    //ChangeRigidType 먼저 처리하도록
+    //ChangeRigidType ���� ó���ϵ���
     for (auto it = m_Commands.begin(); it != m_Commands.end(); )
     {
         if (it->type == CmdType::ChangeRigid)
@@ -395,6 +442,27 @@ void MMMEngine::PhysxManager::FlushDirtyColliders_PreStep()
     m_DirtyColliders.clear();
 }
 
+void MMMEngine::PhysxManager::FlushDirtyColliderFilters_PreStep()
+{
+    if (m_FilterDirtyColliders.empty()) return;
+
+    for (auto* col : m_FilterDirtyColliders)
+    {
+        if (!col) continue;
+        if (!col->GetPxShape()) { col->ClearFilterDirty(); continue; } // ���� ���� ���̸� ��ŵ
+
+        const uint32_t layer = col->GetEffectiveLayer();
+        col->SetFilterData(m_CollisionMatrix.MakeSimFilter(layer),
+            m_CollisionMatrix.MakeQueryFilter(layer));
+
+        // ���� ������ ������ PhysX pair�� �ݿ�
+        m_PhysScene.ResetFilteringFor(col);
+
+        col->ClearFilterDirty();
+    }
+    m_FilterDirtyColliders.clear();
+}
+
 
 
 void MMMEngine::PhysxManager::EraseCommandsForRigid(MMMEngine::RigidBodyComponent* rb)
@@ -438,7 +506,7 @@ void MMMEngine::PhysxManager::EraseCommandsForCollider(MMMEngine::ColliderCompon
 void MMMEngine::PhysxManager::NotifyRigidTypeChanged(RigidBodyComponent* rb)
 {
     if (!rb) return;
-    RequestChangeRigidType(rb); // 내부 커맨드 큐 적재
+    RequestChangeRigidType(rb); // ���� Ŀ�ǵ� ť ����
 }
 
 void MMMEngine::PhysxManager::UnbindScene()

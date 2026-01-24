@@ -416,7 +416,7 @@ void MMMEngine::PhysScene::PushRigidsToPhysics()
 void MMMEngine::PhysScene::ChangeRigidType(MMMEngine::RigidBodyComponent* rb, const CollisionMatrix& matrix)
 {
 	if (!m_scene || !rb) return;
-	//if (!rb->HasPendingTypeChange()) return;
+	if (!rb->HasPendingTypeChange()) return;
 
 	const bool registered = (m_rigids.find(rb) != m_rigids.end());
 
@@ -438,7 +438,7 @@ void MMMEngine::PhysScene::ChangeRigidType(MMMEngine::RigidBodyComponent* rb, co
 
 	//새 actor 생성
 	auto& physics = PhysicX::Get().GetPhysics();
-	//rb->SetType_Internal();
+	rb->SetType_Internal();
 	rb->CreateActor(&physics, rb->GetRequestedPos(), rb->GetRequestedRot());
 
 	auto* newActor = rb->GetPxActor();
@@ -457,7 +457,7 @@ void MMMEngine::PhysScene::ChangeRigidType(MMMEngine::RigidBodyComponent* rb, co
 		col->SetFilterData(matrix.MakeSimFilter(layer), matrix.MakeQueryFilter(layer));
 
 		// actor에 shape만 붙이기 (rb->AttachCollider(관리형) 대신)
-		//rb->AttachShapeOnly(shape);
+		rb->AttachShapeOnly(shape);
 	}
 
 	//씬에 다시 등록
@@ -470,6 +470,40 @@ void MMMEngine::PhysScene::ChangeRigidType(MMMEngine::RigidBodyComponent* rb, co
 	//질량/관성 재계산은 dynamic일 때만
 	if (auto* dyn = newActor->is<physx::PxRigidDynamic>())
 		physx::PxRigidBodyExt::updateMassAndInertia(*dyn, rb->GetMass());
-	//rb->OffPendingType();
+	rb->OffPendingType();
+}
+
+void MMMEngine::PhysScene::SetGravity(float x, float y, float z)
+{
+	m_desc.gravity[0] = x;
+	m_desc.gravity[1] = y;
+	m_desc.gravity[2] = z;
+
+	if (m_scene)
+	{
+		m_scene->setGravity(ToPxVec(m_desc.gravity));
+	}
+}
+
+void MMMEngine::PhysScene::ResetFilteringFor(MMMEngine::ColliderComponent* col)
+{
+	if (!m_scene || !col) return;
+
+	// shape가 없으면 아직 PhysX에 붙어있지 않거나 생성 전
+	physx::PxShape* shape = col->GetPxShape();
+	if (!shape) return;
+
+	// 이 콜라이더가 붙어있는 rb 찾기
+	auto it = m_ownerByCollider.find(col);
+	if (it == m_ownerByCollider.end()) return;
+
+	MMMEngine::RigidBodyComponent* rb = it->second;
+	if (!rb) return;
+
+	physx::PxRigidActor* actor = rb->GetPxActor();
+	if (!actor) return;
+
+	// PhysX에 "필터링 다시 계산" 요청
+	m_scene->resetFiltering(*actor);
 }
 

@@ -163,6 +163,7 @@
     <ClInclude Include="AnimationClip.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="Behaviour.h" />
+    <ClInclude Include="BoxColliderComponent.h" />
     <ClInclude Include="CapsuleColliderComponent.h" />
     <ClInclude Include="ColliderComponent.h" />
     <ClInclude Include="CollisionMatrix.h" />
@@ -234,6 +235,7 @@
     <ClInclude Include="SerializableEvent.h" />
     <ClInclude Include="ShaderInfo.h" />
     <ClInclude Include="SkeletalMesh.h" />
+    <ClInclude Include="SphereColliderComponent.h" />
     <ClInclude Include="StaticMesh.h" />
     <ClInclude Include="VShader.h" />
     <ClInclude Include="Singleton.hpp" />
@@ -254,6 +256,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Behaviour.cpp" />
     <ClCompile Include="BehaviourManger.cpp" />
+    <ClCompile Include="BoxColliderComponent.cpp" />
     <ClCompile Include="CapsuleColliderComponent.cpp" />
     <ClCompile Include="ColliderComponent.cpp" />
     <ClCompile Include="CollisionMatrix.cpp" />
@@ -294,6 +297,7 @@
     <ClCompile Include="ScriptBehaviour.cpp" />
     <ClCompile Include="ShaderInfo.cpp" />
     <ClCompile Include="SkeletalMesh.cpp" />
+    <ClCompile Include="SphereColliderComponent.cpp" />
     <ClCompile Include="StaticMesh.cpp" />
     <ClCompile Include="VShader.cpp" />
     <ClCompile Include="SkyboxRenderer.cpp" />

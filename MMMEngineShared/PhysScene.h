@@ -12,7 +12,7 @@
 struct PhysSceneDesc
 {
 	//Vec3 gravity = { 0.f, -9.81f, 0.f };
-	float gravity[3] = { 0.f, -9.81f, 0.f };
+	float gravity[3] = { 0.f, 0.f, 0.f };
 
 	uint32_t cpuThreadCount = 0;
 	//총알같은 가속옵션 필요할때 true 및 설정
@@ -88,6 +88,11 @@ namespace MMMEngine
 
 		const std::vector<MMMEngine::PhysXSimulationCallback::ContactEvent>& GetFrameContacts() const { return m_frameContacts; }
 		const std::vector<PhysXSimulationCallback::TriggerEvent>& GetFrameTriggers() const { return m_frameTriggers; }
+
+		//�� �߷� ����
+		void SetGravity(float x, float y, float z);
+
+		void ResetFilteringFor(MMMEngine::ColliderComponent* col);
 
 	private:
 		PhysSceneDesc m_desc;

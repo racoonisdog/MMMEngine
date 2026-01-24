@@ -87,6 +87,7 @@ void Initialize()
 
 	MMMEngine::PhysicX::Get().Initialize();
 	SceneManager::Get().onSceneInitBefore.AddListenerLambda([]() { 
+		PhysxManager::Get().UnbindScene();
 		MMMEngine::PhysxManager::Get().BindScene(SceneManager::Get().GetCurrentSceneRaw());
 		});
 }

@@ -3,8 +3,18 @@
 #include "RigidBodyComponent.h"
 #include "Transform.h"
 #include "GameObject.h"
+#include "PhysxHelper.h"
+#include "rttr/registration"
 
+RTTR_REGISTRATION
+{
+    using namespace rttr;
+    using namespace MMMEngine;
 
+    registration::class_<ColliderComponent>("ColliderComponent")
+        (rttr::metadata("INSPECTOR", "DONT_ADD_COMP"));
+    type::register_wrapper_converter_for_base_classes<MMMEngine::ObjPtr<ColliderComponent>>();
+}
 
 
 void MMMEngine::ColliderComponent::ApplySceneQueryFlag()
@@ -66,17 +76,18 @@ void MMMEngine::ColliderComponent::SetOverrideLayer(bool enable)
     m_OverrideLayer = enable;
     if (m_Shape)
     {
-        // PhysxManager를 통해 필터 재적용 요청
-        //PhysxManager::Get().RequestReapplyFilters();
+        MarkFilterDirty();
+        
     }
 }
 
 void MMMEngine::ColliderComponent::SetLayer(uint32_t layer)
 {
+    if (m_LayerOverride == layer) return;
     m_LayerOverride = layer;
     if (m_Shape)
     {
-        //PhysxManager::Get().RequestReapplyFilters();
+        MarkFilterDirty();
     }
 }
 
@@ -144,10 +155,37 @@ void MMMEngine::ColliderComponent::SetShapeMode(ShapeMode mode)
     ApplyAll();
 }
 
-void MMMEngine::ColliderComponent::SetLocalPose(const physx::PxTransform& t)
+//void MMMEngine::ColliderComponent::SetLocalPose(const physx::PxTransform& t)
+//{
+//    m_LocalPose = t; ApplyAll();
+//}
+
+void MMMEngine::ColliderComponent::SetLocalCenter(Vector3 pos)
 {
-    m_LocalPose = t; ApplyAll();
+    m_LocalCenter = pos;
+    auto pxPos = ToPxVec(m_LocalCenter);
+    m_LocalPose.p = pxPos;
+    ApplyLocalPose();
 }
+
+void MMMEngine::ColliderComponent::SetLocalRotation(Quaternion quater)
+{
+    m_LocalQuater = quater;
+    auto pxQuat = ToPxQuat(m_LocalQuater);
+    m_LocalPose.q = pxQuat;
+    ApplyLocalPose();
+}
+
+Vector3 MMMEngine::ColliderComponent::GetLocalCenter()
+{
+    return m_LocalCenter;
+}
+
+Quaternion MMMEngine::ColliderComponent::GetLocalQuater()
+{
+    return m_LocalQuater;
+}
+
 
 void MMMEngine::ColliderComponent::SetSceneQueryEnabled(bool on)
 {
@@ -157,6 +195,25 @@ void MMMEngine::ColliderComponent::SetSceneQueryEnabled(bool on)
 void MMMEngine::ColliderComponent::SetFilterData(const physx::PxFilterData& sim, const physx::PxFilterData& query)
 {
     m_SimFilter = sim; m_QueryFilter = query; ApplyAll();
+}
+
+void MMMEngine::ColliderComponent::MarkFilterDirty()
+{
+    m_filterDirty = true;
+
+    // �ݶ��̴��� "���� �ٲ����"�� �˸�
+    PhysxManager::Get().NotifyColliderChanged(this);
+}
+
+physx::PxTransform MMMEngine::ColliderComponent::GetWorldPosPx() const
+{
+    if (!m_Shape) return physx::PxTransform(physx::PxIdentity);
+
+    physx::PxRigidActor* actor = m_Shape->getActor();
+    if (!actor) return physx::PxTransform(physx::PxIdentity);
+
+    // actor�� ���� ���� + shape�� ���� ����
+    return actor->getGlobalPose() * m_Shape->getLocalPose();
 }
 
 void MMMEngine::ColliderComponent::SetShape(physx::PxShape* shape, bool owned)
@@ -187,4 +244,18 @@ void MMMEngine::ColliderComponent::ApplyAll()
     ApplySceneQueryFlag();
     ApplyFilterData();
     ApplyLocalPose();
+}
+
+
+void MMMEngine::ColliderComponent::Initialize()
+{
+	// Shape�� ���� �����ؾ� AttachCollider���� ����� �� ����
+	auto& physics = MMMEngine::PhysicX::Get().GetPhysics();
+	physx::PxMaterial* mat = MMMEngine::PhysicX::Get().GetDefaultMaterial();
+
+	if (mat)
+	{
+		BuildShape(&physics, mat);
+	}
+	MMMEngine::PhysxManager::Get().NotifyColliderAdded(this);
 }

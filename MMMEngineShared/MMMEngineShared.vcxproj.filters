@@ -56,6 +56,12 @@
     <ClCompile Include="RigidBodyComponent.cpp">
       <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
+    <ClCompile Include="BoxColliderComponent.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="SphereColliderComponent.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -278,6 +284,12 @@
     </ClInclude>
     <ClInclude Include="RigidBodyComponent.h">
       <Filter>헤더 파일\Core\Physics API</Filter>
+    </ClInclude>
+    <ClInclude Include="BoxColliderComponent.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="SphereColliderComponent.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
