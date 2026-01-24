@@ -2,6 +2,7 @@
 #include "GlobalRegistry.h"
 #include "DisplayMode.h"
 #include "SimpleMath.h"
+#include "RenderManager.h"
 #include "App.h"
 #include <cassert>
 
@@ -11,7 +12,7 @@ namespace MMMEngine::Screen
 	inline void SetResolution(int width, int height, DisplayMode mode)
 	{
 		assert(GlobalRegistry::g_pApp && "글로벌 레지스트리에 Application이 등록되어있지 않습니다!");
-		GlobalRegistry::g_pApp->SetWindowSize(width, height);
+		RenderManager::Get().ResizeSceneSize(width, height, width, height);
 		GlobalRegistry::g_pApp->SetDisplayMode(mode);
 	}
 

@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <type_traits>
 #include <typeindex>
+#include <filesystem>
 
 #include <vector>
 
@@ -11,6 +12,8 @@
 #include "ExportSingleton.hpp"
 
 #include "Resource.h"
+// todo 삭제
+#include <iostream>
 
 namespace MMMEngine
 {
@@ -40,20 +43,40 @@ namespace MMMEngine
 		}
 	};
 
+
+
 	class MMMENGINE_API ResourceManager : public Utility::ExportSingleton<ResourceManager>
 	{
 	private:
 		std::unordered_map<ResKey, std::weak_ptr<Resource>, ResKeyHash> m_cache;
-
+		std::filesystem::path m_rootPath;
 	public:
+		std::filesystem::path GetCurrentRootPath() { return m_rootPath; }
+
 		void ClearCache() { m_cache.clear(); }
+
+		void StartUp(std::wstring rootPath)
+		{
+			m_rootPath = rootPath;
+		}
+
+		void ShutDown()
+		{
+			m_cache.clear();
+		}
 
 		template<class T>
 		ResPtr<T> Load(std::wstring filePath)
 		{
 			static_assert(std::is_base_of_v<Resource, T>, "T는 반드시 Resource를 상속받아야 합니다.");
 
-			ResKey key{ rttr::type::get<T>().get_name().to_string(), filePath };
+			std::wstring root = m_rootPath.generic_wstring();
+			if (!root.empty() && root.back() != L'/' && root.back() != L'\\')
+				root += L'/';
+
+			std::wstring truePath = m_rootPath.generic_wstring() + filePath;
+
+			ResKey key{ rttr::type::get<T>().get_name().to_string(), truePath };
 
 			if (auto it = m_cache.find(key); it != m_cache.end())
 				if (auto sp = it->second.lock())
@@ -61,8 +84,11 @@ namespace MMMEngine
 
 			auto res = std::make_shared<T>();
 			res->SetFilePath(filePath);
-			if (!res->LoadFromFilePath(filePath))
+			if (!res->LoadFromFilePath(truePath))
+			{
+				std::cout << u8"파일 패스가 잘못되었어용" << std::endl;
 				return nullptr;
+			}
 
 			m_cache[key] = res;
 			return res;
@@ -74,66 +100,49 @@ namespace MMMEngine
 			if (!resourceType.is_valid())
 				return rttr::variant();
 
+			std::wstring root = m_rootPath.generic_wstring();
+			if (!root.empty() && root.back() != L'/' && root.back() != L'\\')
+				root += L'/';
+
+			std::wstring truePath = m_rootPath.generic_wstring() + filePath;
+
 			std::string typeName = resourceType.get_name().to_string();
-			ResKey key{ typeName, filePath };
+			ResKey key{ typeName, truePath };
 
 			// 캐시 확인
-			if (auto it = m_cache.find(key); it != m_cache.end())
+			auto it = m_cache.find(key);
+			if (it != m_cache.end())
+			{
 				if (auto sp = it->second.lock())
-				{
-					// ResPtr<T> 타입으로 variant 생성
-					rttr::type resPtrType = rttr::type::get_by_name("ResPtr<" + typeName + ">");
-					if (resPtrType.is_valid())
-					{
-						rttr::variant result = resPtrType.create();
-						// shared_ptr을 variant에 저장
-						result = std::dynamic_pointer_cast<Resource>(sp);
-						return result;
-					}
-				}
+					return rttr::variant(sp);
+
+				// 만료된 weak_ptr 제거
+				m_cache.erase(it);
+			}
 
 			// 새로 생성
 			rttr::variant resource = resourceType.create();
 			if (!resource.is_valid())
 				return rttr::variant();
 
-			Resource* rawPtr = resource.get_value<Resource*>();
-			if (!rawPtr)
-			{
-				// shared_ptr로 시도
-				auto sharedRes = resource.get_value<std::shared_ptr<Resource>>();
-				if (sharedRes)
-					rawPtr = sharedRes.get();
-			}
+			// shared_ptr로 직접 얻기
+			std::shared_ptr<Resource> resPtr = resource.get_value<std::shared_ptr<Resource>>();
+			if (!resPtr)
+				return rttr::variant();  // shared_ptr이 아니면 실패
 
-			if (!rawPtr)
+			// 파일 로드
+			resPtr->SetFilePath(filePath);
+			if (!resPtr->LoadFromFilePath(truePath))
 				return rttr::variant();
-
-			rawPtr->SetFilePath(filePath);
-			if (!rawPtr->LoadFromFilePath(filePath))
-				return rttr::variant();
-
-			// shared_ptr 생성 및 캐싱
-			std::shared_ptr<Resource> resPtr;
-			if (auto sharedRes = resource.get_value<std::shared_ptr<Resource>>())
-			{
-				resPtr = sharedRes;
-			}
-			else
-			{
-				// 원시 포인터인 경우 shared_ptr로 변환 (주의: 소유권 관리 필요)
-				resPtr = std::shared_ptr<Resource>(rawPtr);
-			}
 
 			m_cache[key] = resPtr;
-
-			// ResPtr<T> 형태로 반환
 			return rttr::variant(resPtr);
 		}
 
 		bool Contains(const std::string& typeString, const std::wstring& filePath)
 		{
-			ResKey key{ typeString, filePath };
+			std::wstring truePath = m_rootPath.generic_wstring() + filePath;
+			ResKey key{ typeString, truePath };
 
 			auto resource_iter = m_cache.find(key);
 			if (resource_iter != m_cache.end())

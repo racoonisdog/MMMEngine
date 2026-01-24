@@ -13,8 +13,6 @@ namespace MMMEngine {
 
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pBoneBuffer;				// 본 버퍼
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pShadowBuffer;			// 그림자 버퍼
-
-		
 	public:
 		void Initialize() override;
 		void Render() override;

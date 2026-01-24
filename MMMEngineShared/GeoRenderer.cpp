@@ -3,6 +3,7 @@
 #include "RenderShared.h"
 #include <RendererTools.h>
 
+#include "ShaderInfo.h"
 #include "VShader.h"
 #include "PShader.h"
 
@@ -52,7 +53,7 @@ void MMMEngine::GeoRenderer::Render()
 
 	// 메테리얼 등록 (Texture2D만 받는다)
 	for (auto& [prop, val] : m_pMaterial->GetProperties()) {
-		int idx = RenderManager::Get().PropertyToIdx(prop);
+		int idx = ShaderInfo::Get().PropertyToIdx(ShaderType::S_PBR, prop);
 
 		if (auto tex = std::get_if<ResPtr<Texture2D>>(&val)) {
 			if (*tex) {

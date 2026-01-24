@@ -29,7 +29,7 @@ void MMMEngine::ColliderComponent::ApplySceneQueryFlag()
     m_Shape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, query);
 }
 
-//*** ·¹ÀÌ¾î ±ÔÄ¢ º¯°æÇß´Âµ¥ Áï½Ã ¹İ¿µÀÌ ¾ÈµÈ´Ù¸é ¿©±â¸¦ °Çµå¸®±â
+//*** ë ˆì´ì–´ ê·œì¹™ ë³€ê²½í–ˆëŠ”ë° ì¦‰ì‹œ ë°˜ì˜ì´ ì•ˆëœë‹¤ë©´ ì—¬ê¸°ë¥¼ ê±´ë“œë¦¬ê¸°
 void MMMEngine::ColliderComponent::ApplyFilterData()
 {
     if (!m_Shape) return;
@@ -132,14 +132,14 @@ bool MMMEngine::ColliderComponent::ApplyGeometryIfDirty()
     if (ok)
     {
         m_geometryDirty = false;
-        ApplyAll(); // geometry ¹Ù²ï µÚ flags/filter/pose ÀçÀû¿ë
+        ApplyAll(); // geometry ë°”ë€ ë’¤ flags/filter/pose ì¬ì ìš©
     }
 
     return ok;
 }
 
 
-//Trigger°¡ Scene Query¿¡¼­ ±âº»ÀûÀ¸·Î ºüÁö´Â Á¤Ã¥ÀÎ »óÅÂ ¾Æ´Ï¸é ¿©±â ¼öÁ¤
+//Triggerê°€ Scene Queryì—ì„œ ê¸°ë³¸ì ìœ¼ë¡œ ë¹ ì§€ëŠ” ì •ì±…ì¸ ìƒíƒœ ì•„ë‹ˆë©´ ì—¬ê¸° ìˆ˜ì •
 void MMMEngine::ColliderComponent::SetShapeMode(ShapeMode mode)
 {
     m_Mode = mode;
@@ -201,7 +201,7 @@ void MMMEngine::ColliderComponent::MarkFilterDirty()
 {
     m_filterDirty = true;
 
-    // Äİ¶óÀÌ´õ´Â "³»°¡ ¹Ù²î¾ú´Ù"¸¸ ¾Ë¸²
+    // ï¿½İ¶ï¿½ï¿½Ì´ï¿½ï¿½ï¿½ "ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½ï¿½ï¿½ï¿½"ï¿½ï¿½ ï¿½Ë¸ï¿½
     PhysxManager::Get().NotifyColliderChanged(this);
 }
 
@@ -212,7 +212,7 @@ physx::PxTransform MMMEngine::ColliderComponent::GetWorldPosPx() const
     physx::PxRigidActor* actor = m_Shape->getActor();
     if (!actor) return physx::PxTransform(physx::PxIdentity);
 
-    // actorÀÇ ¿ùµå Æ÷Áî + shapeÀÇ ·ÎÄÃ Æ÷Áî
+    // actorï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ + shapeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     return actor->getGlobalPose() * m_Shape->getLocalPose();
 }
 
@@ -233,7 +233,7 @@ void MMMEngine::ColliderComponent::SetShape(physx::PxShape* shape, bool owned)
 
     if (m_Shape)
     {
-        m_Shape->userData = this; // PhysScene ÀÌº¥Æ® ¸ÅÇÎ¿ë(ÇÙ½É)
+        m_Shape->userData = this; // PhysScene ì´ë²¤íŠ¸ ë§¤í•‘ìš©(í•µì‹¬)
         ApplyAll();
     }
 }
@@ -249,7 +249,7 @@ void MMMEngine::ColliderComponent::ApplyAll()
 
 void MMMEngine::ColliderComponent::Initialize()
 {
-	// Shape¸¦ ¸ÕÀú »ı¼ºÇØ¾ß AttachCollider¿¡¼­ »ç¿ëÇÒ ¼ö ÀÖÀ½
+	// Shapeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ AttachColliderï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	auto& physics = MMMEngine::PhysicX::Get().GetPhysics();
 	physx::PxMaterial* mat = MMMEngine::PhysicX::Get().GetDefaultMaterial();
 

@@ -175,8 +175,9 @@ fs::path MMMEngine::ResourceSerializer::Serialize_StaticMesh(const StaticMesh* _
 	// Json Ãâ·Â
 	std::vector<uint8_t> v = json::to_msgpack(snapshot);
 
-	fs::path p(_path);
-	p = p / (_name.append(L"_StaticMesh"));
+	fs::path p(ResourceManager::Get().GetCurrentRootPath());
+	p = p / _path;
+	p = p / (_name.append(L"_StaticMesh.staticmesh"));
 
 	if (p.has_parent_path() && !fs::exists(p.parent_path())) {
 		fs::create_directories(p.parent_path());

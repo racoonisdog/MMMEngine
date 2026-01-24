@@ -9,10 +9,13 @@ using namespace DirectX::SimpleMath;
 using namespace DirectX;
 #include "DragAndDrop.h"
 #include "StringHelper.h"
+#include "ProjectManager.h"
+#include "ResourceManager.h"
 
 #include <optional>
 
 using namespace MMMEngine;
+using namespace MMMEngine::Editor;
 using namespace MMMEngine::Utility;
 
 static Vector3 g_eulerCache;
@@ -63,21 +66,19 @@ void RenderProperties(rttr::instance inst)
         s_lastCachedObject = g_selectedGameObject;
     }
 
-
-
     auto t = inst.get_derived_type();
     rttr::property p = t.get_property("MUID");
-    rttr::variant v = p.get_value(inst);
-    if (v.is_valid() && v.is_type<MMMEngine::Utility::MUID>())
+    if (p.is_valid())
     {
-        const auto& muid = v.get_value<MMMEngine::Utility::MUID>();
-        std::string id = muid.ToStringWithoutHyphens(); // 또는 ToString()
-        ImGui::PushID(id.c_str());
+        auto v = p.get_value(inst);
+        if (v.is_valid() && v.is_type<MUID>())
+            ImGui::PushID(v.get_value<MUID>().ToStringWithoutHyphens().c_str());
+        else
+            ImGui::PushID(inst.try_convert<void*>()); // 주소 기반(예시)
     }
     else
     {
-        MUID tempId = MUID::NewMUID();
-        ImGui::PushID(tempId.ToString().c_str());
+        ImGui::PushID(inst.try_convert<void*>());
     }
 
     for (auto& prop : t.get_properties())
@@ -182,6 +183,126 @@ void RenderProperties(rttr::instance inst)
 
             if (changed && !readOnly)
                 prop.set_value(inst, ntger);
+        }
+        else if (propType.get_name().to_string().find("shared_ptr") != std::string::npos)
+        {
+            auto args = propType.get_template_arguments();
+            if (args.begin() != args.end())
+            {
+                rttr::type innerType = *args.begin();
+
+                if (innerType.is_derived_from(rttr::type::get<Resource>()) ||
+                    innerType == rttr::type::get<Resource>())
+                {
+                    // 현재 리소스
+                    Resource* res = nullptr;
+                    auto sharedRes = var.get_value<std::shared_ptr<Resource>>();
+                    if (sharedRes)
+                        res = sharedRes.get();
+
+                    // 표시용 경로
+                    std::string displayPath = "None";
+                    if (res)
+                    {
+                        std::wstring fullPath = res->GetFilePath();
+                        if (!fullPath.empty())
+                        {
+                            displayPath = ProjectManager::Get().ToProjectRelativePath(
+                                StringHelper::WStringToString(fullPath)
+                            );
+                        }
+                    }
+
+                    // 프로퍼티 이름
+                    ImGui::Text("%s:", name.c_str());
+
+                    // 경로 표시 (클릭 가능하게)
+                    ImGui::PushID(name.c_str());
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.2f, 0.3f, 1.0f));
+                    ImGui::Button(displayPath.c_str(), ImVec2(-1, 0));
+                    ImGui::PopStyleColor();
+
+                    // Drag & Drop
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FILE_PATH"))
+                        {
+                            std::string absolutePath((const char*)payload->Data, payload->DataSize - 1);
+
+                            // 파일 확장자 검증 (선택사항)
+                            std::string ext = std::filesystem::path(absolutePath).extension().string();
+
+                            // TODO: 리소스 타입별 허용 확장자 체크
+                            // 예: StaticMesh -> .mesh, Texture -> .png/.jpg 등
+
+                            std::string relativePath = ProjectManager::Get().ToProjectRelativePath(absolutePath);
+                            std::wstring wRelativePath = StringHelper::StringToWString(relativePath);
+
+                            try
+                            {
+                                rttr::variant loadedResource = ResourceManager::Get().Load(innerType, wRelativePath);
+
+                                if (loadedResource.is_valid())
+                                {
+                                    if (!readOnly)
+                                    {
+                                        if (loadedResource.convert(prop.get_type()))                  // v를 내부적으로 target type으로 변환 (bool 리턴)
+                                        {
+                                            prop.set_value(inst, loadedResource);                     // v는 이제 shared_ptr<StaticMesh> 타입 variant
+                                        }
+                                        else
+                                        {
+                                            // 변환 실패 처리
+                                        }
+
+                                    }
+                                }
+                            }
+                            catch (const std::exception& e)
+                            {
+                                auto toUtf8 = [](const char* ansi) -> std::string
+                                    {
+                                        if (!ansi)
+                                            return {};
+
+                                        int wideLen = MultiByteToWideChar(CP_ACP, 0, ansi, -1, nullptr, 0);
+                                        if (wideLen <= 0)
+                                            return {};
+
+                                        std::wstring wide(wideLen, L'\0');
+                                        MultiByteToWideChar(CP_ACP, 0, ansi, -1, wide.data(), wideLen);
+
+                                        int utf8Len = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), -1, nullptr, 0, nullptr, nullptr);
+                                        std::string utf8(utf8Len, '\0');
+                                        WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), -1, utf8.data(), utf8Len, nullptr, nullptr);
+
+                                        return utf8;
+                                    };
+
+                                // TODO: 에러 로그
+                                std::cerr << "[Resource Load Error]\n"
+                                    << "Type: " << innerType.get_name().to_string() << "\n"
+                                    << "Path: " << StringHelper::WStringToString(wRelativePath) << "\n"
+                                    << "What: " << toUtf8(e.what()) << std::endl;
+                            }
+                        }
+                        ImGui::EndDragDropTarget();
+                    }
+
+                    // Clear 버튼
+                    if (res != nullptr && !readOnly)
+                    {
+                        ImGui::SameLine();
+                        if (ImGui::SmallButton(("X##" + name).c_str()))
+                        {
+                            std::shared_ptr<Resource> nullPtr = nullptr;
+                            prop.set_value(inst, nullPtr);
+                        }
+                    }
+
+                    ImGui::PopID();
+                }
+            }
         }
         else if (var.is_type<std::string>())
         {

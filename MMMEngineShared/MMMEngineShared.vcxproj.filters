@@ -27,34 +27,34 @@
     <ClCompile Include="TimeManager.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="CapsuleColliderComponent.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="ColliderComponent.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="CollisionMatrix.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="PhysicsEventCallback.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="PhysicsFilter.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="PhysScene.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="PhysX.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="PhysxHelper.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="PhysxManager.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="RigidBodyComponent.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="BoxColliderComponent.cpp">
       <Filter>소스 파일</Filter>
@@ -256,34 +256,34 @@
       <UniqueIdentifier>{44b49f8c-3077-4d0a-be63-9f9da05c9b52}</UniqueIdentifier>
     </Filter>
     <ClInclude Include="CapsuleColliderComponent.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Physics API</Filter>
     </ClInclude>
     <ClInclude Include="ColliderComponent.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Physics API</Filter>
     </ClInclude>
     <ClInclude Include="CollisionMatrix.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Physics API</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsEventCallback.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysScene.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Physics API</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsFilter.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Physics API</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysScene.h">
+      <Filter>헤더 파일\Core\Physics API</Filter>
     </ClInclude>
     <ClInclude Include="PhysX.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Physics API</Filter>
     </ClInclude>
     <ClInclude Include="PhysxHelper.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Physics API</Filter>
     </ClInclude>
     <ClInclude Include="PhysxManager.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Physics API</Filter>
     </ClInclude>
     <ClInclude Include="RigidBodyComponent.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Core\Physics API</Filter>
     </ClInclude>
     <ClInclude Include="BoxColliderComponent.h">
       <Filter>헤더 파일</Filter>
@@ -512,11 +512,11 @@
     <ClInclude Include="TextResource.h">
       <Filter>헤더 파일\Core\Core Test</Filter>
     </ClInclude>
-    <ClInclude Include="AssetsDatabase.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
     <ClInclude Include="ResourceSerializer.h">
       <Filter>헤더 파일\Core\Render API\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderInfo.h">
+      <Filter>헤더 파일\Core\Render API</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -646,6 +646,9 @@
     <ClCompile Include="RenderShared.cpp">
       <Filter>소스 파일\Core\Render API</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderInfo.cpp">
+      <Filter>소스 파일\Core\Render API</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Object.inl">
@@ -659,5 +662,13 @@
     <ResourceCompile Include="MMMEngineShared.rc">
       <Filter>리소스 파일</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="헤더 파일\Core\Physics API">
+      <UniqueIdentifier>{7210efdf-bb0c-4a09-8874-d36d7238e32e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Core\Physcis API">
+      <UniqueIdentifier>{e66850de-f491-4f75-9843-c4ad5567a533}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

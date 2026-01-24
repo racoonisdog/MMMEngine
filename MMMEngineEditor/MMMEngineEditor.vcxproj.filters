@@ -82,6 +82,12 @@
     <Filter Include="소스 파일\EditorCamera">
       <UniqueIdentifier>{bee8b106-bde9-4ffa-9315-07b901dba3c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\EditorWindow\CustomRenderer">
+      <UniqueIdentifier>{4254a7e0-283f-4df6-ac1c-37939482433e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\EditorWIndow\CustomRenderer">
+      <UniqueIdentifier>{02cc79c3-2dd4-4317-bec7-70685a0741d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorRegistry.h">
@@ -162,6 +168,18 @@
     <ClInclude Include="EditorCamera.h">
       <Filter>헤더 파일\EditorCamera</Filter>
     </ClInclude>
+    <ClInclude Include="SceneViewWindow.h">
+      <Filter>헤더 파일\EditorWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="GameViewWindow.h">
+      <Filter>헤더 파일\EditorWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorGridRenderer.h">
+      <Filter>헤더 파일\EditorWindow\CustomRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorShader.h">
+      <Filter>헤더 파일\EditorRegistry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -229,6 +247,15 @@
     </ClCompile>
     <ClCompile Include="EditorCamera.cpp">
       <Filter>소스 파일\EditorCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneViewWindow.cpp">
+      <Filter>소스 파일\EditorWIndow</Filter>
+    </ClCompile>
+    <ClCompile Include="GameViewWindow.cpp">
+      <Filter>소스 파일\EditorWIndow</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorGridRenderer.cpp">
+      <Filter>소스 파일\EditorWIndow\CustomRenderer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

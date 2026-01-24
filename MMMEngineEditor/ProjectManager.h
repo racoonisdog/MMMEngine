@@ -24,6 +24,9 @@ namespace MMMEngine::Editor
         // 저장 경로: projectRoot/ProjectSettings/project.json
         std::optional<std::filesystem::path> SaveActiveProject();
 
+
+        std::string ToProjectRelativePath(const std::string& absolutePath);
+
     private:
         std::optional<Project> m_project;
 
@@ -38,5 +41,6 @@ namespace MMMEngine::Editor
         bool GenerateUserScriptsVcxproj(const std::filesystem::path& projectRootDir) const;
         bool GenerateUserScriptsFilters(const std::filesystem::path& projectRootDir) const; // 선택(있으면 VS에서 보기 좋음)
         void GenerateDefaultScriptIfEmpty(const std::filesystem::path& projectRootDir) const;
+
     };
 }

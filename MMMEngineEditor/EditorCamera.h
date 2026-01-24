@@ -1,4 +1,5 @@
 #pragma once
+#define NOMINMAX
 #include <SimpleMath.h>
 
 namespace MMMEngine::Editor

@@ -21,6 +21,8 @@ using namespace MMMEngine::Utility;
 #include "ScriptBuildWindow.h"
 #include "ConsoleWindow.h"
 #include "FilesWindow.h"
+#include "SceneViewWindow.h"
+#include "GameViewWindow.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -147,6 +149,8 @@ bool MMMEngine::Editor::ImGuiEditorContext::Initialize(HWND hWnd, ID3D11Device* 
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
+
     // 중요: 기본 폰트를 먼저 추가
     m_defaultFont = io.Fonts->AddFontFromFileTTF(
         "C:/Windows/Fonts/malgun.ttf",
@@ -218,6 +222,7 @@ bool MMMEngine::Editor::ImGuiEditorContext::Initialize(HWND hWnd, ID3D11Device* 
     m_isD3D11BackendInit = true;
 
     ConsoleWindow::Get().Init();
+    SceneViewWindow::Get().Initialize(pDevice, pContext, 800, 600);
     return true;
 }
 
@@ -298,6 +303,8 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
             ImGui::MenuItem(u8"하이어라키", nullptr, &g_editor_window_hierarchy);
             ImGui::MenuItem(u8"인스펙터", nullptr, &g_editor_window_inspector);
             ImGui::MenuItem(u8"파일 뷰어", nullptr, &g_editor_window_files);
+            ImGui::MenuItem(u8"씬", nullptr, &g_editor_window_sceneView);
+            ImGui::MenuItem(u8"게임", nullptr, &g_editor_window_gameView);
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu(u8"빌드"))
@@ -335,6 +342,8 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
     SceneListWindow::Get().Render();
     HierarchyWindow::Get().Render();
     InspectorWindow::Get().Render();
+    GameViewWindow::Get().Render();
+    SceneViewWindow::Get().Render();
 }
 
 void MMMEngine::Editor::ImGuiEditorContext::EndFrame()

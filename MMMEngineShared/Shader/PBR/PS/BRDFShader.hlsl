@@ -1,5 +1,5 @@
 // 픽셀 셰이더(쉐이더/셰이더).
-#include "../../CommonShared.hlsli"
+#include "../../CommonSharedPS.hlsli"
 #include "../PBRShared.hlsli"
 
 // GGX
@@ -57,7 +57,7 @@ float4 main(PS_INPUT input) : SV_TARGET
     // 벡터
     float3 N = normalize(mul(normalMap, tbn));
     float3 V = normalize(mCamPos.xyz - input.W_Pos.xyz);
-    float3 L = normalize(-mLightDir[0].xyz);
+    float3 L = normalize(-mLightDir.xyz);
     float3 H = normalize(V + L);
     
     // 기본반사율 구하기
@@ -115,7 +115,7 @@ float4 main(PS_INPUT input) : SV_TARGET
         }
     }
     
-    float3 light = mLightColor[0].rgb;
+    float3 light = mLightColor;
     float3 direct = (diffuse + specular) * light * NL;
     float3 color = (direct * shadowFactor) + amibentIBL + emissive;
     //float4 finalColor = float4(pow(color, 1.0f / 2.2f), 1.0f);

@@ -21,6 +21,7 @@ RTTR_REGISTRATION
 	using namespace rttr;
 
 	registration::class_<MMMEngine::Material>("Material")
+		.constructor<>()(rttr::policy::ctor::as_std_shared_ptr)
 		.property_readonly("VShader", &MMMEngine::Material::GetVShader)
 		.property_readonly("PShader", &MMMEngine::Material::GetPShader)
 		.method("GetProperty", &MMMEngine::Material::GetProperty)
@@ -28,21 +29,21 @@ RTTR_REGISTRATION
 }
 
 
-// ÇÁ·ÎÆÛÆ¼ ¼³Á¤
+// í”„ë¡œí¼í‹° ì„¤ì •
 void MMMEngine::Material::SetProperty(const std::wstring& _name, const MMMEngine::PropertyValue& value)
 {
 	m_properties[_name] = value;
 }
 
 
-// ÇÁ·ÎÆÛÆ¼ °¡Á®¿À±â
+// í”„ë¡œí¼í‹° ê°€ì ¸ì˜¤ê¸°
 MMMEngine::PropertyValue MMMEngine::Material::GetProperty(const std::wstring& _name) const
 {
 	auto it = m_properties.find(_name);
 	if (it != m_properties.end())
 		return it->second;
 
-	// TODO :: µÚ¿¡ name Ãß°¡ÇÏ±â
+	// TODO :: ë’¤ì— name ì¶”ê°€í•˜ê¸°
 	throw std::runtime_error("Property not found");
 
 }

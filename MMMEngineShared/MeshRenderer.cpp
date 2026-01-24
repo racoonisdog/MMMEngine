@@ -38,7 +38,7 @@ MMMEngine::MeshRenderer::~MeshRenderer()
 	// 렌더러 제거 명령
 	for (auto& renderer : renderers) {
 		if (auto locked = renderer.lock()) {
-			RenderManager::Get().RemoveRenderer(RenderType::GEOMETRY, locked);
+			RenderManager::Get().RemoveRenderer(RenderType::R_GEOMETRY, locked);
 		}
 	}
 }
@@ -61,7 +61,7 @@ void MMMEngine::MeshRenderer::Start()
 		for (const auto& idx : meshIndices) {
 			std::weak_ptr<RendererBase> renderer;
 
-			renderer = RenderManager::Get().AddRenderer<GeoRenderer>(RenderType::GEOMETRY);
+			renderer = RenderManager::Get().AddRenderer<GeoRenderer>(RenderType::R_GEOMETRY);
 
 			auto& meshBuffer = mesh->gpuBuffer.vertexBuffers[idx];
 			auto& indicesBuffer = mesh->gpuBuffer.indexBuffers[idx];

@@ -28,11 +28,11 @@ RTTR_REGISTRATION
 
 const aiScene* MMMEngine::AssimpLoader::ImportScene(const std::wstring path, ModelType type)
 {
-	// ¿É¼Ç ¼±ÅÃ
+	// ì˜µì…˜ ì„ íƒ
 	const ImportOptions opt = (type == ModelType::Static) ? StaticModelOptions() : AnimatedModelOptions();
 
-	// Áß¿ä: ÀÌÀü scene ¸Ş¸ğ¸® Á¤¸®(¼±ÅÃÀÌÁö¸¸ ¾ÈÁ¤¼º¿¡ µµ¿ò)
-	// (Assimp::Importer´Â »õ·Î ReadFileÇÏ¸é ³»ºÎ¿¡¼­ ±³Ã¼µÇ±âµµ ÇÏÁö¸¸ ¸í½ÃÀûÀ¸·Î ÇØµµ µÊ)
+	// ì¤‘ìš”: ì´ì „ scene ë©”ëª¨ë¦¬ ì •ë¦¬(ì„ íƒì´ì§€ë§Œ ì•ˆì •ì„±ì— ë„ì›€)
+	// (Assimp::ImporterëŠ” ìƒˆë¡œ ReadFileí•˜ë©´ ë‚´ë¶€ì—ì„œ êµì²´ë˜ê¸°ë„ í•˜ì§€ë§Œ ëª…ì‹œì ìœ¼ë¡œ í•´ë„ ë¨)
 	m_importer.FreeScene();
 
 	const aiScene* scene = m_importer.ReadFile(Utility::StringHelper::WStringToString(path), opt.assimpFlags);
@@ -47,7 +47,7 @@ DirectX::SimpleMath::Vector3 ToVector3(const aiVector3D& v)
 
 DirectX::SimpleMath::Vector4 ToVector4(const aiQuaternion& q)
 {
-	// DirectX´Â (x,y,z,w) ÇüÅÂ·Î µé°í °¡´Â °Ô ÀÏ¹İÀû
+	// DirectXëŠ” (x,y,z,w) í˜•íƒœë¡œ ë“¤ê³  ê°€ëŠ” ê²Œ ì¼ë°˜ì 
 	return DirectX::XMFLOAT4(q.x, q.y, q.z, q.w);
 }
 
@@ -72,11 +72,11 @@ MMMEngine::ResPtr<MMMEngine::StaticMesh> MMMEngine::AssimpLoader::ConvertStaticM
 {
 	auto staticMesh = std::make_shared<StaticMesh>();
 
-	// ¸ŞÅ×¸®¾ó ¸ÅÇÎ
+	// ë©”í…Œë¦¬ì–¼ ë§¤í•‘
 	std::vector<ResPtr<Material>> matList;
 	for (const auto& mat : _model->materials) {
-		// ·»´õ·¯ ¸ŞÅ×¸®¾óÀ¸·Î º¯È¯ -> ¸®½ºÆ® ÀÛ¼º
-		// TODO:: ¸ŞÅ×¸®¾ó »ı¼ºÇÒ¶§ VS, PS ¾î¶»°Ô ÇÒÁö »ı°¢ÇÏ±â.
+		// ë Œë”ëŸ¬ ë©”í…Œë¦¬ì–¼ìœ¼ë¡œ ë³€í™˜ -> ë¦¬ìŠ¤íŠ¸ ì‘ì„±
+		// TODO:: ë©”í…Œë¦¬ì–¼ ìƒì„±í• ë•Œ VS, PS ì–´ë–»ê²Œ í• ì§€ ìƒê°í•˜ê¸°.
 		ResPtr<Material> material = std::make_shared<Material>();
 		for (const auto& [sementic, ref] : mat.textures) {
 			if (!ConvertMaterial(sementic, &ref, material.get()))
@@ -85,22 +85,22 @@ MMMEngine::ResPtr<MMMEngine::StaticMesh> MMMEngine::AssimpLoader::ConvertStaticM
 		matList.push_back(material);
 	}
 	
-	// SubMeshAsset ¡æ MeshData
+	// SubMeshAsset â†’ MeshData
 	for (size_t i = 0; i < _model->subMeshes.size(); ++i)
 	{
 		const auto& sub = _model->subMeshes[i];
 
-		// CPU µ¥ÀÌÅÍ
+		// CPU ë°ì´í„°
 		staticMesh->meshData.vertices.push_back(sub.vertices);
 		staticMesh->meshData.indices.push_back(sub.indices);
 
-		// Material ¸ÅÇÎ
+		// Material ë§¤í•‘
 		if (sub.materialIndex >= 0 && sub.materialIndex < _model->materials.size())
 		{
-			// ¸ŞÅ×¸®¾ó µî·Ï
+			// ë©”í…Œë¦¬ì–¼ ë“±ë¡
 			staticMesh->materials.push_back(matList[sub.materialIndex]);
 
-			// ¸ŞÅ×¸®¾ó:¸Ş½Ã±×·ì µî·Ï
+			// ë©”í…Œë¦¬ì–¼:ë©”ì‹œê·¸ë£¹ ë“±ë¡
 			staticMesh->meshGroupData[sub.materialIndex].push_back((UINT)i);
 		}
 	}
@@ -112,10 +112,10 @@ MMMEngine::ResPtr<MMMEngine::SkeletalMesh> MMMEngine::AssimpLoader::ConvertSkele
 {
 	auto skeletalMesh = std::make_shared<SkeletalMesh>();
 
-	// ¸ŞÅ×¸®¾ó ¸ÅÇÎ
+	// ë©”í…Œë¦¬ì–¼ ë§¤í•‘
 	std::vector<ResPtr<Material>> matList;
 	for (const auto& mat : _model->materials) {
-		// ·»´õ·¯ ¸ŞÅ×¸®¾óÀ¸·Î º¯È¯ -> ¸®½ºÆ® ÀÛ¼º
+		// ë Œë”ëŸ¬ ë©”í…Œë¦¬ì–¼ìœ¼ë¡œ ë³€í™˜ -> ë¦¬ìŠ¤íŠ¸ ì‘ì„±
 		ResPtr<Material> material = std::make_shared<Material>();
 		for (const auto& [sementic, ref] : mat.textures) {
 			if (!ConvertMaterial(sementic, &ref, material.get()))
@@ -124,38 +124,38 @@ MMMEngine::ResPtr<MMMEngine::SkeletalMesh> MMMEngine::AssimpLoader::ConvertSkele
 		matList.push_back(material);
 	}
 
-	// SubMeshAsset ¡æ MeshData
+	// SubMeshAsset â†’ MeshData
 	for (size_t i = 0; i < _model->subMeshes.size(); ++i)
 	{
 		const auto& sub = _model->subMeshes[i];
 
-		// CPU µ¥ÀÌÅÍ
+		// CPU ë°ì´í„°
 		skeletalMesh->meshData.vertices.push_back(sub.vertices);
 		skeletalMesh->meshData.indices.push_back(sub.indices);
 
-		// Material ¸ÅÇÎ
+		// Material ë§¤í•‘
 		if (sub.materialIndex >= 0 && sub.materialIndex < _model->materials.size())
 		{
-			// ¸ŞÅ×¸®¾ó µî·Ï
+			// ë©”í…Œë¦¬ì–¼ ë“±ë¡
 			skeletalMesh->materials.push_back(matList[sub.materialIndex]);
 
-			// ¸ŞÅ×¸®¾ó:¸Ş½Ã±×·ì µî·Ï
+			// ë©”í…Œë¦¬ì–¼:ë©”ì‹œê·¸ë£¹ ë“±ë¡
 			skeletalMesh->meshGroupData[sub.materialIndex].push_back((UINT)i);
 		}
 	}
 
-	// º» ¸ÅÆ®¸¯½º, ¿ÀÇÁ¼Â Àü´Ş
+	// ë³¸ ë§¤íŠ¸ë¦­ìŠ¤, ì˜¤í”„ì…‹ ì „ë‹¬
 	if (!_model->skin.bones.empty())
 	{
 		for (size_t i = 0; i < _model->skin.bones.size() && i < BONE_MAXSIZE; ++i)
 		{
 			const auto& bone = _model->skin.bones[i];
-			skeletalMesh->boneBuffer.BoneMat[i] = DirectX::SimpleMath::Matrix::Identity; // ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÁ¡¿¡¼­ °»½ÅµÊ
-			skeletalMesh->offsetBuffer.BoneMat[i] = bone.offset; // ¹ÙÀÎµå Æ÷Áî ¿ÀÇÁ¼Â
+			skeletalMesh->boneBuffer.BoneMat[i] = DirectX::SimpleMath::Matrix::Identity; // ì• ë‹ˆë©”ì´ì…˜ ì‹œì ì—ì„œ ê°±ì‹ ë¨
+			skeletalMesh->offsetBuffer.BoneMat[i] = bone.offset; // ë°”ì¸ë“œ í¬ì¦ˆ ì˜¤í”„ì…‹
 		}
 	}
 
-	// ¾Ö´Ï¸ŞÀÌ¼Ç Å¬¸³ Àü´Ş
+	// ì• ë‹ˆë©”ì´ì…˜ í´ë¦½ ì „ë‹¬
 
 	return skeletalMesh;
 }
@@ -327,14 +327,14 @@ bool MMMEngine::AssimpLoader::ExtractSubMeshes(const aiScene* scene, const std::
 
 		for (unsigned vi = 0; vi < mesh->mNumVertices; ++vi)
 		{
-			Mesh_Vertex v; // boneIDs/weights´Â ±âº» 0
+			Mesh_Vertex v; // boneIDs/weightsëŠ” ê¸°ë³¸ 0
 
 			// Pos
 			v.Pos = DirectX::XMFLOAT3(mesh->mVertices[vi].x,
 				mesh->mVertices[vi].y,
 				mesh->mVertices[vi].z);
 
-			// Normal (¾øÀ» ¼öµµ ÀÖÀ½)
+			// Normal (ì—†ì„ ìˆ˜ë„ ìˆìŒ)
 			if (hasNormals)
 			{
 				v.Normal = DirectX::XMFLOAT3(mesh->mNormals[vi].x,
@@ -441,7 +441,7 @@ bool MMMEngine::AssimpLoader::ExtractMaterials(const aiScene* scene, const std::
 		if (GetTexturePath(mat, aiTextureType_BASE_COLOR, raw) || GetTexturePath(mat, aiTextureType_DIFFUSE, raw))
 			put(TextureSemantic::BaseColor, raw, true);
 
-		// Normal (fallback: HEIGHT·Î µé¾î¿À´Â °æ¿ì)
+		// Normal (fallback: HEIGHTë¡œ ë“¤ì–´ì˜¤ëŠ” ê²½ìš°)
 		raw.clear();
 		if (GetTexturePath(mat, aiTextureType_NORMALS, raw) || GetTexturePath(mat, aiTextureType_HEIGHT, raw))
 			put(TextureSemantic::Normal, raw, false);
@@ -515,7 +515,7 @@ bool MMMEngine::AssimpLoader::ExtractSkinning(const aiScene* scene, const NodeTr
 	outSkinning.bones.clear();
 
 	if (!scene || !scene->mMeshes) return false;
-	if (inoutSubMeshes.size() != scene->mNumMeshes) return false; // mesh 1:1 ÀüÁ¦(Áö±İ ±¸Á¶)
+	if (inoutSubMeshes.size() != scene->mNumMeshes) return false; // mesh 1:1 ì „ì œ(ì§€ê¸ˆ êµ¬ì¡°)
 
 	auto getOrCreateBoneIndex = [&](const std::string& boneName, const aiMatrix4x4& offsetM) -> int
 		{
@@ -538,7 +538,7 @@ bool MMMEngine::AssimpLoader::ExtractSkinning(const aiScene* scene, const NodeTr
 			return newIndex;
 		};
 
-	// ¸ğµç ¸Ş½Ã¿¡ ´ëÇØ
+	// ëª¨ë“  ë©”ì‹œì— ëŒ€í•´
 	for (unsigned mi = 0; mi < scene->mNumMeshes; ++mi)
 	{
 		const aiMesh* mesh = scene->mMeshes[mi];
@@ -555,7 +555,7 @@ bool MMMEngine::AssimpLoader::ExtractSkinning(const aiScene* scene, const NodeTr
 
 		sm.skinned = true;
 
-		// aiBone ´ÜÀ§·Î weight¸¦ vertex¿¡ ´©Àû
+		// aiBone ë‹¨ìœ„ë¡œ weightë¥¼ vertexì— ëˆ„ì 
 		for (unsigned bi = 0; bi < mesh->mNumBones; ++bi)
 		{
 			const aiBone* bone = mesh->mBones[bi];
@@ -575,7 +575,7 @@ bool MMMEngine::AssimpLoader::ExtractSkinning(const aiScene* scene, const NodeTr
 			}
 		}
 
-		// Á¤±ÔÈ­
+		// ì •ê·œí™”
 		for (auto& v : sm.vertices)
 			NormalizeWeights(v);
 	}
@@ -709,18 +709,15 @@ void MMMEngine::AssimpLoader::RegisterModel(const std::wstring path, ModelType t
 		filename = fPath.stem().wstring();
 	}
 
-	auto currentProjectFS = Editor::ProjectManager::Get().GetActiveProject().ProjectRootFS();
-
 	switch (type)
 	{
 	case MMMEngine::ModelType::Static:
 		staticMesh = ConvertStaticMesh(&model);
-		currentProjectFS = currentProjectFS / fs::path(m_exportPath);
-		ResourceSerializer::Get().Serialize_StaticMesh(staticMesh.get(), currentProjectFS.wstring(), filename);
+		ResourceSerializer::Get().Serialize_StaticMesh(staticMesh.get(), m_exportPath, filename);
 		break;
 	case MMMEngine::ModelType::Animated:
 		skeletalMesh = ConvertSkeletalMesh(&model);
-		//TODO::Skeletalmesh Á÷·ÄÈ­
+		//TODO::Skeletalmesh ì§ë ¬í™”
 		//ResourceSerializer::Get().Serialize_StaticMesh(skeletalMesh.get(), m_exportPath);
 		break;
 	default:

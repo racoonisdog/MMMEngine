@@ -15,15 +15,15 @@
 
 namespace MMMEngine {
 	enum RenderType {
-		SHADOWMAP = 0,
-		PREDEPTH = 1,
-		SKYBOX = 2,
-		GEOMETRY = 3,
-		TRANSCULANT = 4,
-		ADDTIVE = 5,
-		PARTICLE = 6,
-		POSTPROCESS = 7,
-		UI = 8,
+		R_SHADOWMAP = 0,
+		R_PREDEPTH = 1,
+		R_SKYBOX = 2,
+		R_GEOMETRY = 3,
+		R_TRANSCULANT = 4,
+		R_ADDTIVE = 5,
+		R_PARTICLE = 6,
+		R_POSTPROCESS = 7,
+		R_UI = 8,
 	};
 
 	struct Render_CamBuffer {
@@ -36,17 +36,6 @@ namespace MMMEngine {
 	{
 		DirectX::SimpleMath::Matrix mWorld;
 		DirectX::SimpleMath::Matrix mNormalMatrix;
-	};
-
-	struct Render_LightBuffer {
-		DirectX::SimpleMath::Vector4 mLightDir;
-		DirectX::SimpleMath::Vector4 mLightColor;
-	};
-
-	struct Render_ShadowBuffer
-	{
-		DirectX::SimpleMath::Matrix ShadowView;
-		DirectX::SimpleMath::Matrix ShadowProjection;
 	};
 
 	struct Mesh_Vertex

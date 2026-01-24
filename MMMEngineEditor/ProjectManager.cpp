@@ -244,6 +244,40 @@ void MMMEngine::ExampleBehaviour::Update()
 )";
     }
 
+    std::string ProjectManager::ToProjectRelativePath(const std::string& absolutePath)
+    {
+        if (!HasActiveProject())
+            return absolutePath;
+
+        const auto& project = GetActiveProject();
+
+        try
+        {
+            fs::path root = fs::canonical(fs::path(project.rootPath));
+            fs::path abs = fs::canonical(fs::path(absolutePath));
+
+            // 프로젝트 내부 파일인지 확인
+            auto [rootEnd, absEnd] = std::mismatch(root.begin(), root.end(), abs.begin());
+
+            if (rootEnd == root.end())  // 프로젝트 내부 파일
+            {
+                fs::path relative = fs::relative(abs, root);
+                std::string result = relative.string();
+
+                // 경로 구분자 통일
+                std::replace(result.begin(), result.end(), '\\', '/');
+                return result;
+            }
+        }
+        catch (const fs::filesystem_error&)
+        {
+            // canonical 실패 시 (파일이 존재하지 않는 경우 등)
+        }
+
+        // 프로젝트 외부 파일이거나 에러 발생 시 절대 경로 반환
+        return absolutePath;
+    }
+
     bool ProjectManager::GenerateUserScriptsVcxproj(const fs::path& projectRootDir) const
     {
         const fs::path projDir = projectRootDir / "Source" / "UserScripts";
@@ -266,6 +300,8 @@ void MMMEngine::ExampleBehaviour::Update()
         std::string engineSharedLibName = "MMMEngineShared.lib";
         std::string rttrDebugLibName = "rttr_core_d.lib";
         std::string rttrReleaseLibName = "rttr_core.lib";
+        std::string physXLibsName = "PhysXCommon_64.lib;PhysXCooking_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib";
+        std::string renderResourceLibs = "assimp-vc143-mt.lib;pugixml.lib;minizip.lib;zlib.lib;kubazip.lib;poly2tri.lib;draco.lib";
 
         if (!engineDir.empty())
         {
@@ -359,7 +395,7 @@ void MMMEngine::ExampleBehaviour::Update()
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>)xml" << engineSharedDebugLibDir << R"xml(;)xml" << engineSharedCommonLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>)xml" << engineSharedDebugLibDir << R"xml(;)xml" << engineSharedCommonLibDir << R"xml(;)xml" << physXLibsName << renderResourceLibs << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrDebugLibName << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -377,7 +413,7 @@ void MMMEngine::ExampleBehaviour::Update()
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>)xml" << engineSharedReleaseLibDir << R"xml(;)xml" << engineSharedCommonLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>)xml" << engineSharedReleaseLibDir << R"xml(;)xml" << engineSharedCommonLibDir << R"xml(;)xml" << physXLibsName << renderResourceLibs << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrReleaseLibName << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

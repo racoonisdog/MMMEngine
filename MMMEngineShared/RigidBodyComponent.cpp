@@ -83,13 +83,13 @@ void MMMEngine::RigidBodyComponent::CreateActor(physx::PxPhysics* physics, Vecto
 	m_Actor->userData = this;
 }
 
-//생성했을때 이미 존재하면 등록안하도록 함
+//깊 대� 議댁ы硫 깅濡 
 void MMMEngine::RigidBodyComponent::Initialize()
 {
 	auto it = GetGameObject()->GetComponentsCount<RigidBodyComponent>();
 	if (it >= 2)
 	{
-		std::cout << u8"이미 존재하는 RigidComponent" << std::endl;
+		std::cout << u8"대� 議댁ы RigidComponent" << std::endl;
 		Destroy(SelfPtr(this));
 		return;
 	}
@@ -155,12 +155,12 @@ void MMMEngine::RigidBodyComponent::DetachCollider(ColliderComponent* collider)
 {
 	if (!collider) return;
 
-	// 붙어있는 목록에서 제거
+	// 遺댁 紐⑸ �嫄
 	auto it = std::find(m_Colliders.begin(), m_Colliders.end(), collider);
 	if (it != m_Colliders.end())
 		m_Colliders.erase(it);
 
-	// actor가 있으면 PhysX shape도 detach
+	// actor媛 쇰㈃ PhysX shape detach
 	if (m_Actor)
 	{
 		if (auto* shape = collider->GetPxShape())
@@ -191,21 +191,21 @@ void MMMEngine::RigidBodyComponent::PushToPhysics()
 void MMMEngine::RigidBodyComponent::PullFromPhysics()
 {
 	if (!m_Actor) return;
-	//if (!m_Tr) return; // 엔진 Transform 포인터(혹은 참조)가 연결된 경우만 ( 오류방지용 )
+	//if (!m_Tr) return; // 吏 Transform ъ명(뱀 李몄“)媛 곌껐 寃쎌곕 ( ㅻ諛⑹ )
 
 
-	// Static은 보통 Pull할 필요 없음 , 에디터 이동/텔레포트는 Push에서 setGlobalPose로 처리)
+	// Static 蹂댄 Pull   ,  대/�ы몃 Push setGlobalPose濡 泥由)
 	if (m_Desc.type == Type::Static) return;
 
 	auto* t_dynamic = m_Actor->is<physx::PxRigidDynamic>();
 	if (!t_dynamic) return;
 
-	//키네마틱은 코드 포지션 기준이라 Pull로 덮어쓰지 않음
-	//동기화 옵션을 두고 켤 수있도록 가능
-	//지금은 키네마틱이면 덮어쓰지 않도록 
+	//ㅻㅻ깆 肄 ъ 湲곗대 Pull濡 �댁곗 
+	//湲고 듭 怨 耳 濡 媛
+	//吏湲 ㅻㅻ깆대㈃ �댁곗 濡 
 	if (m_Desc.isKinematic)
 	{
-		// const physx::PxTransform pxPose = t_dynamic->getGlobalPose(); 동기화 옵션용
+		// const physx::PxTransform pxPose = t_dynamic->getGlobalPose(); 湲고 듭
 		// ApplyPoseToEngine(pxPose);
 		return;
 	}
@@ -222,7 +222,7 @@ void MMMEngine::RigidBodyComponent::PushPoseIfDirty()
 {
 	if (!m_Actor) return;
 
-	//텔레포트/에디터 강제 이동 요청을 처리하는 분기
+	//�ы/ 媛� 대 泥� 泥由ы 遺湲
 	if (m_PoseDirty)
 	{
 		m_Actor->setGlobalPose(ToPxTrans(m_RequestedWorldPose.position, m_RequestedWorldPose.rotation));
@@ -238,7 +238,7 @@ void MMMEngine::RigidBodyComponent::PushPoseIfDirty()
 		m_PoseDirty = false;
 	}
 
-	//키네마틱 이동 요청이 있을때 처리하는 분기
+	//ㅻㅻ 대 泥�  泥由ы 遺湲
 	if (m_Desc.isKinematic && m_HasKinematicTarget)
 	{
 		if (auto* t_dynamic = m_Actor->is<physx::PxRigidDynamic>())
@@ -270,7 +270,7 @@ void MMMEngine::RigidBodyComponent::PushForces()
 
 	m_ForceQueue.clear();
 	m_TorqueQueue.clear();
-	//8크기로 바로 재할당
+	//8ш린濡 諛濡 ы
 	m_ForceQueue.reserve(8);
 	m_TorqueQueue.reserve(8);
 
@@ -289,17 +289,17 @@ void MMMEngine::RigidBodyComponent::Teleport(const Vector3& worldPos, const Quat
 
 void MMMEngine::RigidBodyComponent::SetKinematicTarget(const Vector3& worldPos, const Quaternion& Quater)
 {
-	// 키네마틱 호출용 방어코드 다이나믹일경우 아웃
+	// ㅻㅻ 몄 諛⑹댁 ㅼ대誘뱀쇨꼍 
 	if (m_Desc.type != Type::Dynamic) return;
 
-	// 키네마틱 설정이 되었고 키네마틱좌표를 저장
+	// ㅻㅻ ㅼ 怨 ㅻㅻ깆瑜 �
 	m_KinematicTarget.position = worldPos;
 	m_KinematicTarget.rotation = Quater;
 
 	m_HasKinematicTarget = true;
 	m_WakeRequested = true;
 
-	// 만약 호출 시점에 키네마틱 전환까지 같이 보장하고 싶으면 (까먹엇을수도 있으니깐)
+	// 留 몄 � ㅻㅻ �源吏 媛 蹂댁ν怨 띠쇰㈃ (源癒뱀 쇰源)
 	// m_Desc.isKinematic = true; 
 	// m_DescDirty = true;
 }
@@ -309,7 +309,7 @@ void MMMEngine::RigidBodyComponent::MoveKinematicTarget()
 	if (m_Desc.type != Type::Dynamic) return;
 	if (!m_Desc.isKinematic) return;
 
-	// mesh자체의 transform을 목표로 삼는다
+	// mesh泥댁 transform 紐⑺濡 쇰
 	m_KinematicTarget.position = GetTransform()->GetWorldPosition();
 	m_KinematicTarget.rotation = GetTransform()->GetWorldRotation();
 
@@ -328,12 +328,12 @@ void MMMEngine::RigidBodyComponent::Editor_changeTrans(const Vector3& worldPos, 
 
 void MMMEngine::RigidBodyComponent::AddForce(Vector3 f, ForceMode mod)
 {
-	//다이나믹이 아니면 힘을 줄 필요가 없음
+	//ㅼ대誘뱀 硫  以 媛 
 	if (m_Desc.type != Type::Dynamic) return;
-	//키네마틱이 true라면 힘을 줄 필요가 없음
+	//ㅻㅻ깆 true쇰㈃  以 媛 
 	if (m_Desc.isKinematic) return;
 
-	//바로 처리하는게 아니라 vector에 넣음
+	//諛濡 泥由ы寃  vector ｌ
 	m_ForceQueue.push_back({ f, mod });
 
 	m_WakeRequested = true;
@@ -380,7 +380,7 @@ void MMMEngine::RigidBodyComponent::AddImpulse(Vector3 imp)
 	m_WakeRequested = true;
 }
 
-//선형 속도(Linear Velocity) 설정
+// (Linear Velocity) ㅼ
 void MMMEngine::RigidBodyComponent::SetLinearVelocity(Vector3 v)
 {
 	if (!m_Actor) return;
@@ -401,7 +401,7 @@ Vector3 MMMEngine::RigidBodyComponent::GetLinearVelocity() const
 
 	if (auto* d = m_Actor->is<physx::PxRigidDynamic>())
 	{
-		// 키네마틱이면 0 반환
+		// ㅻㅻ깆대㈃ 0 諛
 		if (m_Desc.isKinematic) return Vector3();
 		return ToVec(d->getLinearVelocity());
 	}
@@ -484,7 +484,7 @@ void MMMEngine::RigidBodyComponent::BindTeleport()
 	SetKinematicTarget(temptrans->GetWorldPosition(), temptrans->GetWorldRotation());
 }
 
-//private 함수들
+//private ⑥
 physx::PxForceMode::Enum MMMEngine::RigidBodyComponent::ToPxForceMode(ForceMode mode)
 {
 	switch (mode)
@@ -518,7 +518,7 @@ void MMMEngine::RigidBodyComponent::SetType(Type newType)
 	if (m_Desc.type == newType)
 		return;
 
-	//현재 월드 포즈 확보
+	//  ъ 蹂
 	Vector3 temp_Position = {};
 	Quaternion temp_Quarter = {};
 
@@ -545,9 +545,9 @@ void MMMEngine::RigidBodyComponent::SetType(Type newType)
 	m_RequestedRot = temp_Quarter;
 	m_TypeChangePending = true;
 
-	// wake는 '나중에' 씬에 들어간 뒤에 처리되게 플래그만
+	// wake '以' ъ ㅼ닿 ㅼ 泥由щ寃 洹몃
 	m_WakeRequested = true;
 
-	// 매니저에 처리 요청
+	// 留ㅻ� 泥由 泥
 	MMMEngine::PhysxManager::Get().NotifyRigidTypeChanged(this);
 }

@@ -1,12 +1,3 @@
-// 공용 1~19
-Texture2D _albedo : register(t0);
-Texture2D _normal: register(t1);
-Texture2D _emissive : register(t2);
-Texture2D _shadowmap : register(t3);
-Texture2D _opacity : register(t4);
-
-SamplerState _sp0 : register(s0);
-
 // 카메라버퍼
 cbuffer Cambuffer : register(b0)
 {
@@ -32,29 +23,10 @@ cbuffer BoneOffSetBuffer : register(b3)
     matrix mBoneOffsetMat[256];
 }
 
-
-// 라이트관련 5~9
-// Directional Light
-cbuffer LightBuffer : register(b5)
-{
-    float4 mLightDir[4];
-    float4 mLightColor[4];
-}
-
-// 쉐도우 버퍼
-cbuffer ShadowVP : register(b7)
+cbuffer ShadowVP : register(b4)
 {
     matrix mShadowView;
     matrix mShadowProjection;
-}
-
-
-// PP 버퍼 10~14
-cbuffer ToneBuffer : register(b10)
-{
-    float mExposure;
-    float mBrightness;
-    float2 _TonePadding;
 }
 
 struct PS_INPUT

@@ -82,98 +82,92 @@ void MMMEngine::Editor::FilesWindow::Render()
 
 void MMMEngine::Editor::FilesWindow::DrawToolbar(const fs::path& root)
 {
-    // Back button
+    float windowVisibleX2 = ImGui::GetCursorScreenPos().x + ImGui::GetContentRegionAvail().x;
+    float spacing = ImGui::GetStyle().ItemSpacing.x;
+
+    // 도우미 함수: 이전 아이템 이후에 다음 아이템이 들어갈 공간이 있는지 확인
+    auto ConfirmSameLine = [&](float nextItemWidth) {
+        float lastItemX2 = ImGui::GetItemRectMax().x;
+        float nextItemX2 = lastItemX2 + spacing + nextItemWidth;
+        if (nextItemX2 < windowVisibleX2)
+            ImGui::SameLine();
+        };
+
+    // 1. 뒤로 가기 (첫 번째 아이템은 SameLine 체크가 필요 없음)
     ImGui::BeginDisabled(m_historyIndex <= 0);
-    if (ImGui::Button("\xef\x81\xa0")) // Font Awesome arrow-left
+    if (ImGui::Button("\xef\x81\xa0"))
     {
-        if (m_historyIndex > 0)
-        {
+        if (m_historyIndex > 0) {
             m_historyIndex--;
             m_currentDirectory = m_navigationHistory[m_historyIndex];
         }
     }
     ImGui::EndDisabled();
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip(u8"뒤로 가기");
 
-    if (ImGui::IsItemHovered())
-        ImGui::SetTooltip(u8"뒤로 가기");
-
-    ImGui::SameLine();
-
-    // Forward button
+    // 2. 앞으로 가기
+    ConfirmSameLine(ImGui::GetFrameHeight());
     ImGui::BeginDisabled(m_historyIndex >= (int)m_navigationHistory.size() - 1);
-    if (ImGui::Button("\xef\x81\xa1")) // Font Awesome arrow-right
+    if (ImGui::Button("\xef\x81\xa1"))
     {
-        if (m_historyIndex < (int)m_navigationHistory.size() - 1)
-        {
+        if (m_historyIndex < (int)m_navigationHistory.size() - 1) {
             m_historyIndex++;
             m_currentDirectory = m_navigationHistory[m_historyIndex];
         }
     }
     ImGui::EndDisabled();
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip(u8"앞으로 가기");
 
-    if (ImGui::IsItemHovered())
-        ImGui::SetTooltip(u8"앞으로 가기");
-
-    ImGui::SameLine();
-
-    // Up button (parent directory)
+    // 3. 상위 폴더로
+    ConfirmSameLine(ImGui::GetFrameHeight());
     ImGui::BeginDisabled(m_currentDirectory == root);
-    if (ImGui::Button("\xef\x81\xa2")) // Font Awesome arrow-up
+    if (ImGui::Button("\xef\x81\xa2"))
     {
-        if (m_currentDirectory.has_parent_path() && m_currentDirectory != root)
-        {
+        if (m_currentDirectory.has_parent_path() && m_currentDirectory != root) {
             NavigateTo(m_currentDirectory.parent_path());
         }
     }
     ImGui::EndDisabled();
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip(u8"상위 폴더로");
 
-    if (ImGui::IsItemHovered())
-        ImGui::SetTooltip(u8"상위 폴더로");
-
-    ImGui::SameLine();
-    ImGui::SameLine();
-
-    // View options
+    // 4. 아이콘 크기 슬라이더 (그룹화)
+    float sliderWidth = 100.0f;
+    float sliderGroupWidth = ImGui::CalcTextSize(u8"아이콘 크기:").x + spacing + sliderWidth;
+    ConfirmSameLine(sliderGroupWidth);
+    ImGui::BeginGroup();
     ImGui::Text(u8"아이콘 크기:");
     ImGui::SameLine();
-    ImGui::SetNextItemWidth(100);
+    ImGui::SetNextItemWidth(sliderWidth);
     ImGui::SliderFloat("##iconsize", &m_iconSize, 50.0f, 150.0f, "%.0f");
+    ImGui::EndGroup();
 
-    ImGui::SameLine();
-
-    // New Folder button
+    // 5. 새 폴더 버튼
+    float newFolderBtnWidth = ImGui::CalcTextSize(u8"새 폴더").x + ImGui::GetStyle().FramePadding.x * 2;
+    ConfirmSameLine(newFolderBtnWidth);
     if (ImGui::Button(u8"새 폴더"))
     {
         fs::path newFolderPath = MakeFolderUnique(m_currentDirectory, "folder");
         fs::create_directories(newFolderPath);
     }
 
-    ImGui::SameLine();
-
-    // Delete button
+    // 6. 삭제 버튼
+    float deleteBtnWidth = ImGui::CalcTextSize(u8"삭제").x + ImGui::GetStyle().FramePadding.x * 2;
+    ConfirmSameLine(deleteBtnWidth);
     ImGui::BeginDisabled(selectedFileOrDir.empty());
     if (ImGui::Button(u8"삭제"))
     {
-        try
-        {
+        try {
             fs::path toDelete(selectedFileOrDir);
-            if (fs::exists(toDelete))
-            {
-                if (fs::is_directory(toDelete))
-                    fs::remove_all(toDelete);
-                else
-                    fs::remove(toDelete);
+            if (fs::exists(toDelete)) {
+                if (fs::is_directory(toDelete)) fs::remove_all(toDelete);
+                else fs::remove(toDelete);
                 selectedFileOrDir.clear();
             }
         }
-        catch (const std::exception& e)
-        {
-            // TODO: Log error
-        }
+        catch (...) {}
     }
     ImGui::EndDisabled();
 }
-
 void MMMEngine::Editor::FilesWindow::DrawNavigationBar(const fs::path& root)
 {
     // Breadcrumb navigation
@@ -198,12 +192,18 @@ void MMMEngine::Editor::FilesWindow::DrawNavigationBar(const fs::path& root)
             ImGui::SameLine();
         }
 
+        // imgui id push로 파일 안에 같은 이름의 파일이 있더라도 UI ID겹침 방지
+        ImGui::PushID(static_cast<int>(i));
+
         std::string label = (i == 0) ? "Root" : pathParts[i].filename().string();
 
         if (ImGui::SmallButton(label.c_str()))
         {
             NavigateTo(pathParts[i]);
         }
+
+        // id pop
+        ImGui::PopID(); 
     }
 }
 
@@ -586,7 +586,7 @@ void MMMEngine::Editor::FilesWindow::NavigateTo(const fs::path& newPath)
 void MMMEngine::Editor::FilesWindow::CreateNewScript(const std::string& parentDir, const std::string& scriptName)
 
 {
-    fs::path scriptsDir = fs::path(parentDir) / "Source" / "UserScripts" / "Scripts";
+    fs::path scriptsDir = fs::path(parentDir);// / "Source" / "UserScripts" / "Scripts";
 
     if (!fs::exists(scriptsDir))
     {

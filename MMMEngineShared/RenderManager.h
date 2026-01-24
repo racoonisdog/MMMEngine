@@ -90,9 +90,6 @@ namespace MMMEngine
 		//ObjPtr<EditorCamera> m_pCamera;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pCambuffer = nullptr;		// 캠 버퍼
 		Render_CamBuffer m_camMat;
-		
-		// 텍스쳐 버퍼인덱스 주는 맵 <propertyName, index> (쉐어드로 옮길것)
-		std::unordered_map<std::wstring, int> m_propertyMap;
 	public:
 		void StartUp(HWND _hwnd, UINT _ClientWidth, UINT _ClientHeight);
 		void InitD3D();
@@ -110,6 +107,11 @@ namespace MMMEngine
 
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView1> GetSceneRTV() { return m_pSceneRTV; }
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView1> GetSceneSRV() { return m_pSceneSRV; }
+		void GetSceneSize(UINT& outWidth, UINT& outHeight) 
+		{ 
+			outWidth = m_sceneWidth; 
+			outHeight = m_sceneHeight; 
+		}
 
 		void BeginFrame();
 		void Render();
@@ -121,8 +123,6 @@ namespace MMMEngine
 		const std::shared_ptr<VShader> GetDefaultVS() const { return m_pDefaultVSShader; }
 		const std::shared_ptr<PShader> GetDefaultPS() const { return m_pDefaultPSShader; }
 		const Microsoft::WRL::ComPtr<ID3D11InputLayout> GetDefaultInputLayout() const { return m_pDefaultInputLayout; }
-		
-		const int PropertyToIdx(const std::wstring& _propertyName) const;
 	public:
 		template <typename T, typename... Args>
 		std::weak_ptr<RendererBase> AddRenderer(RenderType _passType, Args&&... args) {

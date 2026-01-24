@@ -4,6 +4,7 @@
 #include "StringHelper.h"
 #include "rttr/type"
 #include "Transform.h"
+#include "ResourceManager.h"
 
 #include <fstream>
 #include <filesystem>
@@ -81,6 +82,33 @@ json SerializeVariant(const rttr::variant& var)
             arr.push_back(SerializeVariant(item));
         }
         return arr;
+    }
+
+    // shared_ptr<Resource> 처리
+    if (t.is_wrapper())
+    {
+        auto args = t.get_template_arguments();
+        if (args.begin() != args.end())
+        {
+            rttr::type innerType = *args.begin();
+            rttr::type resourceBase = rttr::type::get<MMMEngine::Resource>();
+
+            if (innerType.is_derived_from(resourceBase) || innerType == resourceBase)
+            {
+                auto resPtr = var.get_value<std::shared_ptr<MMMEngine::Resource>>();
+
+                if (resPtr && !resPtr->GetFilePath().empty())
+                {
+                    // 파일 경로를 문자열로 저장
+                    return MMMEngine::Utility::StringHelper::WStringToString(
+                        resPtr->GetFilePath()
+                    );
+                }
+
+                // null이거나 경로가 없으면 null 저장
+                return nullptr;
+            }
+        }
     }
 
     if (var.get_type().get_name().to_string().find("ObjPtr") != std::string::npos)
@@ -311,6 +339,37 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
         return;
     }
 
+    // shared_ptr<Resource 파생 클래스> 체크
+    if (target_type.is_wrapper())
+    {
+        auto args = target_type.get_template_arguments();
+        if (args.begin() != args.end())
+        {
+            rttr::type innerType = *args.begin();
+
+            // Resource를 상속받은 타입인지 확인
+            if (innerType.is_derived_from(rttr::type::get<Resource>()))
+            {
+                std::string pathStr = j.get<std::string>();
+                std::wstring filePath = Utility::StringHelper::StringToWString(pathStr);
+
+                rttr::variant loadedResource = ResourceManager::Get().Load(
+                    innerType, filePath);
+
+                if (loadedResource.convert(target.get_type()))                  // v를 내부적으로 target type으로 변환 (bool 리턴)
+                {
+                    target = loadedResource;               // v는 이제 shared_ptr<StaticMesh> 타입 variant
+                }
+
+          
+
+
+
+                return;
+            }
+        }
+    }
+
     // ObjPtr<T> 타입 처리
     if (target_type.get_name().to_string().find("ObjPtr") != std::string::npos)
     {
@@ -402,7 +461,7 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
 
     const json& gameObjects = snapshot["GameObjects"];
 
-    // 1-pass: GO + Transform(기존) MUID/값 복원 + 테이블 등록
+    // 1-pass: GO + Transform(혹은 RectTransform인 경우 곧바로 EnsureTransform) MUID/값 복원 + 테이블 등록
     for (const auto& goJson : gameObjects)
     {
         std::string goName = goJson["Name"].get<std::string>();
@@ -427,6 +486,7 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
 
         g_objectTable[goMUID] = go;
 
+        // todo : 여기서 RectTransform도 같이 찾기 -> 분기 생성
         // Transform json 찾기
         const json& components = goJson["Components"];
         const json* trComp = FindTransformComp(components);
@@ -470,11 +530,8 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
                 continue;
 
             DeserializeComponent(compJson, go);
-
         }
     }
-
-    // 2.5-pass: RectTransform만 찾아서 값타입만 역직렬화 + pendingRectParent에 기록해두기
 
     // 3-pass: Parent 연결 (Transform MUID 기준)
     for (auto& [childTrMUID, parentTrMUID] : pendingParent)

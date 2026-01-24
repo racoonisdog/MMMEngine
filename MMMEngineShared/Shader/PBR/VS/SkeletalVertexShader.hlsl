@@ -1,4 +1,4 @@
-#include "../../CommonShared.hlsli"
+#include "../../CommonSharedVS.hlsli"
 
 PS_INPUT main(VS_INPUT input)
 {
