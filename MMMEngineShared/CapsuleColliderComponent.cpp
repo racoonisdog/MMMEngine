@@ -25,12 +25,12 @@ RTTR_REGISTRATION
 
 void MMMEngine::CapsuleColliderComponent::SetRadius(float radius)
 {
-	m_radius = radius; if (m_Shape) ApplyAll();
+	m_radius = radius; if (m_Shape) MarkGeometryDirty();
 }
 
 void MMMEngine::CapsuleColliderComponent::SetHalfHeight(float halfheight)
 {
-	m_halfHeight = halfheight; if (m_Shape) ApplyAll();
+	m_halfHeight = halfheight; if (m_Shape) MarkGeometryDirty();
 }
 
 float MMMEngine::CapsuleColliderComponent::GetRadius() const
@@ -80,18 +80,20 @@ void MMMEngine::CapsuleColliderComponent::BuildShape(physx::PxPhysics* physics, 
 
     // Y-up 캡슐이 필요하면 아래코드로
     // SetLocalPose( physx::PxTransform(physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0,0,1))) * m_LocalPose );
-	m_Shape->userData = this;
+	//m_Shape->userData = this;
 }
 
-void MMMEngine::ColliderComponent::Initialize()
-{
-	// Shape를 먼저 생성해야 AttachCollider에서 사용할 수 있음
-	auto& physics = MMMEngine::PhysicX::Get().GetPhysics();
-	physx::PxMaterial* mat = MMMEngine::PhysicX::Get().GetDefaultMaterial();
+//void MMMEngine::ColliderComponent::Initialize()
+//{
+//	// Shape를 먼저 생성해야 AttachCollider에서 사용할 수 있음
+//	auto& physics = MMMEngine::PhysicX::Get().GetPhysics();
+//	physx::PxMaterial* mat = MMMEngine::PhysicX::Get().GetDefaultMaterial();
+//
+//	if (mat)
+//	{
+//		BuildShape(&physics, mat);
+//	}
+//	MMMEngine::PhysxManager::Get().NotifyColliderAdded(this);
+//}
 
-	if (mat)
-	{
-		BuildShape(&physics, mat);
-	}
-	MMMEngine::PhysxManager::Get().NotifyColliderAdded(this);
-}
+

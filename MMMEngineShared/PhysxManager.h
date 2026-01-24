@@ -55,6 +55,9 @@ namespace MMMEngine
 
 		void SetSceneGravity(float x, float y, float z);
 
+
+		void SetLayerCollision(uint32_t layerA, uint32_t layerB, bool canCollide);
+
 	private:
 		// 내부에서만 쓰는 헬퍼
 		void FlushCommands_PreStep();

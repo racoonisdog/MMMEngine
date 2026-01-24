@@ -207,8 +207,7 @@ namespace MMMEngine {
 	private:
 		physx::PxForceMode::Enum ToPxForceMode(ForceMode mode);
 
-
-
-
+		//collider 전체 삭제에 대한 책임을 가지는 단 하나의 rigid 보장 bool flag
+		bool m_ColliderMaster = false;
 	};
 }

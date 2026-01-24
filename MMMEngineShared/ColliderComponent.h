@@ -75,23 +75,13 @@ namespace MMMEngine
 
 
 		virtual bool UpdateShapeGeometry() = 0;
-		/*
-		if (!m_scene || !col) return;
-
-		 attach 안 된 상태에서도 shape만 있으면 갱신은 가능.
-		 attach 상태에서 갱신하는 게 일반적.
-		if (!col->GetPxShape())
-        return; // 정책: shape 없으면 여기서 만들지 않음(Attach/초기화에서만 생성)
-
-		const bool ok = col->UpdateShapeGeometry();
-		#ifdef _DEBUG
-		if (!ok) OutputDebugStringA("[PhysScene] UpdateColliderGeometry failed.\n");
-		#endif
-		*/
 
 		void RefreshCommonProps() { ApplyAll(); }
 
-		
+		//디버그를 찍기위한 함수
+		//월드 pose 얻기
+		physx::PxTransform GetWorldPosPx() const;
+
 
 	protected:
 		// 파생 클래스가 shape 생성 후 반드시 호출

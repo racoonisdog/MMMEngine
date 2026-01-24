@@ -98,12 +98,23 @@ void MMMEngine::RigidBodyComponent::Initialize()
 	
 	//auto TransTarget = GetGameObject()->GetTransform();
 	//TransTarget->onMatrixUpdate.AddListener<RigidBodyComponent, &RigidBodyComponent::BindTeleport>(this);
-
+	m_ColliderMaster = true;
 	MMMEngine::PhysxManager::Get().NotifyRigidAdded(this);
 }
 
 void MMMEngine::RigidBodyComponent::UnInitialize()
 {
+	if (m_ColliderMaster)
+	{
+		if(GetGameObject().IsValid())
+		{
+			auto objPtr = GetGameObject()->GetComponents<ColliderComponent>();
+			for (auto& it : objPtr)
+			{
+				Destroy(it);
+			}
+		}
+	}
 	MMMEngine::PhysxManager::Get().NotifyRigidRemoved(this);
 }
 

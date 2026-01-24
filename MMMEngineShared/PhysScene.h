@@ -8,21 +8,21 @@
 //using namespace DirectX::SimpleMath;
 
 
-//Todo : í„°ì§€ë©´ MMMEngine ê±¸ì–´ë‘ê¸°
+//Todo : ÅÍÁö¸é MMMEngine °É¾îµÎ±â
 struct PhysSceneDesc
 {
 	//Vec3 gravity = { 0.f, -9.81f, 0.f };
-	float gravity[3] = { 0.f, -9.81f, 0.f };
+	float gravity[3] = { 0.f, 0.f, 0.f };
 
 	uint32_t cpuThreadCount = 0;
-	//ì´ì•Œê°™ì€ ê°€ì†ì˜µì…˜ í•„ìš”í• ë•Œ true ë° ì„¤ì •
+	//ÃÑ¾Ë°°Àº °¡¼Ó¿É¼Ç ÇÊ¿äÇÒ¶§ true ¹× ¼³Á¤
 	bool enableCCD = false;
-	//pvd í˜„ í”„ë¡œì íŠ¸ì—ì„œëŠ” ì•ˆì”€
+	//pvd Çö ÇÁ·ÎÁ§Æ®¿¡¼­´Â ¾È¾¸
 	bool enablePVD = false;
 
-	//ì¶©ëŒ í•„í„° ì„¤ì •
+	//Ãæµ¹ ÇÊÅÍ ¼³Á¤
 	physx::PxSimulationFilterShader userFilterShader = nullptr;
-	//ì‚¬ìš©ì ì»¤ìŠ¤í…€ ì½œë°± ì´ë²¤íŠ¸ , í˜„ í”„ë¡œì íŠ¸ëŠ” ì“¸ì˜ˆì • ì—†ìŒ
+	//»ç¿ëÀÚ Ä¿½ºÅÒ Äİ¹é ÀÌº¥Æ® , Çö ÇÁ·ÎÁ§Æ®´Â ¾µ¿¹Á¤ ¾øÀ½
 	physx::PxSimulationEventCallback* userEventCallback = nullptr;
 };
 
@@ -39,28 +39,28 @@ namespace MMMEngine
 
 		void Destroy();
 
-		//ì‹œë®¬ë ˆì´ì…˜ì„ í•œ í”„ë ˆì„ ì§„í–‰ì‹œí‚¤ëŠ” í•¨ìˆ˜ //simulate ê³„ì‚° ì‹œì‘, fetchResults ê³„ì‚°ì´ ëë‚ ë•Œê¹Œì§€ ëŒ€ê¸° //ë©€í‹°ìŠ¤ë ˆë“œ
+		//½Ã¹Ä·¹ÀÌ¼ÇÀ» ÇÑ ÇÁ·¹ÀÓ ÁøÇà½ÃÅ°´Â ÇÔ¼ö //simulate °è»ê ½ÃÀÛ, fetchResults °è»êÀÌ ³¡³¯¶§±îÁö ´ë±â //¸ÖÆ¼½º·¹µå
 		void Step(float dt);
 
 		void PullRigidsFromPhysics();
 
 		void DrainEvents();
 
-		//PxRigidActorë¥¼ PxSceneì— ë“±ë¡ // addí•œìˆœê°„ë¶€í„° ë¬¼ë¦¬ê°€ ì ìš©
+		//PxRigidActor¸¦ PxScene¿¡ µî·Ï // addÇÑ¼ø°£ºÎÅÍ ¹°¸®°¡ Àû¿ë
 		void AddActor(physx::PxActor& actor);
-		//Sceneì—ì„œ actorë¥¼ ë¹¼ëŠ” í•¨ìˆ˜  //Sceneì—ì„œ ë¹ ì§€ë©´ ë”ì´ìƒ ì‹œë®¬ì•ˆí•¨
+		//Scene¿¡¼­ actor¸¦ »©´Â ÇÔ¼ö  //Scene¿¡¼­ ºüÁö¸é ´õÀÌ»ó ½Ã¹Ä¾ÈÇÔ
 		void RemoveActor(physx::PxActor& actor);
 
 		physx::PxScene& GetScene() { return *m_scene; }
 
-		//PhysSceneëŠ” í•˜ë‚˜ë§Œ ì¡´ì¬í•´ì•¼í•¨ ( ì‹±ê¸€í†¤ êµ¬í˜„ì´ ì•„ë‹ˆë¼ ë³µì‚¬ ë§‰ì•„ë‘ê¸° í•„ìš” )
+		//PhysScene´Â ÇÏ³ª¸¸ Á¸ÀçÇØ¾ßÇÔ ( ½Ì±ÛÅæ ±¸ÇöÀÌ ¾Æ´Ï¶ó º¹»ç ¸·¾ÆµÎ±â ÇÊ¿ä )
 		PhysScene(const PhysScene&) = delete;
 		PhysScene& operator=(const PhysScene&) = delete;
 		PhysScene(PhysScene&&) = delete;
 		PhysScene& operator=(PhysScene&&) = delete;
 
 		
-		//ë“±ë¡/í•´ì œ/ë¶€ì°©/ë¶„ë¦¬/ë¦¬ë¹Œë“œ
+		//µî·Ï/ÇØÁ¦/ºÎÂø/ºĞ¸®/¸®ºôµå
 		void RegisterRigid(MMMEngine::RigidBodyComponent* rb);
 		void UnregisterRigid(MMMEngine::RigidBodyComponent* rb);
 
@@ -75,13 +75,13 @@ namespace MMMEngine
 
 		void ReapplyFilters(const CollisionMatrix& matrix);
 
-		//ì½œë¦¬ë” í¬ê¸° ë³€ê²½
+		//Äİ¸®´õ Å©±â º¯°æ
 		void UpdateColliderGeometry(MMMEngine::ColliderComponent* col);
 
-		//ì½œë¦¬ë” ì¬ë¶€ì°©
+		//Äİ¸®´õ ÀçºÎÂø
 		void RebuildCollider(MMMEngine::ColliderComponent* col, const CollisionMatrix& matrix);
 
-		//í˜„ì¬ ì”¬ì— ë“±ë¡ëœ rigidë“¤ì— ëŒ€í•´ pushtophysics í˜¸ì¶œìš©
+		//ÇöÀç ¾À¿¡ µî·ÏµÈ rigidµé¿¡ ´ëÇØ pushtophysics È£Ãâ¿ë
 		void PushRigidsToPhysics();
 
 		void ChangeRigidType(MMMEngine::RigidBodyComponent* col, const CollisionMatrix& matrix);
@@ -106,13 +106,13 @@ namespace MMMEngine
 		std::vector<MMMEngine::PhysXSimulationCallback::TriggerEvent> m_frameTriggers;
 
 
-		//í•´ë‹¹ sceneì—ì„œ ì‚¬ìš©ë˜ëŠ” rigid ëª©ë¡
+		//ÇØ´ç scene¿¡¼­ »ç¿ëµÇ´Â rigid ¸ñ·Ï
 		std::unordered_set<MMMEngine::RigidBodyComponent*> m_rigids;
 		
-		//í•´ë‹¹ shapeê°€ ì–´ëŠ actorì— ë¶™ì–´ìˆëŠ”ì§€ ( ì–´ë–¤ colliderê°€ rigidì— ë¶™ì—ˆëŠ”ì§€ )
+		//ÇØ´ç shape°¡ ¾î´À actor¿¡ ºÙ¾îÀÖ´ÂÁö ( ¾î¶² collider°¡ rigid¿¡ ºÙ¾ú´ÂÁö )
 		std::unordered_map< MMMEngine::ColliderComponent*, MMMEngine::RigidBodyComponent*> m_ownerByCollider;
 
-		// Rigidê°€ ì£½ê±°ë‚˜ ì œê±°í• ë•Œ ì¼ê´„ì ìœ¼ë¡œ detachì²˜ë¦¬í•˜ê¸° ìœ„í•œ ì»¨í…Œì´ë„ˆ ( ì„ì‹œ ë³´ê´€ ì»¨í…Œì´ë„ˆ )
+		// Rigid°¡ Á×°Å³ª Á¦°ÅÇÒ¶§ ÀÏ°ıÀûÀ¸·Î detachÃ³¸®ÇÏ±â À§ÇÑ ÄÁÅ×ÀÌ³Ê ( ÀÓ½Ã º¸°ü ÄÁÅ×ÀÌ³Ê )
 		std::unordered_map<MMMEngine::RigidBodyComponent*, std::vector<MMMEngine::ColliderComponent*>> m_collidersByRigid;
 	};
 }

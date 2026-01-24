@@ -4,8 +4,17 @@
 #include "Transform.h"
 #include "GameObject.h"
 #include "PhysxHelper.h"
+#include "rttr/registration"
 
+RTTR_REGISTRATION
+{
+    using namespace rttr;
+    using namespace MMMEngine;
 
+    registration::class_<ColliderComponent>("ColliderComponent")
+        (rttr::metadata("INSPECTOR", "DONT_ADD_COMP"));
+    type::register_wrapper_converter_for_base_classes<MMMEngine::ObjPtr<ColliderComponent>>();
+}
 
 
 void MMMEngine::ColliderComponent::ApplySceneQueryFlag()
@@ -20,7 +29,7 @@ void MMMEngine::ColliderComponent::ApplySceneQueryFlag()
     m_Shape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, query);
 }
 
-//*** ë ˆì´ì–´ ê·œì¹™ ë³€ê²½í–ˆëŠ”ë° ì¦‰ì‹œ ë°˜ì˜ì´ ì•ˆëœë‹¤ë©´ ì—¬ê¸°ë¥¼ ê±´ë“œë¦¬ê¸°
+//*** ·¹ÀÌ¾î ±ÔÄ¢ º¯°æÇß´Âµ¥ Áï½Ã ¹Ý¿µÀÌ ¾ÈµÈ´Ù¸é ¿©±â¸¦ °Çµå¸®±â
 void MMMEngine::ColliderComponent::ApplyFilterData()
 {
     if (!m_Shape) return;
@@ -68,6 +77,7 @@ void MMMEngine::ColliderComponent::SetOverrideLayer(bool enable)
     if (m_Shape)
     {
         MarkFilterDirty();
+        
     }
 }
 
@@ -122,14 +132,14 @@ bool MMMEngine::ColliderComponent::ApplyGeometryIfDirty()
     if (ok)
     {
         m_geometryDirty = false;
-        ApplyAll(); // geometry ë°”ë€ ë’¤ flags/filter/pose ìž¬ì ìš©
+        ApplyAll(); // geometry ¹Ù²ï µÚ flags/filter/pose ÀçÀû¿ë
     }
 
     return ok;
 }
 
 
-//Triggerê°€ Scene Queryì—ì„œ ê¸°ë³¸ì ìœ¼ë¡œ ë¹ ì§€ëŠ” ì •ì±…ì¸ ìƒíƒœ ì•„ë‹ˆë©´ ì—¬ê¸° ìˆ˜ì •
+//Trigger°¡ Scene Query¿¡¼­ ±âº»ÀûÀ¸·Î ºüÁö´Â Á¤Ã¥ÀÎ »óÅÂ ¾Æ´Ï¸é ¿©±â ¼öÁ¤
 void MMMEngine::ColliderComponent::SetShapeMode(ShapeMode mode)
 {
     m_Mode = mode;
@@ -195,6 +205,17 @@ void MMMEngine::ColliderComponent::MarkFilterDirty()
     PhysxManager::Get().NotifyColliderChanged(this);
 }
 
+physx::PxTransform MMMEngine::ColliderComponent::GetWorldPosPx() const
+{
+    if (!m_Shape) return physx::PxTransform(physx::PxIdentity);
+
+    physx::PxRigidActor* actor = m_Shape->getActor();
+    if (!actor) return physx::PxTransform(physx::PxIdentity);
+
+    // actorÀÇ ¿ùµå Æ÷Áî + shapeÀÇ ·ÎÄÃ Æ÷Áî
+    return actor->getGlobalPose() * m_Shape->getLocalPose();
+}
+
 void MMMEngine::ColliderComponent::SetShape(physx::PxShape* shape, bool owned)
 {
     if (m_Shape)
@@ -212,7 +233,7 @@ void MMMEngine::ColliderComponent::SetShape(physx::PxShape* shape, bool owned)
 
     if (m_Shape)
     {
-        m_Shape->userData = this; // PhysScene ì´ë²¤íŠ¸ ë§¤í•‘ìš©(í•µì‹¬)
+        m_Shape->userData = this; // PhysScene ÀÌº¥Æ® ¸ÅÇÎ¿ë(ÇÙ½É)
         ApplyAll();
     }
 }
@@ -223,4 +244,18 @@ void MMMEngine::ColliderComponent::ApplyAll()
     ApplySceneQueryFlag();
     ApplyFilterData();
     ApplyLocalPose();
+}
+
+
+void MMMEngine::ColliderComponent::Initialize()
+{
+	// Shape¸¦ ¸ÕÀú »ý¼ºÇØ¾ß AttachCollider¿¡¼­ »ç¿ëÇÒ ¼ö ÀÖÀ½
+	auto& physics = MMMEngine::PhysicX::Get().GetPhysics();
+	physx::PxMaterial* mat = MMMEngine::PhysicX::Get().GetDefaultMaterial();
+
+	if (mat)
+	{
+		BuildShape(&physics, mat);
+	}
+	MMMEngine::PhysxManager::Get().NotifyColliderAdded(this);
 }
