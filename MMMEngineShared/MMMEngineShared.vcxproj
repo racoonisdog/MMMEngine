@@ -209,7 +209,6 @@
     <ClInclude Include="InputKeyCode.h" />
     <ClInclude Include="MMMInput.h" />
     <ClInclude Include="InputManager.h" />
-    <ClInclude Include="GeoRenderer.h" />
     <ClInclude Include="PhysicsEventCallback.h" />
     <ClInclude Include="PhysicsFilter.h" />
     <ClInclude Include="PhysScene.h" />
@@ -217,7 +216,7 @@
     <ClInclude Include="PhysxHelper.h" />
     <ClInclude Include="PhysxManager.h" />
     <ClInclude Include="PShader.h" />
-    <ClInclude Include="RendererBase.h" />
+    <ClInclude Include="RenderCommand.h" />
     <ClInclude Include="RendererTools.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="RenderStateGuard.h" />
@@ -242,7 +241,6 @@
     <ClInclude Include="StaticMesh.h" />
     <ClInclude Include="VShader.h" />
     <ClInclude Include="Singleton.hpp" />
-    <ClInclude Include="SkyboxRenderer.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="TextResource.h" />
@@ -275,7 +273,6 @@
     <ClCompile Include="MUID.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
-    <ClCompile Include="GeoRenderer.cpp" />
     <ClCompile Include="PhysicsEventCallback.cpp" />
     <ClCompile Include="PhysicsFilter.cpp" />
     <ClCompile Include="PhysScene.cpp" />
@@ -283,7 +280,7 @@
     <ClCompile Include="PhysxHelper.cpp" />
     <ClCompile Include="PhysxManager.cpp" />
     <ClCompile Include="PShader.cpp" />
-    <ClCompile Include="RendererBase.cpp" />
+    <ClCompile Include="RenderCommand.cpp" />
     <ClCompile Include="RendererTools.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="RenderShared.cpp" />
@@ -304,7 +301,6 @@
     <ClCompile Include="SphereColliderComponent.cpp" />
     <ClCompile Include="StaticMesh.cpp" />
     <ClCompile Include="VShader.cpp" />
-    <ClCompile Include="SkyboxRenderer.cpp" />
     <ClCompile Include="ScriptLoader.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="Texture2D.cpp" />

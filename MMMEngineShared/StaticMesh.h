@@ -12,6 +12,7 @@ namespace MMMEngine {
 			friend class SceneManager;
 			friend class Scene;
 	public:
+		// -- 직렬화되는 데이터
 		// 메시 데이터
 		MeshData meshData;
 		// GPU 버퍼
@@ -20,6 +21,10 @@ namespace MMMEngine {
 		std::vector<ResPtr<Material>> materials;
 		// 메시 그룹 <MatIdx, MeshIdx>
 		std::unordered_map<UINT, std::vector<UINT>> meshGroupData;
+		// ----
+		
+		// 인덱스 사이즈
+		std::vector<UINT> indexSizes;
 
 		bool castShadows = true;
 		bool receiveShadows = true;

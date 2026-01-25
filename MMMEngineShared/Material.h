@@ -49,6 +49,14 @@ namespace MMMEngine {
 		void LoadTexture(const std::wstring& _name, const std::wstring& _filePath);
 
 		bool LoadFromFilePath(const std::wstring& _filePath) override;
+
+		bool operator<(const Material& other) const {
+			return GetFilePath() < other.GetFilePath(); // Resource에 이름이 있다고 가정
+		}
+
+		bool operator==(const Material& other) const {
+			return GetFilePath() == other.GetFilePath();
+		}
 	};
 }
 

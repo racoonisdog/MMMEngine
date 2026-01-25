@@ -1,8 +1,10 @@
-#include "../../CommonShared.hlsli"
+#include "../../CommonSharedVS.hlsli"
 
-PS_INPUT main(VS_INPUT input)
+VS_OUTPUT main(VS_INPUT input)
 {
-    PS_INPUT output = (PS_INPUT) 0;
+    VS_OUTPUT output = (VS_OUTPUT) 0;
+
+    float4 worldPos = float4(input.Pos, 1.0f);
     
     float4x4 skinMat =
     {
@@ -28,9 +30,9 @@ PS_INPUT main(VS_INPUT input)
         skinMat += mul(input.BoneWeight.w, tempMat[3]);
         
         skinMat = mul(skinMat, mWorld);
-        output.Pos = mul(input.Pos, skinMat);
+        output.Pos = mul(worldPos, skinMat);
     #else
-        output.Pos = mul(input.Pos, mWorld);
+        output.Pos = mul(worldPos, mWorld);
     #endif
     
     output.W_Pos = output.Pos;

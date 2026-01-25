@@ -29,7 +29,7 @@ cbuffer ShadowVP : register(b4)
     matrix mShadowProjection;
 }
 
-struct PS_INPUT
+struct VS_OUTPUT
 {
     float4 Pos : SV_POSITION;
     float3 Norm : NORMAL;
@@ -42,10 +42,10 @@ struct PS_INPUT
 
 struct VS_INPUT
 {
-    float4 Pos : POSITION;
+    float3 Pos : POSITION;
     float3 Norm : NORMAL;
     float3 Tan : TANGENT;
     float2 Tex : TEXCOORD0;
-    uint4 BoneIdx : BONEINDEX;
+    int4 BoneIdx : BONEINDEX;
     float4 BoneWeight : BONEWEIGHT;
 };

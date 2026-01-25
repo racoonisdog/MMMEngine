@@ -41,13 +41,3 @@ struct PS_INPUT
     float4 S_Pos : TEXCOORD1;   // 쉐도우 포지션
     float4 W_Pos : TEXCOORD2;   // 월드 포지션
 };
-
-struct VS_INPUT
-{
-    float4 Pos : POSITION;
-    float3 Norm : NORMAL;
-    float3 Tan : TANGENT;
-    float2 Tex : TEXCOORD0;
-    int4 BoneIdx : BONEINDEX;
-    float4 BoneWeight : BONEWEIGHT;
-};

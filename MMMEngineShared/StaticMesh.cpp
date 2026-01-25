@@ -43,6 +43,7 @@ Microsoft::WRL::ComPtr<ID3D11Buffer> CreateVertexBuffer(const std::vector<MMMEng
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	bd.CPUAccessFlags = 0;
+	bd.MiscFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA vbData = {};
 	bd.ByteWidth = UINT(sizeof(MMMEngine::Mesh_Vertex) * _vertices.size());
@@ -98,12 +99,13 @@ bool MMMEngine::StaticMesh::LoadFromFilePath(const std::wstring& filePath)
 	for (auto& indices : meshData.indices) {
 		Microsoft::WRL::ComPtr<ID3D11Buffer> subMeshBuffer = CreateIndexBuffer(indices);
 		gpuBuffer.indexBuffers.push_back(subMeshBuffer);
+		indexSizes.push_back(indices.size());
 	}
 
 	// CPU 데이터 정리
 	// WARNING::필요하면 지우거나 주석처리할것 (런타임 메모리 최적화용)
-	//meshData.vertices.clear();
-	//meshData.indices.clear();
+	meshData.vertices.clear();
+	meshData.indices.clear();
 
 	return true;
 }

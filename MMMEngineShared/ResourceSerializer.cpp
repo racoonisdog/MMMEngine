@@ -99,7 +99,6 @@ json SerializeVertex(const std::vector<Mesh_Vertex>& _vertices)
 			rttr::filter_item::public_access |
 			rttr::filter_item::non_public_access))
 		{
-			auto string = vert.get_name().to_string();
 			if (prop.is_readonly())
 				continue;
 
@@ -184,9 +183,13 @@ fs::path MMMEngine::ResourceSerializer::Serialize_StaticMesh(const StaticMesh* _
 	}
 
 	std::ofstream file(p.string(), std::ios::binary);
+	/*std::ofstream file(p.string());*/
 	if (!file.is_open()) {
 		throw std::runtime_error("파일을 열 수 없습니다: " + Utility::StringHelper::WStringToString(_path));
 	}
+
+	/*file << snapshot.dump(4);
+	file.close();*/
 
 	file.write(reinterpret_cast<const char*>(v.data()), v.size());
 	file.close();
@@ -196,16 +199,22 @@ fs::path MMMEngine::ResourceSerializer::Serialize_StaticMesh(const StaticMesh* _
 
 void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std::wstring _path)
 {
-	// 파일 열기
-	std::ifstream file(_path, std::ios::binary);
-	if (!file.is_open())
-	{
-		throw std::runtime_error("파일을 열 수 없습니다: " + Utility::StringHelper::WStringToString(_path));
-	}
+	//// 파일 열기
+	//std::ifstream file(_path, std::ios::binary);
+	//if (!file.is_open())
+	//{
+	//	throw std::runtime_error("파일을 열 수 없습니다: " + Utility::StringHelper::WStringToString(_path));
+	//}
 
-	// 파일 전체 읽기
-	std::vector<uint8_t> buffer((std::istreambuf_iterator<char>(file)),
-		std::istreambuf_iterator<char>());
+	//// 파일 전체 읽기
+	//std::vector<uint8_t> buffer((std::istreambuf_iterator<char>(file)),
+	//	std::istreambuf_iterator<char>());
+	std::ifstream file(_path, std::ios::binary | std::ios::ate);
+	auto size = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	std::vector<char> buffer(size);
+	file.read(buffer.data(), size);
 	file.close();
 
 	// msgpack → json 변환
@@ -245,48 +254,55 @@ void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std
 					for (auto& vertJson : subMeshJson) {
 						Mesh_Vertex vertex;
 
-						type vertType = type::get<Mesh_Vertex>();
-						for (auto& prop : vertType.get_properties()) {
-							if (prop.is_readonly())
-								continue;
+						// RTTR 파싱
+						//type vertType = type::get<Mesh_Vertex>();
+						//for (auto& prop : vertType.get_properties()) {
+						//	if (prop.is_readonly())
+						//		continue;
 
-							std::string name = prop.get_name().to_string();
-							if (!vertJson.contains(name))
-								continue;
+						//	std::string name = prop.get_name().to_string();
+						//	if (!vertJson.contains(name))
+						//		continue;
 
-							auto& jval = vertJson[name];
-							rttr::variant newVal;
+						//	auto& jval = vertJson[name];
+						//	rttr::variant newVal;
 
-							// 숫자/문자/배열 처리
-							if (jval.is_number_integer())
-								newVal = jval.get<int>();
-							else if (jval.is_number_float())
-								newVal = jval.get<float>();
-							else if (jval.is_string())
-								newVal = jval.get<std::string>();
-							else if (jval.is_array() && jval.size() == 3) {
-								DirectX::SimpleMath::Vector3 vec;
-								vec.x = jval[0].get<float>();
-								vec.y = jval[1].get<float>();
-								vec.z = jval[2].get<float>();
-								newVal = vec;
-							}
-							else if (jval.is_array() && jval.size() == 2) {
-								DirectX::SimpleMath::Vector2 vec;
-								vec.x = jval[0].get<float>();
-								vec.y = jval[1].get<float>();
-								newVal = vec;
-							}
-							else if (jval.is_array()) {
-								std::vector<int> arr;
-								for (auto& elem : jval)
-									arr.push_back(elem.get<int>());
-								newVal = arr;
-							}
+						//	// 숫자/문자/배열 처리
+						//	if (jval.is_number_integer())
+						//		newVal = jval.get<int>();
+						//	else if (jval.is_number_float())
+						//		newVal = jval.get<float>();
+						//	else if (jval.is_string())
+						//		newVal = jval.get<std::string>();
+						//	else if (jval.is_array() && jval.size() == 3) {
+						//		DirectX::SimpleMath::Vector3 vec;
+						//		vec.x = jval[0].get<float>();
+						//		vec.y = jval[1].get<float>();
+						//		vec.z = jval[2].get<float>();
+						//		newVal = vec;
+						//	}
+						//	else if (jval.is_array() && jval.size() == 2) {
+						//		DirectX::SimpleMath::Vector2 vec;
+						//		vec.x = jval[0].get<float>();
+						//		vec.y = jval[1].get<float>();
+						//		newVal = vec;
+						//	}
+						//	else if (jval.is_array()) {
+						//		std::vector<int> arr;
+						//		for (auto& elem : jval)
+						//			arr.push_back(elem.get<int>());
+						//		newVal = arr;
+						//	}
 
-							if (newVal.is_valid())
-								prop.set_value(vertex, newVal);
-						}
+						//	if (newVal.is_valid())
+						//		prop.set_value(vertex, newVal);
+						//}
+
+						// 직접 파싱
+						vertex.Pos = { vertJson["Pos"][0], vertJson["Pos"][1], vertJson["Pos"][2] };
+						vertex.Normal = { vertJson["Normal"][0], vertJson["Normal"][1], vertJson["Normal"][2] };
+						vertex.Tangent = { vertJson["Tangent"][0], vertJson["Tangent"][1], vertJson["Tangent"][2] };
+						vertex.UV = { vertJson["UV"][0], vertJson["UV"][1] };
 						subMesh.push_back(vertex);
 					}
 					meshData.vertices.push_back(subMesh);

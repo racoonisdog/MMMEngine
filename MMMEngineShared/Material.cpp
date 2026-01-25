@@ -83,10 +83,5 @@ bool MMMEngine::Material::LoadFromFilePath(const std::wstring& _filePath)
 {
 	MaterialSerializer::Get().UnSerealize(this, _filePath);
 
-	if (!m_pVShader)
-		m_pVShader = RenderManager::Get().m_pDefaultVSShader;
-	if (!m_pPShader)
-		m_pPShader = RenderManager::Get().m_pDefaultPSShader;
-
 	return true;
 }

@@ -16,11 +16,11 @@ namespace MMMEngine {
 	private:
 		// GPU 버퍼
 		ResPtr<StaticMesh> mesh = nullptr;
-		std::vector<std::weak_ptr<RendererBase>> renderers;
+		// 메테리얼 path맵
+		std::unordered_map<int, std::wstring> m_shaderPathMap;
 	public:
 		MeshRenderer();
-		~MeshRenderer();
-
+		 
 		ResPtr<StaticMesh>& GetMesh() { return mesh; }
 ;		void SetMesh(ResPtr<StaticMesh>& _mesh);
 		void Start();

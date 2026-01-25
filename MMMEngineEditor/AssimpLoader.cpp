@@ -13,6 +13,7 @@
 #include "RenderManager.h"
 #include "ResourceSerializer.h"
 #include "ProjectManager.h"
+#include "ShaderInfo.h"
 
 namespace fs = std::filesystem;
 
@@ -76,11 +77,12 @@ MMMEngine::ResPtr<MMMEngine::StaticMesh> MMMEngine::AssimpLoader::ConvertStaticM
 	std::vector<ResPtr<Material>> matList;
 	for (const auto& mat : _model->materials) {
 		// 렌더러 메테리얼으로 변환 -> 리스트 작성
-		// TODO:: 메테리얼 생성할때 VS, PS 어떻게 할지 생각하기.
 		ResPtr<Material> material = std::make_shared<Material>();
 		for (const auto& [sementic, ref] : mat.textures) {
 			if (!ConvertMaterial(sementic, &ref, material.get()))
 				throw std::runtime_error("AssimpLoader::MaterialMapping Failed!!");
+			material->SetPShader(ShaderInfo::Get().GetDefaultPShader());
+			material->SetVShader(ShaderInfo::Get().GetDefaultVShader());
 		}
 		matList.push_back(material);
 	}
@@ -120,7 +122,13 @@ MMMEngine::ResPtr<MMMEngine::SkeletalMesh> MMMEngine::AssimpLoader::ConvertSkele
 		for (const auto& [sementic, ref] : mat.textures) {
 			if (!ConvertMaterial(sementic, &ref, material.get()))
 				throw std::runtime_error("AssimpLoader::MaterialMapping Failed!!");
+			material->SetPShader(ShaderInfo::Get().GetDefaultPShader());
+			material->SetVShader(ShaderInfo::Get().GetDefaultVShader());
 		}
+
+		material->SetVShader(ShaderInfo::Get().GetDefaultVShader());
+		material->SetPShader(ShaderInfo::Get().GetDefaultPShader());
+
 		matList.push_back(material);
 	}
 

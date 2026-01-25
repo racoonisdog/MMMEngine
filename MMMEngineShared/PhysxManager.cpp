@@ -14,7 +14,7 @@ void MMMEngine::PhysxManager::BindScene(MMMEngine::Scene* scene)
     m_Scene = scene;
     if (!m_Scene) return;
 
-    // 씬 설정으로 desc 구성 (임시라도)
+    // �� �������� desc ���� (�ӽö�)
     PhysSceneDesc desc{};
     
     for (uint32_t i = 0; i <= 4; ++i)
@@ -41,19 +41,19 @@ void MMMEngine::PhysxManager::StepFixed(float dt)
 {
     if (!m_IsInitialized) return;
     if (dt <= 0.f) return;
-	FlushCommands_PreStep();     // 등록/부착 등
+	FlushCommands_PreStep();     // ���/���� ��
 
-	ApplyFilterConfigIfDirty();  // dirty면 정책 갱신 + 전체 재적용 지시
-    FlushDirtyColliders_PreStep(); //collider의 shape가 에디터 단계에서 변형되면 내부적으로 실행
+	ApplyFilterConfigIfDirty();  // dirty�� ��å ���� + ��ü ������ ����
+    FlushDirtyColliders_PreStep(); //collider�� shape�� ������ �ܰ迡�� �����Ǹ� ���������� ����
 
     m_PhysScene.PushRigidsToPhysics(); //��ϵ� rb����� ��ȸ�ϸ鼭 pushtoPhysics�� ȣ��
 	m_PhysScene.Step(dt);       // simulate/fetch
-    m_PhysScene.PullRigidsFromPhysics();   // PhysX->엔진 읽기 (pose)
-    m_PhysScene.DrainEvents();             // 이벤트 drain
+    m_PhysScene.PullRigidsFromPhysics();   // PhysX->���� �б� (pose)
+    m_PhysScene.DrainEvents();             // �̺�Ʈ drain
 
     DispatchPhysicsEvents();
 
-	FlushCommands_PostStep();    // detach/unreg/release 등 후처리
+	FlushCommands_PostStep();    // detach/unreg/release �� ��ó��
 }
 
 void MMMEngine::PhysxManager::NotifyRigidAdded(RigidBodyComponent* rb)
@@ -112,7 +112,7 @@ void MMMEngine::PhysxManager::NotifyColliderRemoved(ColliderComponent* col)
     if (!go.IsValid()) return;
 
     auto rbPtr = go->GetComponent<RigidBodyComponent>();
-    if (!rbPtr.IsValid()) return; // 정책상 거의 없어야 하지만 방어
+    if (!rbPtr.IsValid()) return; // ��å�� ���� ����� ������ ���
     auto* rb = (RigidBodyComponent*)rbPtr.GetRaw();
 
     RequestDetachCollider(rb, col);
@@ -130,13 +130,13 @@ void MMMEngine::PhysxManager::NotifyColliderChanged(ColliderComponent* col)
 }
 
 
-// rigidbody를 physScene 시뮬레이션 대상으로 등록한다
+// rigidbody�� physScene �ùķ��̼� ������� ����Ѵ�
 void MMMEngine::PhysxManager::RequestRegisterRigid(MMMEngine::RigidBodyComponent* rb)
 {
     if (!rb) return;
     if (m_PendingUnreg.find(rb) != m_PendingUnreg.end()) return;
 
-    // rb 관련 RegRigid 중복 제거 (혹은 rb 관련 명령 정리 정책에 맞게)
+    // rb ���� RegRigid �ߺ� ���� (Ȥ�� rb ���� ���� ���� ��å�� �°�)
     for (auto it = m_Commands.begin(); it != m_Commands.end(); )
     {
         if (it->type == CmdType::RegRigid && it->new_rb == rb)
@@ -148,15 +148,15 @@ void MMMEngine::PhysxManager::RequestRegisterRigid(MMMEngine::RigidBodyComponent
     m_Commands.push_back({ CmdType::RegRigid, rb, nullptr });
 }
 
-// rigidbody가 가진 physX actor를 pxScene에서 제거 ( rigidbody를 더이상 물리월드에 존재하지 않게 만드는 함수 )
+// rigidbody�� ���� physX actor�� pxScene���� ���� ( rigidbody�� ���̻� �������忡 �������� �ʰ� ����� �Լ� )
 void MMMEngine::PhysxManager::RequestUnregisterRigid(MMMEngine::RigidBodyComponent* rb)
 {
     if (!rb) return;
 
-    //예약된거면 중복방지용
+    //����ȰŸ� �ߺ�������
     if (m_PendingUnreg.find(rb) != m_PendingUnreg.end()) return;
 
-    // 아직 처리 전인 Register/Attach/Detach 등을 정리(최소한 Reg/Attach는 제거 추천)
+    // ���� ó�� ���� Register/Attach/Detach ���� ����(�ּ��� Reg/Attach�� ���� ��õ)
 	for (auto it = m_Commands.begin(); it != m_Commands.end(); )
 	{
 		if (it->new_rb == rb)
@@ -164,13 +164,13 @@ void MMMEngine::PhysxManager::RequestUnregisterRigid(MMMEngine::RigidBodyCompone
 		else
 			++it;
 	}
-    //지울예정인 큐에 담음
+    //���￹���� ť�� ����
     m_PendingUnreg.insert(rb);
-    //큐에서 지운 rigid를 unregid type으로 바꿔서 physScene에서 actor를 빼도록 함
+    //ť���� ���� rigid�� unregid type���� �ٲ㼭 physScene���� actor�� ������ ��
     m_Commands.push_back({ CmdType::UnregRigid, rb, nullptr });
 }
 
-//collider를 physx로 만들고 만든 shape를 rigdbody에 attachShape함
+//collider�� physx�� ����� ���� shape�� rigdbody�� attachShape��
 void MMMEngine::PhysxManager::RequestAttachCollider(MMMEngine::RigidBodyComponent* rb, MMMEngine::ColliderComponent* col)
 {
 	if (!rb || !col) return;
@@ -181,7 +181,7 @@ void MMMEngine::PhysxManager::RequestAttachCollider(MMMEngine::RigidBodyComponen
 
     for (auto it = m_Commands.begin(); it != m_Commands.end(); )
     {
-        //DetachCol이 예약되어있다면 상쇄함
+        //DetachCol�� ����Ǿ��ִٸ� �����
         if (it->type == CmdType::DetachCol && it->new_rb == rb && it->col == col)
             it = m_Commands.erase(it);
         else
@@ -190,13 +190,13 @@ void MMMEngine::PhysxManager::RequestAttachCollider(MMMEngine::RigidBodyComponen
 	m_Commands.push_back({ CmdType::AttachCol, rb, col });
 }
 
-//rigid의 actor에서 해당 collider의 pxshape를 제거함
+//rigid�� actor���� �ش� collider�� pxshape�� ������
 void MMMEngine::PhysxManager::RequestDetachCollider(MMMEngine::RigidBodyComponent* rb, MMMEngine::ColliderComponent* col)
 {
     if (!rb || !col) return;
 
     if (m_PendingUnreg.find(rb) != m_PendingUnreg.end()) return;
-    // 아직 처리 전인 Attach가 있으면 상쇄
+    // ���� ó�� ���� Attach�� ������ ���
     for (auto it = m_Commands.begin(); it != m_Commands.end(); )
     {
         if (it->type == CmdType::AttachCol && it->new_rb == rb && it->col == col)
@@ -209,12 +209,12 @@ void MMMEngine::PhysxManager::RequestDetachCollider(MMMEngine::RigidBodyComponen
     m_Commands.push_back({ CmdType::DetachCol, rb, col });
 }
 
-//collider의 shape를 다시 만들어서 원래 붙어있던 actor에 다시 붙인다 (collider쪽에 자기자신이 등록된 object확인 법필요 )
+//collider�� shape�� �ٽ� ���� ���� �پ��ִ� actor�� �ٽ� ���δ� (collider�ʿ� �ڱ��ڽ��� ��ϵ� objectȮ�� ���ʿ� )
 void MMMEngine::PhysxManager::RequestRebuildCollider(MMMEngine::RigidBodyComponent* rb, MMMEngine::ColliderComponent* col)
 {
 	if (!col) return;
 
-    //같은 col에 rebuil가 이미 있으면 중복 제거
+    //���� col�� rebuil�� �̹� ������ �ߺ� ����
     for (auto it = m_Commands.begin(); it != m_Commands.end(); )
     {
         if (it->type == CmdType::RebuildCol && it->col == col)
@@ -225,7 +225,7 @@ void MMMEngine::PhysxManager::RequestRebuildCollider(MMMEngine::RigidBodyCompone
     m_Commands.push_back({ CmdType::RebuildCol, rb, col });
 }
 
-//레이어/마스크 정책이 바뀌면 Scene에 존재하는 모든 shape의 filterdata를 다시 넣도록 지시
+//���̾�/����ũ ��å�� �ٲ�� Scene�� �����ϴ� ��� shape�� filterdata�� �ٽ� �ֵ��� ����
 void MMMEngine::PhysxManager::RequestReapplyFilters()
 {
     m_FilterDirty = true;
@@ -286,8 +286,8 @@ void MMMEngine::PhysxManager::SetLayerCollision(uint32_t layerA, uint32_t layerB
     m_FilterDirty = true;
 }
 
-//물리 시뮬레이션을 돌리기 직전(simulate하기전)에 큐에 쌓인 명령 중 지금 해도 안전한것을 physScene에 실행함
-// actor생성 및 acotr를 추가하는 작업 / shape생성 밑 붙이는 작업 / shape 교체등을 여기서 한다
+//���� �ùķ��̼��� ������ ����(simulate�ϱ���)�� ť�� ���� ���� �� ���� �ص� �����Ѱ��� physScene�� ������
+// actor���� �� acotr�� �߰��ϴ� �۾� / shape���� �� ���̴� �۾� / shape ��ü���� ���⼭ �Ѵ�
 void MMMEngine::PhysxManager::FlushCommands_PreStep()
 {
     //ChangeRigidType ���� ó���ϵ���
@@ -321,7 +321,7 @@ void MMMEngine::PhysxManager::FlushCommands_PreStep()
             it = m_Commands.erase(it);
             break;
         default:
-            // Post에서 처리할 타입(Detach/Unreg)은 남겨둔다
+            // Post���� ó���� Ÿ��(Detach/Unreg)�� ���ܵд�
             ++it;
             break;
         }
@@ -329,7 +329,7 @@ void MMMEngine::PhysxManager::FlushCommands_PreStep()
 }
 
 
-//물리 스탭이 완료된 후 (simulate + fetchResults가 끝난 직후 ) 큐에 쌓인 명령 중 스탭 이후에 처리하는 함수를 실행하는 함수
+//���� ������ �Ϸ�� �� (simulate + fetchResults�� ���� ���� ) ť�� ���� ���� �� ���� ���Ŀ� ó���ϴ� �Լ��� �����ϴ� �Լ�
 void MMMEngine::PhysxManager::FlushCommands_PostStep()
 {
     //Detach
@@ -340,14 +340,14 @@ void MMMEngine::PhysxManager::FlushCommands_PostStep()
             auto* rb = it->new_rb;
             auto* col = it->col;
 
-            // rb가 곧 Unregister 될 예정이면 Detach는 의미 없거나 위험할 수 있음
+            // rb�� �� Unregister �� �����̸� Detach�� �ǹ� ���ų� ������ �� ����
             if (!rb || m_PendingUnreg.find(rb) != m_PendingUnreg.end())
             {
                 it = m_Commands.erase(it);
                 continue;
             }
 
-            // actor가 이미 없으면 detach할 것도 없음 (안전)
+            // actor�� �̹� ������ detach�� �͵� ���� (����)
             if (rb->GetPxActor() == nullptr)
             {
                 it = m_Commands.erase(it);
@@ -372,7 +372,7 @@ void MMMEngine::PhysxManager::FlushCommands_PostStep()
 
             if (rb)
             {
-                m_PhysScene.UnregisterRigid(rb); // 내부에서 actor 존재 체크 + destroy idempotent면 안정
+                m_PhysScene.UnregisterRigid(rb); // ���ο��� actor ���� üũ + destroy idempotent�� ����
                 m_PendingUnreg.erase(rb);
             }
 
@@ -386,17 +386,17 @@ void MMMEngine::PhysxManager::FlushCommands_PostStep()
 
 }
 
-//충돌 매트릭스 설정이 바뀌엇는지 확인하고 바뀌었으면 scene에 등록된 shape에 새필터를 모두 적용시키는 함수
+//�浹 ��Ʈ���� ������ �ٲ������ Ȯ���ϰ� �ٲ������ scene�� ��ϵ� shape�� �����͸� ��� �����Ű�� �Լ�
 void MMMEngine::PhysxManager::ApplyFilterConfigIfDirty()
 {
     if (!m_FilterDirty) return;
     if (!m_Scene) return;
 
-    //최신 설정으로 갱신
-    //Todo Matrix에 설정된 load함수 구할수 있도록 또는 현재 Scene에서 설정가져올수있도록
+    //�ֽ� �������� ����
+    //Todo Matrix�� ������ load�Լ� ���Ҽ� �ֵ��� �Ǵ� ���� Scene���� ���������ü��ֵ���
     //m_CollisionMatrix.LoadFrom(m_Scene->GetPhysicsSettings());
 
-    //현재 씬의 모든 attached collider에 재적용
+    //���� ���� ��� attached collider�� ������
     m_PhysScene.ReapplyFilters(m_CollisionMatrix);
 
     m_FilterDirty = false;
@@ -409,7 +409,7 @@ void MMMEngine::PhysxManager::FlushDirtyColliders_PreStep()
     for (auto* col : m_DirtyColliders)
     {
         if (!col) continue;
-        // PhysScene이 ownerByCollider로 rb 찾게 할 예정
+        // PhysScene�� ownerByCollider�� rb ã�� �� ����
         m_PhysScene.UpdateColliderGeometry(col);
     }
     m_DirtyColliders.clear();
@@ -502,11 +502,11 @@ void MMMEngine::PhysxManager::UnbindScene()
 
 void MMMEngine::PhysxManager::DispatchPhysicsEvents()
 {
-    // 1) Contact (충돌)
+    // 1) Contact (�浹)
     const auto& contacts = m_PhysScene.GetFrameContacts();
     for (const auto& e : contacts)
     {
-        // userData -> 엔진 컴포넌트 복구
+        // userData -> ���� ������Ʈ ����
         auto* rbA = static_cast<RigidBodyComponent*>(e.a ? e.a->userData : nullptr);
         auto* rbB = static_cast<RigidBodyComponent*>(e.b ? e.b->userData : nullptr);
         auto* colA = static_cast<ColliderComponent*>(e.aShape ? e.aShape->userData : nullptr);

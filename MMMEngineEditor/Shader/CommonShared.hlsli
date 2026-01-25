@@ -70,10 +70,10 @@ struct PS_INPUT
 
 struct VS_INPUT
 {
-    float4 Pos : POSITION;
+    float3 Pos : POSITION;
     float3 Norm : NORMAL;
     float3 Tan : TANGENT;
     float2 Tex : TEXCOORD0;
-    uint4 BoneIdx : BONEINDEX;
+    int4 BoneIdx : BONEINDEX;
     float4 BoneWeight : BONEWEIGHT;
 };

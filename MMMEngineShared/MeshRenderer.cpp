@@ -1,10 +1,11 @@
 #include "MeshRenderer.h"
-#include "RendererBase.h"
 #include "StaticMesh.h"
 #include "RenderManager.h"
-#include "GeoRenderer.h"
+#include "RenderCommand.h"
 #include "Object.h"
 #include "Transform.h"
+#include "ShaderInfo.h"
+#include "PShader.h"
 
 #include "rttr/registration.h"
 
@@ -33,16 +34,6 @@ MMMEngine::MeshRenderer::MeshRenderer()
 	REGISTER_BEHAVIOUR_MESSAGE(Update);
 }
 
-MMMEngine::MeshRenderer::~MeshRenderer()
-{
-	// 렌더러 제거 명령
-	for (auto& renderer : renderers) {
-		if (auto locked = renderer.lock()) {
-			RenderManager::Get().RemoveRenderer(RenderType::R_GEOMETRY, locked);
-		}
-	}
-}
-
 void MMMEngine::MeshRenderer::SetMesh(ResPtr<StaticMesh>& _mesh)
 {
 	mesh = _mesh;
@@ -51,37 +42,47 @@ void MMMEngine::MeshRenderer::SetMesh(ResPtr<StaticMesh>& _mesh)
 
 void MMMEngine::MeshRenderer::Start()
 {
+	// 메시 없으면 리턴
+	if (!mesh)
+		return;
+
+	// 메테리얼 인덱스별로 파일경로 캐싱
+	for (int i = 0; i < mesh->materials.size(); ++i) {
+		m_shaderPathMap[i] = mesh->materials[i]->GetPShader()->GetFilePath();
+	}
+}
+
+void MMMEngine::MeshRenderer::Update()
+{
 	// 유효성 확인
-	if (!mesh || mesh->meshData.vertices.empty() || mesh->gpuBuffer.vertexBuffers.empty())
+	if (!mesh || !GetGameObject()->GetTransform())
 		return;
 
 	for (auto& [matIdx, meshIndices] : mesh->meshGroupData) {
 		auto& material = mesh->materials[matIdx];
 
 		for (const auto& idx : meshIndices) {
-			std::weak_ptr<RendererBase> renderer;
-
-			renderer = RenderManager::Get().AddRenderer<GeoRenderer>(RenderType::R_GEOMETRY);
-
+			RenderCommand command;
 			auto& meshBuffer = mesh->gpuBuffer.vertexBuffers[idx];
 			auto& indicesBuffer = mesh->gpuBuffer.indexBuffers[idx];
-			UINT indicesSize = static_cast<UINT>(mesh->meshData.indices[idx].size());
 
-			if (auto locked = renderer.lock()) {
-				locked->SetRenderData(meshBuffer, indicesBuffer, indicesSize, material);
-				renderers.push_back(renderer);
+			command.vertexBuffer = meshBuffer.Get();
+			command.indexBuffer = indicesBuffer.Get();
+			command.material = material.get();
+			command.worldMatIndex = RenderManager::Get().AddMatrix(GetGameObject()->GetTransform()->GetWorldMatrix());
+			command.indiciesSize = mesh->indexSizes[idx];
+
+			// TODO::CamDistance 보내줘야함!!
+			command.camDistance = 0.0f;
+
+			RenderType type = RenderType::R_GEOMETRY;
+
+			auto it = m_shaderPathMap.find(idx);
+			if (it != m_shaderPathMap.end()) {
+				type = ShaderInfo::Get().GetRenderType(it->second);
 			}
-		}
-	}
-}
 
-void MMMEngine::MeshRenderer::Update()
-{
-	// 월드 매트릭스 전달
-	for (auto& renderer : renderers) {
-		if (auto locked = renderer.lock()) {
-			if (auto transform = GetGameObject()->GetTransform())
-				locked->SetWorldMat(transform->GetWorldMatrix());
+			RenderManager::Get().AddCommand(type, std::move(command));
 		}
 	}
 }
