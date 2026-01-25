@@ -25,6 +25,7 @@ namespace MMMEngine
 		void UpdateProjMatrix();
 	public:
 		void MarkViewMatrixDirty();
+		void MarkProjectionMatrixDirty();
 
 		const DirectX::SimpleMath::Matrix GetCameraMatrix();
 		const DirectX::SimpleMath::Matrix& GetViewMatrix();

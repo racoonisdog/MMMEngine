@@ -134,14 +134,16 @@ void Update()
 		BehaviourManager::Get().AllBroadCastBehaviourMessage("OnSceneLoaded");
 	}
 
-	if (!EditorRegistry::g_editor_scene_playing)
+	if (EditorRegistry::g_editor_scene_playing
+		&& !EditorRegistry::g_editor_scene_pause)
 	{
 		BehaviourManager::Get().InitializeBehaviours();
 	}
 
 	TimeManager::Get().ConsumeFixedSteps([&](float fixedDt)
 		{
-			if (EditorRegistry::g_editor_scene_playing)
+			if (!EditorRegistry::g_editor_scene_playing
+				|| EditorRegistry::g_editor_scene_pause)
 				return;
 
 			BehaviourManager::Get().BroadCastBehaviourMessage("FixedUpdate");
@@ -180,7 +182,8 @@ void Update()
 		});
 
 
-	if (!EditorRegistry::g_editor_scene_playing)
+	if (EditorRegistry::g_editor_scene_playing
+		&& !EditorRegistry::g_editor_scene_pause)
 	{
 		BehaviourManager::Get().BroadCastBehaviourMessage("Update");
 		BehaviourManager::Get().BroadCastBehaviourMessage("LateUpdate");
@@ -193,8 +196,13 @@ void Update()
 	ImGuiEditorContext::Get().EndFrame();
 	RenderManager::Get().EndFrame();
 
-	ObjectManager::Get().UpdateInternalTimer(dt);
-	BehaviourManager::Get().DisableBehaviours();
+
+	if (EditorRegistry::g_editor_scene_playing
+		&& !EditorRegistry::g_editor_scene_pause)
+	{
+		ObjectManager::Get().UpdateInternalTimer(dt);
+		BehaviourManager::Get().DisableBehaviours();
+	}
 	ObjectManager::Get().ProcessPendingDestroy();
 }
 

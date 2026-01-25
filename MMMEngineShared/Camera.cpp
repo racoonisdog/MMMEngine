@@ -32,6 +32,11 @@ void MMMEngine::Camera::MarkViewMatrixDirty()
 	m_isViewMatrixDirty = true;
 }
 
+void MMMEngine::Camera::MarkProjectionMatrixDirty()
+{
+	m_isProjMatrixDirty = true;
+}
+
 const DirectX::SimpleMath::Matrix MMMEngine::Camera::GetCameraMatrix()
 {
 	return GetViewMatrix() * GetProjMatrix();
@@ -71,8 +76,12 @@ void MMMEngine::Camera::Initialize()
 {
 	Behaviour::Initialize();
 
-	if(GetTransform().IsValid())
+	if (GetTransform().IsValid())
+	{
 		GetTransform()->onMatrixUpdate.AddListener<Camera, &Camera::MarkViewMatrixDirty>(this);
+		GetTransform()->onMatrixUpdate.AddListener<Camera, &Camera::MarkProjectionMatrixDirty>(this);
+	}
+		
 
 	m_fov = 75;
 	m_near = 0.3f;
@@ -88,7 +97,10 @@ void MMMEngine::Camera::UnInitialize()
 	Behaviour::UnInitialize();
 
 	if (GetTransform().IsValid())
+	{
 		GetTransform()->onMatrixUpdate.RemoveListener<Camera, &Camera::MarkViewMatrixDirty>(this);
+		GetTransform()->onMatrixUpdate.RemoveListener<Camera, &Camera::MarkProjectionMatrixDirty>(this);
+	}
 }
 
 const float& MMMEngine::Camera::GetFov() noexcept
@@ -113,27 +125,31 @@ const float& MMMEngine::Camera::GetAsepct() noexcept
 
 void MMMEngine::Camera::SetFOV(const float& value)
 {
+	MarkProjectionMatrixDirty();
 	m_fov = value;
 }
 
 void MMMEngine::Camera::SetNear(const float& value)
 {
+	MarkProjectionMatrixDirty();
 	m_near = value;
 }
 
 void MMMEngine::Camera::SetFar(const float& value)
 {
+	MarkProjectionMatrixDirty();
 	m_far = value;
 }
 
 void MMMEngine::Camera::SetAspect(const float& value)
 {
+	MarkProjectionMatrixDirty();
 	m_aspect = value;
 }
 
 MMMEngine::ObjPtr<MMMEngine::Camera> MMMEngine::Camera::GetMainCamera()
 {
-	if (!s_mainCam.IsValid())
+	if (!s_mainCam.IsValid() || s_mainCam->IsDestroyed())
 	{
 		//새로운 메인캠 찾기
 		auto mainCamGOs = GameObject::FindGameObjectsWithTag("MainCamera");
@@ -148,8 +164,12 @@ MMMEngine::ObjPtr<MMMEngine::Camera> MMMEngine::Camera::GetMainCamera()
 				}
 			}
 	}
+	else
+	{
+		s_mainCam = nullptr;
+	}
 
-	return ObjPtr<Camera>();
+	return s_mainCam;
 }
 
 MMMEngine::ObjPtr<MMMEngine::GameObject> MMMEngine::Camera::CreateMainCamera()

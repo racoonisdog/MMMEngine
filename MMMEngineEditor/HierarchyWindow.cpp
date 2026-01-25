@@ -155,6 +155,9 @@ void MMMEngine::Editor::HierarchyWindow::Render()
 
 		for (auto& go : gameObjects)
 		{
+			if (!go->GetTransform().IsValid())
+				continue;
+
 			if (go->GetTransform()->GetParent() == nullptr)
 			{
 				DrawHierarchyMember(go, true);

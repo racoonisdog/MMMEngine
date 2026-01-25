@@ -294,7 +294,7 @@ bool ApplySceneListChanges()
     auto sceneRef = SceneManager::Get().GetCurrentScene();
     auto sceneRaw = SceneManager::Get().GetSceneRaw(sceneRef);
     SceneSerializer::Get().Serialize(*sceneRaw, SceneManager::Get().GetSceneListPath() + L"/" + StringHelper::StringToWString(sceneRaw->GetName()) + L".scene");
-    SceneManager::Get().UpdateAndReloadScenes(enabledScenes);
+    SceneManager::Get().RebulidAndApplySceneList(enabledScenes);
     SceneSerializer::Get().ExtractScenesList(SceneManager::Get().GetAllSceneToRaw(), SceneManager::Get().GetSceneListPath());
     return true; // ¼º°ø
 }

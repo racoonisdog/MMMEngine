@@ -156,7 +156,15 @@ const std::unordered_map<std::string, size_t>& MMMEngine::SceneManager::GetScene
 	return m_sceneNameToID;
 }
 
-void MMMEngine::SceneManager::UpdateAndReloadScenes(std::vector<std::string> sceneList)
+void MMMEngine::SceneManager::ReloadSnapShotCurrentScene()
+{
+	SnapShot snapshot;
+	auto currentScene = m_scenes[m_currentSceneID].get();
+	SceneSerializer::Get().SerializeToMemory(*currentScene, snapshot);
+	currentScene->SetSnapShot(std::move(snapshot));
+}
+
+void MMMEngine::SceneManager::RebulidAndApplySceneList(std::vector<std::string> sceneList)
 {
 	// 현재 씬 배열에 존재하는지 체크, 새로운 것도 체크
 	std::string currentSceneName = m_scenes[m_currentSceneID]->GetName();
@@ -173,11 +181,13 @@ void MMMEngine::SceneManager::UpdateAndReloadScenes(std::vector<std::string> sce
 		{
 			idx = m_sceneNameToID[sceneName];
 		}
-
+		
+		// 씬 리스트에 있는 씬
 		if (idx != -1)
 		{
 			changedScenes.push_back(std::move(m_scenes[idx]));
 		}
+		// 기존 씬 리스트에 없는 신규 씬
 		else
 		{
 			// 파일 경로 탐색

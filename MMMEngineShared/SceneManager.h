@@ -35,8 +35,10 @@ namespace MMMEngine
 		void RegisterGameObjectToDDOL(ObjPtr<GameObject> go);
 
 		const std::unordered_map<std::string, size_t>& GetScenesHash();
+
+		void ReloadSnapShotCurrentScene(); // 현재 씬의 스냅샷을 갱신 (하드디스크 저장 X, 온 메모리 체인지)
 		
-		void UpdateAndReloadScenes(std::vector<std::string> sceneList);
+		void RebulidAndApplySceneList(std::vector<std::string> sceneList);
 
 		std::vector<ObjPtr<GameObject>> GetAllGameObjectInCurrentScene();
 		std::vector<ObjPtr<GameObject>> GetAllGameObjectInDDOL();

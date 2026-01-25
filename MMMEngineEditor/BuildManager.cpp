@@ -1,6 +1,7 @@
 #include "BuildManager.h"
 #include <Windows.h>
 #include <array>
+#include <thread>
 #include <sstream>
 
 namespace fs = std::filesystem;
@@ -83,6 +84,10 @@ namespace MMMEngine::Editor
             << "\"" << vcxprojPath.string() << "\" "
             << "/p:Configuration=" << configStr << " "
             << "/p:Platform=x64 "
+            << "/m:" << std::thread::hardware_concurrency() << " "  // 병렬 빌드 (CPU 코어 수만큼)
+            << "/p:CL_MPCount=" << std::thread::hardware_concurrency() << " "  // 컴파일러 병렬화
+            << "/p:UseMultiToolTask=true "
+            << "/p:EnforceProcessCountAcrossBuilds=true "
             << "/v:minimal "  // 최소 출력
             << "/nologo";     // 로고 숨김
 
@@ -208,6 +213,24 @@ namespace MMMEngine::Editor
         }
 
         return output;
+    }
+
+    bool BuildManager::HasFilesChanged(const fs::path& scriptsPath) {
+        bool changed = false;
+
+        for (const auto& entry : fs::recursive_directory_iterator(scriptsPath)) {
+            if (entry.path().extension() == ".cpp" || entry.path().extension() == ".h") {
+                auto lastWriteTime = fs::last_write_time(entry.path());
+                auto& cachedTime = m_fileTimestamps[entry.path().string()];
+
+                if (cachedTime != lastWriteTime) {
+                    changed = true;
+                    cachedTime = lastWriteTime;
+                }
+            }
+        }
+
+        return changed;
     }
 
     BuildOutput BuildManager::BuildUserScripts(

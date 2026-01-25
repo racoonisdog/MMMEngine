@@ -31,6 +31,11 @@ namespace MMMEngine::Editor
     class BuildManager : public Utility::Singleton<BuildManager>
     {
     public:
+        // 파일 변경 감지
+        std::unordered_map<std::string, std::filesystem::file_time_type> m_fileTimestamps;
+
+        bool HasFilesChanged(const std::filesystem::path& scriptsPath);
+
         // UserScripts 프로젝트 빌드
         BuildOutput BuildUserScripts(
             const std::filesystem::path& projectRootDir,
