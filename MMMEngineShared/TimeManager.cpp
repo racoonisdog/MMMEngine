@@ -42,6 +42,11 @@ void MMMEngine::TimeManager::BeginFrame()
         : 0.0f;
 }
 
+void MMMEngine::TimeManager::ResetFixedStepAccumed()
+{
+    m_fixedStepsThisFrame = 0;
+}
+
 const float MMMEngine::TimeManager::GetDeltaTime() const
 {
     return m_deltaTime;

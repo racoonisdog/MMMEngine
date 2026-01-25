@@ -27,9 +27,15 @@ namespace fs = std::filesystem;
 using namespace MMMEngine;
 using namespace MMMEngine::Utility;
 using namespace MMMEngine::Editor;
+using namespace Microsoft::WRL;
 
 void AfterProjectLoaded()
 {
+	auto currentProject = ProjectManager::Get().GetActiveProject();
+	SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", 0, true);
+	GlobalRegistry::g_pApp->SetWindowTitle(L"MMMEditor [ " + Utility::StringHelper::StringToWString(currentProject.rootPath) + L" ]");
+	ObjectManager::Get().StartUp();
+
 	// 유저 스크립트 불러오기
 	fs::path cwd = fs::current_path();
 	DLLHotLoadHelper::CleanupHotReloadCopies(cwd);
@@ -42,6 +48,8 @@ void AfterProjectLoaded()
 
 	// 리소스 매니저 부팅
 	ResourceManager::Get().StartUp(projectPath.generic_wstring() + L"/");
+
+	BuildManager::Get().SetProgressCallbackString([](const std::string& progress) { std::cout << progress.c_str() << std::endl; });
 }
 
 void Initialize()
@@ -62,39 +70,29 @@ void Initialize()
 	EditorRegistry::g_editor_project_loaded = ProjectManager::Get().Boot();
 	if (EditorRegistry::g_editor_project_loaded)
 	{
-		// 존재하는 경우 씬을 처음으로 스타트
-		auto currentProject = ProjectManager::Get().GetActiveProject();
-		SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", currentProject.lastSceneIndex, true);
-		app->SetWindowTitle(L"MMMEditor [ " + Utility::StringHelper::StringToWString(currentProject.rootPath) + L" ]");
-		ObjectManager::Get().StartUp();
-
-
 		// 경로 부팅
 		AfterProjectLoaded();
-		
-		BuildManager::Get().SetProgressCallbackString([](const std::string& progress) { std::cout << progress.c_str() << std::endl; });
-
 	}
-
 
 	app->OnWindowSizeChanged.AddListener<RenderManager, &RenderManager::ResizeSwapChainSize>(&RenderManager::Get());
 
-	Microsoft::WRL::ComPtr<ID3D11Device> device = RenderManager::Get().GetDevice();
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> context = RenderManager::Get().GetContext();
+	ComPtr<ID3D11Device> device = RenderManager::Get().GetDevice();
+	ComPtr<ID3D11DeviceContext> context = RenderManager::Get().GetContext();
 
 	ImGuiEditorContext::Get().Initialize(hwnd, device.Get(), context.Get());
 	app->OnBeforeWindowMessage.AddListener<ImGuiEditorContext, &ImGuiEditorContext::HandleWindowMessage>(&ImGuiEditorContext::Get());
 
-	MMMEngine::PhysicX::Get().Initialize();
+	PhysicX::Get().Initialize();
 	SceneManager::Get().onSceneInitBefore.AddListenerLambda([]() { 
 		PhysxManager::Get().UnbindScene();
-		MMMEngine::PhysxManager::Get().BindScene(SceneManager::Get().GetCurrentSceneRaw());
+		PhysxManager::Get().BindScene(SceneManager::Get().GetCurrentSceneRaw());
 		});
 }
 
 void Update_ProjectNotLoaded()
 {
 	TimeManager::Get().BeginFrame();
+	TimeManager::Get().ResetFixedStepAccumed();
 	InputManager::Get().Update();
 
 	RenderManager::Get().BeginFrame();
@@ -106,18 +104,8 @@ void Update_ProjectNotLoaded()
 
 	if (EditorRegistry::g_editor_project_loaded)
 	{
-		auto currentProject = ProjectManager::Get().GetActiveProject();
-		SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", 0, true);
-		GlobalRegistry::g_pApp->SetWindowTitle(L"MMMEditor [ " + Utility::StringHelper::StringToWString(currentProject.rootPath) + L" ]");
-
-		ObjectManager::Get().StartUp();
-
-
 		// 경로 부팅
 		AfterProjectLoaded();
-	
-		BuildManager::Get().SetProgressCallbackString([](const std::string& progress) { std::cout << progress << std::endl; });
-		return;
 	}
 }
 
@@ -142,22 +130,52 @@ void Update()
 		BehaviourManager::Get().AllBroadCastBehaviourMessage("OnSceneLoaded");
 	}
 
-	//if (EditorRegistry::g_editor_scene_playing)
-	//{
-	//	BehaviourManager::Get().InitializeBehaviours();
-	//}
-	BehaviourManager::Get().InitializeBehaviours();
-
+	if (EditorRegistry::g_editor_scene_playing)
+	{
+		BehaviourManager::Get().InitializeBehaviours();
+	}
 	TimeManager::Get().ConsumeFixedSteps([&](float fixedDt)
 		{
-			/*if (!EditorRegistry::g_editor_scene_playing)
-				return;*/
+			if (!EditorRegistry::g_editor_scene_playing)
+				return;
 
-			MMMEngine::PhysxManager::Get().StepFixed(fixedDt);
 			BehaviourManager::Get().BroadCastBehaviourMessage("FixedUpdate");
+			PhysxManager::Get().StepFixed(fixedDt);
+
+			std::vector<std::tuple<ObjPtr<GameObject>, ObjPtr<GameObject>, P_EvenType>> vec;
+
+			std::swap(vec, PhysxManager::Get().GetCallbackQue());
+
+			for (auto& [A, B, Event] : vec)
+			{
+				switch (Event)
+				{
+				case P_EvenType::C_enter:
+					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnCollisionEnter", B);
+					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnCollisionEnter", A);
+					break;
+				case P_EvenType::C_stay:
+					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnCollisionStay", B);
+					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnCollisionStay", A);
+					break;
+				case P_EvenType::C_out:
+					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnCollisionExit", B);
+					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnCollisionExit", A);
+					break;
+				case P_EvenType::T_enter:
+					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnTriggerEnter", B);
+					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnTriggerEnter", A);
+					break;															
+				case P_EvenType::T_out:											
+					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnTriggerEnter", B);
+					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnTriggerEnter", A);
+					break;
+				}
+			}
 		});
 
 	BehaviourManager::Get().BroadCastBehaviourMessage("Update");
+	BehaviourManager::Get().BroadCastBehaviourMessage("LateUpdate");
 
 	RenderManager::Get().BeginFrame();
 	RenderManager::Get().Render();

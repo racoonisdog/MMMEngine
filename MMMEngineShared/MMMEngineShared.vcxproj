@@ -164,6 +164,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="Behaviour.h" />
     <ClInclude Include="BoxColliderComponent.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="CapsuleColliderComponent.h" />
     <ClInclude Include="ColliderComponent.h" />
     <ClInclude Include="CollisionMatrix.h" />

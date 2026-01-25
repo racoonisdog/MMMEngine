@@ -46,6 +46,8 @@ namespace MMMEngine
 			}
 		}
 
+		void ResetFixedStepAccumed();
+
 		const float GetDeltaTime() const;
 		const float GetFixedDeltaTime() const;
 		const float GetTotalTime() const;

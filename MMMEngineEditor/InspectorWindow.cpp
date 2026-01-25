@@ -339,6 +339,9 @@ void RenderProperties(rttr::instance inst)
 
         else if (var.is_type<Quaternion>())
         {
+            auto SnapToZero = [](float& v, float eps = 1e-4f) {
+                if (fabsf(v) < eps) v = 0.0f;
+                };
             // 고유 키 (string 캐시처럼)
             rttr::property muidProp = t.get_property("MUID");
             rttr::variant muidVar = muidProp.get_value(inst);
@@ -367,6 +370,7 @@ void RenderProperties(rttr::instance inst)
             //    - DragFloat3 호출 후, Active가 아니고 changed도 아니면 실제 값으로 캐시를 동기화
             float data[3] = { eulerCache[key].x, eulerCache[key].y, eulerCache[key].z };
 
+
             if (readOnly) ImGui::BeginDisabled(true);
             bool changed = ImGui::DragFloat3(name.c_str(), data, 0.1f);
             bool active = ImGui::IsItemActive();
@@ -375,12 +379,20 @@ void RenderProperties(rttr::instance inst)
             // 4) 사용자가 편집하지 않는 동안엔 gizmo 등 외부 변경을 반영
             if (!active && !changed)
             {
+                SnapToZero(eDeg.x);
+                SnapToZero(eDeg.y);
+                SnapToZero(eDeg.z);
                 eulerCache[key] = eDeg; // 외부 변경 반영(= gizmo 최신화)
             }
 
             // 5) 사용자가 인스펙터에서 편집한 경우만 set_value
             if (changed && !readOnly)
             {
+
+                SnapToZero(data[0]);
+                SnapToZero(data[1]);
+                SnapToZero(data[2]);
+
                 eulerCache[key] = { data[0], data[1], data[2] };
 
                 Quaternion updatedQ = Quaternion::CreateFromYawPitchRoll(
@@ -388,6 +400,8 @@ void RenderProperties(rttr::instance inst)
                     eulerCache[key].x * (XM_PI / 180.f),
                     eulerCache[key].z * (XM_PI / 180.f)
                 );
+
+
 
                 updatedQ.Normalize();
                 prop.set_value(inst, updatedQ);

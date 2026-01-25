@@ -28,7 +28,7 @@ namespace MMMEngine
 		std::vector<ObjPtr<Component>> m_components;
 
 		std::string m_tag = "";
-		uint32_t m_layer = static_cast<uint32_t>(0);
+		uint32_t m_layer = 0;
 
 		bool m_active = true;
 		bool m_activeInHierarchy = true; // Hierarchy에서 활성화 여부

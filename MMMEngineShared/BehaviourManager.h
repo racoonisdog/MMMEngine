@@ -49,6 +49,18 @@ namespace MMMEngine
 			}
 		}
 
+		// 매개변수 있는 브로드캐스트
+		template<typename... Args>
+		void SpecificBroadCastBehaviourMessage(ObjPtr<GameObject>& obj, const std::string& messageName, Args&&... args)
+		{
+			for (auto& behaviour : m_activeBehaviours)
+			{
+				if (behaviour.IsValid() && behaviour->GetGameObject() == obj)
+					behaviour->CallMessage(messageName, std::forward<Args>(args)...);
+			}
+		}
+
+
 		void ReloadUserScripts(const std::string& name);
 
 		template<typename... Args>

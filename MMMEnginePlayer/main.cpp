@@ -32,7 +32,7 @@ void Update()
 
 	float dt = TimeManager::Get().GetDeltaTime();
 
-	//�� ��ȯ �� �ѹ��� ȣ��
+	//씬 변경 시
 	if (SceneManager::Get().CheckSceneIsChanged())
 	{
 		ObjectManager::Get().UpdateInternalTimer(dt);
