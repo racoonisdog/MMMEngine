@@ -334,6 +334,7 @@ void MMMEngine::ExampleBehaviour::Update()
         std::string engineSharedCommonDebugLibDir = R"($(ProjectDir)..\..\..\Common\Lib\Debug)";
         std::string engineSharedCommonReleaseLibDir = R"($(ProjectDir)..\..\..\Common\Lib\Release)";
         std::string engineSharedLibName = "MMMEngineShared.lib";
+        std::string DirectXLibName = "DirectXTK.lib;DirectXTex.lib";
         std::string rttrDebugLibName = "rttr_core_d.lib";
         std::string rttrReleaseLibName = "rttr_core.lib";
         std::string physXLibsName = "PhysXCommon_64.lib;PhysXCooking_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib";
@@ -435,7 +436,7 @@ void MMMEngine::ExampleBehaviour::Update()
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>)xml" << engineSharedDebugLibDir << R"xml(;)xml" << engineSharedCommonDebugLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrDebugLibName << R"xml(;)xml" << physXLibsName << R"xml(;)xml" << renderResourceLibs << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << DirectXLibName << R"xml(;)xml" << rttrDebugLibName << R"xml(;)xml" << physXLibsName << R"xml(;)xml" << renderResourceLibs << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
@@ -454,7 +455,7 @@ void MMMEngine::ExampleBehaviour::Update()
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>)xml" << engineSharedReleaseLibDir << R"xml(;)xml" << engineSharedCommonReleaseLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrReleaseLibName << R"xml(;)xml" << physXLibsName << R"xml(;)xml" << renderResourceLibs << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << DirectXLibName << R"xml(;)xml" << rttrReleaseLibName << R"xml(;)xml" << physXLibsName << R"xml(;)xml" << renderResourceLibs << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
