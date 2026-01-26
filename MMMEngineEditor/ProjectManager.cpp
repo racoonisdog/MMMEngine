@@ -432,8 +432,8 @@ void MMMEngine::ExampleBehaviour::Update()
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>)xml" << engineSharedDebugLibDir << R"xml(;)xml" << engineSharedCommonDebugLibDir << R"xml(;)xml" << physXLibsName << renderResourceLibs << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrDebugLibName << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>)xml" << engineSharedDebugLibDir << R"xml(;)xml" << engineSharedCommonDebugLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrDebugLibName << R"xml(;)xml" << physXLibsName << renderResourceLibs << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
@@ -451,8 +451,8 @@ void MMMEngine::ExampleBehaviour::Update()
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>)xml" << engineSharedReleaseLibDir << R"xml(;)xml" << engineSharedCommonReleaseLibDir << R"xml(;)xml" << physXLibsName << renderResourceLibs << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrReleaseLibName << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>)xml" << engineSharedReleaseLibDir << R"xml(;)xml" << engineSharedCommonReleaseLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrReleaseLibName << R"xml(;)xml" << physXLibsName << renderResourceLibs << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
