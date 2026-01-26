@@ -84,10 +84,10 @@ namespace MMMEngine::Editor
             << "\"" << vcxprojPath.string() << "\" "
             << "/p:Configuration=" << configStr << " "
             << "/p:Platform=x64 "
-            << "/m:" << std::thread::hardware_concurrency() << " "  // 병렬 빌드 (CPU 코어 수만큼)
-            << "/p:CL_MPCount=" << std::thread::hardware_concurrency() << " "  // 컴파일러 병렬화
-            << "/p:UseMultiToolTask=true "
-            << "/p:EnforceProcessCountAcrossBuilds=true "
+            //<< "/m:" << std::thread::hardware_concurrency() << " "  // 병렬 빌드 (CPU 코어 수만큼)
+            //<< "/p:CL_MPCount=" << std::thread::hardware_concurrency() << " "  // 컴파일러 병렬화
+            //<< "/p:UseMultiToolTask=true "
+            //<< "/p:EnforceProcessCountAcrossBuilds=true "
             << "/v:minimal "  // 최소 출력
             << "/nologo";     // 로고 숨김
 

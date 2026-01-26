@@ -203,6 +203,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendererTools.h" />
     <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="RenderShared.h" />
     <ClInclude Include="RenderStateGuard.h" />
     <ClInclude Include="Resolution.h" />
     <ClInclude Include="Resource.h" />
@@ -270,7 +271,6 @@
     <ClCompile Include="RendererTools.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="RenderShared.cpp" />
-    <ClCompile Include="RenderShared.h" />
     <ClCompile Include="RenderStateGuard.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -297,9 +297,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Object.inl" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="MMMEngineShared.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -564,11 +564,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MMMEngineShared.rc">
-      <Filter>리소스 파일</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="헤더 파일\Core\Physics API">
       <UniqueIdentifier>{7210efdf-bb0c-4a09-8874-d36d7238e32e}</UniqueIdentifier>
     </Filter>

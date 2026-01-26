@@ -16,35 +16,22 @@ std::wstring MMMEngine::Editor::DLLHotLoadHelper::MakeHotDllName(const fs::path&
 
 fs::path MMMEngine::Editor::DLLHotLoadHelper::CopyDllForHotReload(const fs::path& dllPath, const fs::path& hotDir)
 {
+    namespace fs = std::filesystem;
+
     if (!fs::exists(dllPath))
-    {
-        return fs::path{}; // 빈 경로 반환으로 "실패" 알림
-    }
+        return {};
 
-    fs::create_directories(hotDir);
-    fs::path copied = hotDir / MakeHotDllName(dllPath);
+    std::error_code ec;
+    fs::create_directories(hotDir, ec);
+    if (ec) return {};
 
-    try
-    {
-        fs::copy_file(dllPath, copied, fs::copy_options::overwrite_existing);
+    const fs::path copied = hotDir / MakeHotDllName(dllPath);
 
-        // PDB 처리 (생략 가능 로직)
-        fs::path pdb = dllPath;
-        pdb.replace_extension(L".pdb");
-        if (fs::exists(pdb))
-        {
-            fs::path copiedPdb = copied;
-            copiedPdb.replace_extension(L".pdb");
-            fs::copy_file(pdb, copiedPdb, fs::copy_options::overwrite_existing);
-        }
+    // DLL만 복사 (PDB는 복사하지 않음)
+    fs::copy_file(dllPath, copied, fs::copy_options::overwrite_existing, ec);
+    if (ec) return {};
 
-        return copied;
-    }
-    catch (const fs::filesystem_error& e)
-    {
-        // 복사 과정 중 발생한 에러 처리 (권한 문제 등)
-        return fs::path{};
-    }
+    return copied;
 }
 
 void MMMEngine::Editor::DLLHotLoadHelper::CleanupHotReloadCopies(const fs::path& hotDir)
@@ -71,11 +58,6 @@ void MMMEngine::Editor::DLLHotLoadHelper::CleanupHotReloadCopies(const fs::path&
                 if (!ec) break;
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
-
-            // pdb도 같이 삭제(있으면)
-            fs::path pdb = p; pdb.replace_extension(L".pdb");
-            std::error_code ec2;
-            fs::remove(pdb, ec2);
         }
     }
 }
