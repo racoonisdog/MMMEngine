@@ -3,9 +3,7 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Behaviour.cpp" />
-    <ClCompile Include="BehaviourManager.cpp" />
     <ClCompile Include="Component.cpp" />
-    <ClCompile Include="dxtk\Src\SimpleMath.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalRegistry.cpp" />
     <ClCompile Include="InputManager.cpp" />
@@ -74,6 +72,9 @@
     <ClCompile Include="BoxColliderComponent.cpp">
       <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
+    <ClCompile Include="BehaviourManager.cpp">
+      <Filter>소스 파일\Core\Behaviour API</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -81,27 +82,6 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="Delegates.hpp" />
     <ClInclude Include="DisplayMode.h" />
-    <ClInclude Include="dxtk\Inc\Audio.h" />
-    <ClInclude Include="dxtk\Inc\BufferHelpers.h" />
-    <ClInclude Include="dxtk\Inc\CommonStates.h" />
-    <ClInclude Include="dxtk\Inc\DDSTextureLoader.h" />
-    <ClInclude Include="dxtk\Inc\DirectXHelpers.h" />
-    <ClInclude Include="dxtk\Inc\Effects.h" />
-    <ClInclude Include="dxtk\Inc\GamePad.h" />
-    <ClInclude Include="dxtk\Inc\GeometricPrimitive.h" />
-    <ClInclude Include="dxtk\Inc\GraphicsMemory.h" />
-    <ClInclude Include="dxtk\Inc\Keyboard.h" />
-    <ClInclude Include="dxtk\Inc\Model.h" />
-    <ClInclude Include="dxtk\Inc\Mouse.h" />
-    <ClInclude Include="dxtk\Inc\PostProcess.h" />
-    <ClInclude Include="dxtk\Inc\PrimitiveBatch.h" />
-    <ClInclude Include="dxtk\Inc\ScreenGrab.h" />
-    <ClInclude Include="dxtk\Inc\SimpleMath.h" />
-    <ClInclude Include="dxtk\Inc\SpriteBatch.h" />
-    <ClInclude Include="dxtk\Inc\SpriteFont.h" />
-    <ClInclude Include="dxtk\Inc\VertexTypes.h" />
-    <ClInclude Include="dxtk\Inc\WICTextureLoader.h" />
-    <ClInclude Include="dxtk\Inc\XboxDDSTextureLoader.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="ExportSingleton.hpp" />
     <ClInclude Include="GameObject.h" />
