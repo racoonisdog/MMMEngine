@@ -668,10 +668,35 @@ void MMMEngine::)" << scriptName << R"(::Update()
 
 void MMMEngine::Editor::FilesWindow::OpenFileInEditor(const fs::path& filePath)
 {
+    std::string ext = filePath.extension().string();
+
+    // C++ 소스 파일인 경우 Visual Studio로 열기
+    if (ext == ".cpp" || ext == ".h" || ext == ".hpp" || ext == ".c")
+    {
+        // 프로젝트 경로 가져오기
+        const auto& project = ProjectManager::Get().GetActiveProject();
+        fs::path projectRoot = fs::path(project.rootPath);
+        fs::path vcxprojPath = projectRoot / "Source" / "UserScripts" / "UserScripts.vcxproj";
+
+        if (fs::exists(vcxprojPath))
+        {
+#ifdef _WIN32
+            // Visual Studio에서 프로젝트와 파일을 함께 열기
+            std::string cmd = "start devenv \"" + vcxprojPath.string() + "\" \"" + filePath.string() + "\"";
+            int result = system(cmd.c_str());
+
+            if (result == 0)
+            {
+                return; // 성공적으로 열렸으면 종료
+            }
+#endif
+        }
+    }
+
+    // 기본 에디터로 열기 (폴백)
 #ifdef _WIN32
     std::string cmd = "code \"" + filePath.string() + "\"";
     int result = system(cmd.c_str());
-
     if (result != 0)
     {
         cmd = "notepad \"" + filePath.string() + "\"";
