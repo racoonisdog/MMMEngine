@@ -223,6 +223,7 @@
     <ClInclude Include="SkeletalMesh.h" />
     <ClInclude Include="SphereColliderComponent.h" />
     <ClInclude Include="StaticMesh.h" />
+    <ClInclude Include="UserScriptsCommon.h" />
     <ClInclude Include="VShader.h" />
     <ClInclude Include="Singleton.hpp" />
     <ClInclude Include="StringHelper.h" />

@@ -513,6 +513,11 @@ void MMMEngine::RigidBodyComponent::SetUseGravity(bool value)
 	m_Desc.useGravity = value; m_DescDirty = true; m_WakeRequested = true;
 }
 
+void MMMEngine::RigidBodyComponent::SetKinematic(bool value)
+{
+	m_Desc.isKinematic = value; m_DescDirty = true; m_WakeRequested = true;
+}
+
 void MMMEngine::RigidBodyComponent::SetType(Type newType)
 {
 	if (m_Desc.type == newType)

@@ -127,7 +127,7 @@ namespace MMMEngine {
 
 
 		void SetUseGravity(bool value);
-		void SetKinematic(bool value) { m_Desc.isKinematic = value; m_DescDirty = true; m_WakeRequested = true; }
+		void SetKinematic(bool value);
 		void SetMass(float mass) { m_Desc.mass = mass; m_DescDirty = true; m_WakeRequested = true; }
 		void SetLineDamping(float lin) { m_Desc.linearDamping = lin; m_DescDirty = true; m_WakeRequested = true; }
 		void SetAngularDamping(float ang) { m_Desc.angularDamping = ang, m_DescDirty = true; m_WakeRequested = true; }
