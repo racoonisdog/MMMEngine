@@ -430,7 +430,7 @@ void MMMEngine::ExampleBehaviour::Update()
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>false</ConformanceMode>
       <DisableSpecificWarnings>4819;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;MMMENGINE_EXPORTS;RTTR_DLL;USERSCRIPTS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;RTTR_DLL;USERSCRIPTS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>)xml" << engineSharedInclude << R"xml(;)xml" << engineSharedIncludeDXTk << R"xml(;)xml" << engineSharedIncludeDXTkInc << R"xml(;)xml" << engineSharedIncludePhysXInc << R"xml(;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -448,7 +448,7 @@ void MMMEngine::ExampleBehaviour::Update()
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <DisableSpecificWarnings>4819;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;MMMENGINE_EXPORTS;RTTR_DLL;USERSCRIPTS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;RTTR_DLL;USERSCRIPTS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>)xml" << engineSharedInclude << R"xml(;)xml" << engineSharedIncludeDXTk << R"xml(;)xml" << engineSharedIncludeDXTkInc << R"xml(;)xml" << engineSharedIncludePhysXInc << R"xml(;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
