@@ -328,6 +328,7 @@ void MMMEngine::ExampleBehaviour::Update()
         std::string engineSharedInclude = R"($(ProjectDir)..\..\..\MMMEngineShared)";
         std::string engineSharedIncludeDXTk = R"($(ProjectDir)..\..\..\MMMEngineShared\dxtk)";
         std::string engineSharedIncludeDXTkInc = R"($(ProjectDir)..\..\..\MMMEngineShared\dxtk\inc)";
+        std::string engineSharedIncludePhysXInc = R"($(ProjectDir)..\..\..\MMMEngineShared\physx)";
         std::string engineSharedDebugLibDir = R"($(ProjectDir)..\..\..\X64\Debug)";
         std::string engineSharedReleaseLibDir = R"($(ProjectDir)..\..\..\X64\Release)";
         std::string engineSharedCommonDebugLibDir = R"($(ProjectDir)..\..\..\Common\Lib\Debug)";
@@ -343,6 +344,7 @@ void MMMEngine::ExampleBehaviour::Update()
             engineSharedInclude = engineDir + R"(\MMMEngineShared\)";
             engineSharedIncludeDXTk = engineDir + R"(\MMMEngineShared\dxtk)";
             engineSharedIncludeDXTkInc = engineDir + R"(\MMMEngineShared\dxtk\inc)";
+            engineSharedIncludePhysXInc = engineDir + R"(\MMMEngineShared\physx)";
             engineSharedDebugLibDir = engineDir + R"(\X64\Debug)";
             engineSharedReleaseLibDir = engineDir + R"(\X64\Release)";
             engineSharedCommonDebugLibDir = engineDir + R"(\Common\Lib\Debug)";
@@ -428,12 +430,12 @@ void MMMEngine::ExampleBehaviour::Update()
       <ConformanceMode>false</ConformanceMode>
       <DisableSpecificWarnings>4819;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;MMMENGINE_EXPORTS;RTTR_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>)xml" << engineSharedInclude << R"xml(;)xml" << engineSharedIncludeDXTk << R"xml(;)xml" << engineSharedIncludeDXTkInc << R"xml(;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>)xml" << engineSharedInclude << R"xml(;)xml" << engineSharedIncludeDXTk << R"xml(;)xml" << engineSharedIncludeDXTkInc << R"xml(;)xml" << engineSharedIncludePhysXInc << R"xml(;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>)xml" << engineSharedDebugLibDir << R"xml(;)xml" << engineSharedCommonDebugLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrDebugLibName << R"xml(;)xml" << physXLibsName << renderResourceLibs << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrDebugLibName << R"xml(;)xml" << physXLibsName << R"xml(;)xml" << renderResourceLibs << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
@@ -446,13 +448,13 @@ void MMMEngine::ExampleBehaviour::Update()
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <DisableSpecificWarnings>4819;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;MMMENGINE_EXPORTS;RTTR_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>)xml" << engineSharedInclude << R"xml(;)xml" << engineSharedIncludeDXTk << R"xml(;)xml" << engineSharedIncludeDXTkInc << R"xml(;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>)xml" << engineSharedInclude << R"xml(;)xml" << engineSharedIncludeDXTk << R"xml(;)xml" << engineSharedIncludeDXTkInc << R"xml(;)xml" << engineSharedIncludePhysXInc << R"xml(;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>)xml" << engineSharedReleaseLibDir << R"xml(;)xml" << engineSharedCommonReleaseLibDir << R"xml(;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrReleaseLibName << R"xml(;)xml" << physXLibsName << renderResourceLibs << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>)xml" << engineSharedLibName << R"xml(;)xml" << rttrReleaseLibName << R"xml(;)xml" << physXLibsName << R"xml(;)xml" << renderResourceLibs << R"xml(;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
