@@ -97,9 +97,6 @@ namespace MMMEngine::Editor
                 auto currentProject = ProjectManager::Get().GetActiveProject();
                 SceneManager::Get().StartUp(currentProject.ProjectRootFS().generic_wstring() + L"/Assets/Scenes", currentProject.lastSceneIndex, true);
                 ObjectManager::Get().StartUp();
-
-
-                // todo : 씬 플레이 재시작하기
             }
         }
   

@@ -252,7 +252,7 @@ namespace MMMEngine
 #include "rttr/registration"
 #include "rttr/detail/policies/ctor_policies.h"
 
-RTTR_REGISTRATION
+RTTR_PLUGIN_REGISTRATION
 {
 	using namespace rttr;
 	using namespace MMMEngine;
