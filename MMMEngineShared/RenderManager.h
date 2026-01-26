@@ -128,6 +128,8 @@ namespace MMMEngine
 		void AddCommand(RenderType _type, RenderCommand&& _command);	// 렌더커맨드 추가
 		int AddMatrix(const DirectX::SimpleMath::Matrix& _worldMatrix);		// 월드매트릭스 추가
 
+		void ClearAllCommands();
+
 		void BeginFrame();
 		void Render();
 		void RenderOnlyRenderer();

@@ -243,4 +243,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	app.OnUpdate.AddListener<&Update>();
 	app.OnRelease.AddListener<&Release>();
 	app.Run();
+
+	return 0;
 }

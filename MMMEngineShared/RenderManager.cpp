@@ -36,7 +36,6 @@ namespace MMMEngine {
 
 	void RenderManager::ApplyMatToContext(ID3D11DeviceContext4* _context, Material* _material)
 	{
-		
 		auto VS = _material->GetVShader()->m_pVShader;
 		auto PS = _material->GetPShader()->m_pPShader;
 		_context->IASetInputLayout(_material->GetVShader()->m_pInputLayout.Get());
@@ -526,6 +525,11 @@ namespace MMMEngine {
 		m_objWorldMatMap[index] = _worldMatrix;
 
 		return index;
+	}
+
+	void RenderManager::ClearAllCommands()
+	{
+		m_renderCommands.clear();
 	}
 
 	void RenderManager::BeginFrame()
