@@ -17,7 +17,6 @@ RTTR_REGISTRATION
 	registration::class_<MeshRenderer>("MeshRenderer")
 		(rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<MeshRenderer>>()))
 		.property("Mesh", &MeshRenderer::GetMesh, &MeshRenderer::SetMesh);
-		
 
 	registration::class_<ObjPtr<MeshRenderer>>("ObjPtr<MeshRenderer>")
 		.constructor<>(
@@ -28,11 +27,6 @@ RTTR_REGISTRATION
 	type::register_wrapper_converter_for_base_classes<MMMEngine::ObjPtr<MeshRenderer>>();
 }
 
-MMMEngine::MeshRenderer::~MeshRenderer()
-{
-	RenderManager::Get().RemoveRenderer(renderIndex);
-}
-
 void MMMEngine::MeshRenderer::SetMesh(ResPtr<StaticMesh>& _mesh)
 {
 	mesh = _mesh;
@@ -41,6 +35,11 @@ void MMMEngine::MeshRenderer::SetMesh(ResPtr<StaticMesh>& _mesh)
 void MMMEngine::MeshRenderer::Initialize()
 {
 	renderIndex = RenderManager::Get().AddRenderer(this);
+}
+
+void MMMEngine::MeshRenderer::UnInitialize()
+{
+	RenderManager::Get().RemoveRenderer(renderIndex);
 }
 
 void MMMEngine::MeshRenderer::Init()

@@ -53,7 +53,6 @@ void AfterProjectLoaded()
 	ShaderInfo::Get().StartUp();
 	
 	BuildManager::Get().SetProgressCallbackString([](const std::string& progress) { std::cout << progress.c_str() << std::endl; });
-	ShaderInfo::Get().StartUp();
 }
 
 void Initialize()

@@ -8,13 +8,14 @@ namespace fs = std::filesystem;
 
 DEFINE_SINGLETON(MMMEngine::ShaderInfo);
 
-void MMMEngine::ShaderInfo::CreateShaderReflection(std::wstring&& _filePath)
+void MMMEngine::ShaderInfo::CreatePShaderReflection(std::wstring&& _filePath)
 {
 	// 타입 검색
-	if (m_shaderTypeMap.find(_filePath) == m_shaderTypeMap.end())
+	auto typeIt = m_typeInfoMap.find(_filePath);
+	if (typeIt == m_typeInfoMap.end())
 		throw std::runtime_error("ShaderInfo::CreateShaderReflection : Shader Type not found !!");
 
-	ShaderType _type = m_shaderTypeMap[_filePath];
+	ShaderType _type = typeIt->second.shaderType;
 
 	// 절대경로 만들기
 	fs::path realPath(ResourceManager::Get().GetCurrentRootPath());
@@ -38,6 +39,30 @@ void MMMEngine::ShaderInfo::CreateShaderReflection(std::wstring&& _filePath)
 	D3D11_SHADER_DESC shaderDesc;
 	reflection->GetDesc(&shaderDesc);
 
+	// SRV 인덱스 등록
+	for (UINT r = 0; r < shaderDesc.BoundResources; r++) {
+		D3D11_SHADER_INPUT_BIND_DESC bindDesc;
+		reflection->GetResourceBindingDesc(r, &bindDesc);
+
+		std::wstring propName(bindDesc.Name, bindDesc.Name + strlen(bindDesc.Name));
+
+		PropertyInfo pinfo;
+
+		if (bindDesc.Type == D3D_SIT_TEXTURE)
+		{
+			pinfo.propertyType = PropertyType::Texture;
+			pinfo.bufferIndex = bindDesc.BindPoint; // tN 슬롯
+			m_propertyInfoMap[_type][propName] = pinfo;
+		}
+		else if (bindDesc.Type == D3D_SIT_SAMPLER)
+		{
+			pinfo.propertyType = PropertyType::Sampler;
+			pinfo.bufferIndex = bindDesc.BindPoint; // sN 슬롯
+			m_propertyInfoMap[_type][propName] = pinfo;
+		}
+	}
+
+	// ConstantBuffer 등록
 	for (UINT i = 0; i < shaderDesc.ConstantBuffers; i++)
 	{
 		ID3D11ShaderReflectionConstantBuffer* cb = reflection->GetConstantBufferByIndex(i);
@@ -56,18 +81,19 @@ void MMMEngine::ShaderInfo::CreateShaderReflection(std::wstring&& _filePath)
 			std::wstring propName(varDesc.Name, varDesc.Name + strlen(varDesc.Name));
 
 			// 오프셋과 크기 기록
-			size_t offset = varDesc.StartOffset;
-			size_t size = varDesc.Size;
+			CBPropertyInfo cbinfo;
+            cbinfo.bufferName = cbName;
+            cbinfo.offset     = varDesc.StartOffset;
+            cbinfo.size       = varDesc.Size;
 
-			// 예: CBPropertyInfo에 저장
-			CBPropertyInfo info;
-			info.bufferName = cbName;
-			info.offset = static_cast<UINT>(offset);
-			info.size = static_cast<UINT>(size);
-
-			m_CBPropertyMap[_type][propName] = cbName;
 			// 오프셋/크기 매핑 테이블에도 저장
-			m_CBPropertyOffsetMap[cbName][propName] = info;
+			m_CBPropertyMap[_type][propName] = cbinfo;
+
+			// 프로퍼티 타입 등록
+			PropertyInfo pinfo;
+			pinfo.propertyType = PropertyType::Constant;
+			pinfo.bufferIndex = i; // bN 슬롯 번호 (BindPoint로 바꿔도 가능)
+			m_propertyInfoMap[_type][propName] = pinfo;
 		}
 	}
 }
@@ -84,53 +110,14 @@ void MMMEngine::ShaderInfo::StartUp()
 	m_pDefaultVShader = ResourceManager::Get().Load<VShader>(L"Shader/PBR/VS/SkeletalVertexShader.hlsl");
 	m_pDefaultPShader = ResourceManager::Get().Load<PShader>(L"Shader/PBR/PS/BRDFShader.hlsl");
 
-	// 쉐이더 타입정의
-	m_shaderTypeMap[L"Shader/PBR/PS/BRDFShader.hlsl"] = ShaderType::S_PBR;
-
-	// 렌더타입 정의
-	m_renderTypeMap[L"Shader/PBR/PS/BRDFShader.hlsl"] = RenderType::R_GEOMETRY;
+	// 쉐이더 타입정보정의
+	m_typeInfoMap[L"Shader/PBR/PS/BRDFShader.hlsl"] = { ShaderType::S_PBR, RenderType::R_GEOMETRY, nullptr };
 
 	// 쉐이더 리플렉션 등록 (상수버퍼 개별업데이트 사용하기 위함)
-	CreateShaderReflection(L"Shader/PBR/PS/BRDFShader.hlsl");
-
-	// 텍스쳐 프로퍼티 타입정의
-	m_typeInfo[S_PBR][L"basecolor"] = PropertyType::Texture;
-	m_typeInfo[S_PBR][L"normal"] = PropertyType::Texture;
-	m_typeInfo[S_PBR][L"emissive"] = PropertyType::Texture;
-	m_typeInfo[S_PBR][L"shadowmap"] = PropertyType::Texture;
-	m_typeInfo[S_PBR][L"opacity"] = PropertyType::Texture;
-	m_typeInfo[S_PBR][L"metallic"] = PropertyType::Texture;
-	m_typeInfo[S_PBR][L"roughness"] = PropertyType::Texture;
-	m_typeInfo[S_PBR][L"ao"] = PropertyType::Texture;
-
-	m_typeInfo[S_PBR][L"basecolor_factor"] = PropertyType::Constant;
-	m_typeInfo[S_PBR][L"metallic_factor"] = PropertyType::Constant;
-	m_typeInfo[S_PBR][L"roughness_factor"] = PropertyType::Constant;
-	m_typeInfo[S_PBR][L"ao_factor"] = PropertyType::Constant;
-	m_typeInfo[S_PBR][L"emissive_factor"] = PropertyType::Constant;
-
-	// 텍스쳐 버퍼번호 하드코딩
-	m_texPropertyMap[S_PBR][L"basecolor"] = 0;
-	m_texPropertyMap[S_PBR][L"normal"] = 1;
-	m_texPropertyMap[S_PBR][L"emissive"] = 2;
-	m_texPropertyMap[S_PBR][L"shadowmap"] = 3;
-	m_texPropertyMap[S_PBR][L"opacity"] = 4;
-	m_texPropertyMap[S_PBR][L"metallic"] = 30;
-	m_texPropertyMap[S_PBR][L"roughness"] = 31;
-	m_texPropertyMap[S_PBR][L"ao"] = 32;
-
-	// 상수버퍼이름 하드코딩
-	m_CBPropertyMap[S_PBR][L"basecolor_factor"] = L"S_PBR_materialbuffer";
-	m_CBPropertyMap[S_PBR][L"metallic_factor"] = L"S_PBR_materialbuffer";
-	m_CBPropertyMap[S_PBR][L"roughness_factor"] = L"S_PBR_materialbuffer";
-	m_CBPropertyMap[S_PBR][L"ao_factor"] = L"S_PBR_materialbuffer";
-	m_CBPropertyMap[S_PBR][L"emissive_factor"] = L"S_PBR_materialbuffer";
-
-	// 상수버퍼번호 하드코딩
-	m_CBIndexMap[S_PBR][L"S_PBR_materialbuffer"] = 3;
+	CreatePShaderReflection(L"Shader/PBR/PS/BRDFShader.hlsl");
 
 	// 구조체별 이름 등록 (원래 이름과같게, 소문자로 하는것이 규칙)
-	m_CBBufferMap[L"pbr_materialbuffer"] = CreateConstantBuffer<PBR_MaterialBuffer>();
+	m_CBBufferMap[L"MatBuffer"] = CreateConstantBuffer<PBR_MaterialBuffer>();
 
 	// Json 읽기
 	DeSerialize();
@@ -138,13 +125,13 @@ void MMMEngine::ShaderInfo::StartUp()
 
 void MMMEngine::ShaderInfo::ShutDown()
 {
-	m_shaderTypeMap.clear();
-	m_typeInfo.clear();
-	m_texPropertyMap.clear();
+	m_pDefaultPShader.reset();
+	m_pDefaultPShader.reset();
+
+	m_typeInfoMap.clear();
+	m_propertyInfoMap.clear();
 	m_CBPropertyMap.clear();
-	m_CBIndexMap.clear();
 	m_CBBufferMap.clear();
-	m_CBPropertyOffsetMap.clear();
 }
 
 std::wstring MMMEngine::ShaderInfo::GetDefaultVShader()
@@ -159,43 +146,75 @@ std::wstring MMMEngine::ShaderInfo::GetDefaultPShader()
 
 const MMMEngine::RenderType MMMEngine::ShaderInfo::GetRenderType(const std::wstring& _shaderPath)
 {
-	if (m_renderTypeMap.find(_shaderPath) == m_renderTypeMap.end())
+	if (m_typeInfoMap.find(_shaderPath) == m_typeInfoMap.end())
 		return RenderType::R_GEOMETRY;
 
-	return m_renderTypeMap[_shaderPath];
+	return m_typeInfoMap[_shaderPath].renderType;
 }
 
 const MMMEngine::ShaderType MMMEngine::ShaderInfo::GetShaderType(const std::wstring& _shaderPath)
 {
-	if (m_shaderTypeMap.find(_shaderPath) == m_shaderTypeMap.end())
+	if (m_typeInfoMap.find(_shaderPath) == m_typeInfoMap.end())
 		return ShaderType::S_PBR;
 
-	return m_shaderTypeMap[_shaderPath];
+	return m_typeInfoMap[_shaderPath].shaderType;
 }
 
-// TODO :: 프로퍼티 입력받으면 업데이트하게 만들기
-void MMMEngine::ShaderInfo::UpdateProperty(ID3D11DeviceContext* context,
+void MMMEngine::ShaderInfo::UpdateProperty(ID3D11DeviceContext4* context,
 	const ShaderType shaderType,
 	const std::wstring& propertyName,
 	const void* data)
 {
-	auto cbName = m_CBPropertyMap[shaderType][propertyName];
-	auto buffer = m_CBBufferMap[cbName];
-	auto& info = m_CBPropertyOffsetMap[cbName][propertyName];
+	// PropertyInfo 조회
+	auto propIt = m_propertyInfoMap.find(shaderType);
+	if (propIt == m_propertyInfoMap.end())
+		return;
 
-	D3D11_MAPPED_SUBRESOURCE mapped;
-	context->Map(buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	auto& propMap = propIt->second;
+	auto pinfoIt = propMap.find(propertyName);
+	if (pinfoIt == propMap.end())
+		return;
 
-	memcpy((BYTE*)mapped.pData + info.offset, data, info.size);
+	const PropertyInfo& pinfo = pinfoIt->second;
 
-	context->Unmap(buffer.Get(), 0);
+	if (pinfo.propertyType == PropertyType::Constant) {
+		// ConstantBuffer 변수 정보 조회
+		auto cbIt = m_CBPropertyMap[shaderType].find(propertyName);
+		if (cbIt == m_CBPropertyMap[shaderType].end())
+			return;
+
+		const CBPropertyInfo& cbInfo = cbIt->second;
+
+		auto bufIt = m_CBBufferMap.find(cbInfo.bufferName);
+		if (bufIt == m_CBBufferMap.end())
+			return;
+
+		auto buffer = bufIt->second;
+
+		D3D11_MAPPED_SUBRESOURCE mapped;
+		if (SUCCEEDED(context->Map(buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped)))
+		{
+			memcpy((BYTE*)mapped.pData + cbInfo.offset, data, cbInfo.size);
+			context->Unmap(buffer.Get(), 0);
+		}
+	}
+	else if (pinfo.propertyType == PropertyType::Texture) {
+		// Texture는 SRV 바인딩만 하면 됨
+		ID3D11ShaderResourceView* srv = reinterpret_cast<ID3D11ShaderResourceView*>(const_cast<void*>(data));
+		context->PSSetShaderResources(pinfo.bufferIndex, 1, &srv);
+	}
+	else if (pinfo.propertyType == PropertyType::Sampler) {
+		// SamplerState는 Sampler 슬롯에 바인딩
+		ID3D11SamplerState* sampler = reinterpret_cast<ID3D11SamplerState*>(const_cast<void*>(data));
+		context->PSSetSamplers(pinfo.bufferIndex, 1, &sampler);
+	}
 }
 
-const int MMMEngine::ShaderInfo::PropertyToIdx(const ShaderType _type, const std::wstring& _propertyName, PropertyType* _out /*= nullptr*/) const
+const int MMMEngine::ShaderInfo::PropertyToIdx(const ShaderType _type, const std::wstring& _propertyName, PropertyInfo* _out /*= nullptr*/) const
 {
 	// ShaderType 존재 확인
-	auto typeIt = m_typeInfo.find(_type);
-	if (typeIt == m_typeInfo.end())
+	auto typeIt = m_propertyInfoMap.find(_type);
+	if (typeIt == m_propertyInfoMap.end())
 		return -1;
 
 	// PropertyName 존재 확인
@@ -204,28 +223,10 @@ const int MMMEngine::ShaderInfo::PropertyToIdx(const ShaderType _type, const std
 		return -1;
 
 	// 타입 반환
-	if (_out) *_out = propIt->second;
+	if (_out)
+		*_out = propIt->second;
 
-	// 텍스처면 tN 반환
-	if (propIt->second == PropertyType::Texture) {
-		auto texIt = m_texPropertyMap.at(_type).find(_propertyName);
-		if (texIt == m_texPropertyMap.at(_type).end())
-			return -1;
-		return texIt->second;
-	}
-	// 상수면 bN 반환
-	else if (propIt->second == PropertyType::Constant) {
-		auto cbNameIt = m_CBPropertyMap.at(_type).find(_propertyName);
-		if (cbNameIt == m_CBPropertyMap.at(_type).end())
-			return -1;
-
-		auto cbIndexIt = m_CBIndexMap.at(_type).find(cbNameIt->second);
-		if (cbIndexIt == m_CBIndexMap.at(_type).end())
-			return -1;
-
-		return cbIndexIt->second;
-	}
-
-	return -1;
+	// bufferIndex 반환 (Texture면 tN, Constant면 bN 슬롯 번호)
+	return propIt->second.bufferIndex;
 
 }

@@ -50,7 +50,6 @@ MMMEngine::UnloadState MMMEngine::ScriptLoader::UnloadScript()
         }
     }
 
-
     return UnloadState::ScriptNotLoaded;
 }
 

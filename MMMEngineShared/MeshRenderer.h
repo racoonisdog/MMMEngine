@@ -15,14 +15,12 @@ namespace MMMEngine {
 		ResPtr<StaticMesh> mesh = nullptr;
 
 		void Initialize() override;
+		void UnInitialize() override;
 		void Init() override;
 		void Render() override;
 	public:
-		~MeshRenderer() override;
-		 
 		ResPtr<StaticMesh>& GetMesh() { return mesh; }
-;		void SetMesh(ResPtr<StaticMesh>& _mesh);
-		
+		void SetMesh(ResPtr<StaticMesh>& _mesh);
 	};
 }
 

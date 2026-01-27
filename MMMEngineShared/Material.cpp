@@ -19,13 +19,20 @@ using json = nlohmann::json;
 RTTR_REGISTRATION
 {
 	using namespace rttr;
+	using namespace MMMEngine;
 
-	registration::class_<MMMEngine::Material>("Material")
-		.constructor<>()(rttr::policy::ctor::as_std_shared_ptr)
-		.property_readonly("VShader", &MMMEngine::Material::GetVShader)
-		.property_readonly("PShader", &MMMEngine::Material::GetPShader)
-		.method("GetProperty", &MMMEngine::Material::GetProperty)
-		.method("SetProperty", &MMMEngine::Material::SetProperty);
+	registration::class_<Material>("Material")
+		.constructor<>()(policy::ctor::as_std_shared_ptr)
+		.property("VShader", &Material::GetVShaderRttr, &Material::SetVShader);
+
+	type::register_converter_func(
+		[](std::shared_ptr<Resource> from, bool& ok) -> std::shared_ptr<Material>
+		{
+			auto result = std::dynamic_pointer_cast<Material>(from);
+			ok = (result != nullptr);
+			return result;
+		}
+	);
 }
 
 
@@ -70,6 +77,11 @@ const MMMEngine::ResPtr<MMMEngine::VShader> MMMEngine::Material::GetVShader()
 const MMMEngine::ResPtr<MMMEngine::PShader> MMMEngine::Material::GetPShader()
 {
 	return m_pPShader;
+}
+
+const std::wstring& MMMEngine::Material::GetVShaderRttr()
+{
+	return m_pVShader->GetFilePath();
 }
 
 void MMMEngine::Material::LoadTexture(const std::wstring& _propertyName, const std::wstring& _filePath)

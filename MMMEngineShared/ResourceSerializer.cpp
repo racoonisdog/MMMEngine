@@ -183,7 +183,7 @@ fs::path MMMEngine::ResourceSerializer::Serialize_StaticMesh(const StaticMesh* _
 	}
 
 	std::ofstream file(p.string(), std::ios::binary);
-	/*std::ofstream file(p.string());*/
+	//std::ofstream file(p.string());
 	if (!file.is_open()) {
 		throw std::runtime_error("파일을 열 수 없습니다: " + Utility::StringHelper::WStringToString(_path));
 	}
@@ -234,7 +234,7 @@ void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std
 		for (auto& m : matJson)
 		{
 			auto mat = std::make_shared<Material>();
-			mat->LoadFromFilePath(Utility::StringHelper::StringToWString(m.get<std::string>()));
+			mat = ResourceManager::Get().Load<Material>(Utility::StringHelper::StringToWString(m.get<std::string>()));
 			mats.push_back(mat);
 		}
 		_out->materials = std::move(mats);

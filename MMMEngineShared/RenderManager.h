@@ -17,6 +17,7 @@
 
 #include <Object.h>
 #include <RenderCommand.h>
+#include <Light.h>
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "dxgi.lib")
@@ -38,12 +39,16 @@ namespace MMMEngine
 		DirectX::SimpleMath::Matrix m_viewMatrix;
 		DirectX::SimpleMath::Matrix m_projMatrix;
 
+		// 렌더러 저장
 		std::map<RenderType, std::vector<RenderCommand>> m_renderCommands;
 		std::unordered_map<int, DirectX::SimpleMath::Matrix> m_objWorldMatMap;
 		std::vector<Renderer*> m_renderers;
 		std::queue<Renderer*> m_renInitQueue;
 		unsigned int m_rObjIdx = 0;
 		
+		// 라이트 저장
+		std::vector<Light*> m_lights;
+
 		void ApplyMatToContext(ID3D11DeviceContext4* _context, Material* _material);
 		void ExcuteCommands();
 		void InitCache();
@@ -139,6 +144,9 @@ namespace MMMEngine
 		void SetCamera(const ObjPtr<Camera> _camera) { if(_camera) m_pMainCamera = _camera; }
 		int AddRenderer(Renderer* _renderer);
 		void RemoveRenderer(int _idx);
+
+		int AddLight(Light* _obj);
+		void RemoveLight(int _idx);
 
 		const Microsoft::WRL::ComPtr<ID3D11Device5> GetDevice() const { return m_pDevice; }
 		const Microsoft::WRL::ComPtr<ID3D11DeviceContext4> GetContext() const { return m_pDeviceContext; }

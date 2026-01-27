@@ -126,7 +126,7 @@ namespace MMMEngine {
 		bool ExtractMeshNodeLinks(const aiScene* scene, const NodeTreeAsset& nodes, std::vector<int>& outMeshToNode);
 		bool ExtractMeshBasicInfo(const aiScene* scene, std::vector<MeshBasicInfo>& outInfos);
 		bool ExtractSubMeshes(const aiScene* scene, const std::vector<int>& meshToNodeIndex, std::vector<SubMeshAsset>& outSubMeshes);
-		bool ExtractMaterials(const aiScene* scene, const std::string& modelDir, std::vector<MaterialAsset>& outMaterials);
+		bool ExtractMaterials(const aiScene* scene, const std::string& textureDir, std::vector<MaterialAsset>& outMaterials);
 		bool ExtractSkinning(const aiScene* scene, const NodeTreeAsset& nodes, std::vector<SubMeshAsset>& inoutSubMeshes, SkinningAsset& outSkinning);
 		bool ExtractAnimationClips(const aiScene* scene, const NodeTreeAsset& nodes, std::vector<AnimationClipAsset>& outClips);
 		bool ImportModel(const std::wstring& path, ModelType type, ModelAsset& out);
@@ -150,6 +150,7 @@ namespace MMMEngine {
 		inline ImportOptions StaticModelOptions() {
 			return{
 				ModelType::Static,
+				aiProcess_GlobalScale |
 				aiProcess_Triangulate |
 				aiProcess_GenNormals |
 				aiProcess_CalcTangentSpace |
@@ -160,6 +161,7 @@ namespace MMMEngine {
 		inline ImportOptions AnimatedModelOptions() {
 			return{
 				ModelType::Animated,
+				aiProcess_GlobalScale |
 				aiProcess_Triangulate |
 				aiProcess_GenNormals |
 				aiProcess_CalcTangentSpace |

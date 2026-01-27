@@ -184,7 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssimpLoader.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="BuildManager.cpp" />
     <ClCompile Include="DLLHotLoadHelper.cpp" />

@@ -185,6 +185,7 @@
     <ClInclude Include="ExportSingleton.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GlobalRegistry.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialSerializer.h" />
     <ClInclude Include="MeshRenderer.h" />
@@ -239,6 +240,7 @@
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="TimeManager.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="RenderShared.h" />
     <ClInclude Include="ResourceManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -259,6 +261,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalRegistry.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialSerializer.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />

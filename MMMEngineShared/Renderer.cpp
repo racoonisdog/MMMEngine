@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include <rttr/registration>
+#include "GameObject.h"
 
 RTTR_REGISTRATION
 {
@@ -18,4 +19,9 @@ RTTR_REGISTRATION
 			});
 
 	type::register_wrapper_converter_for_base_classes<MMMEngine::ObjPtr<Renderer>>();
+}
+
+bool MMMEngine::Renderer::IsActiveAndEnabled()
+{
+	return isEnabled && GetGameObject().IsValid() && GetGameObject()->IsActiveInHierarchy();
 }

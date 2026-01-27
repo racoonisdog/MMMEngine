@@ -66,6 +66,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>소스 파일\Core\Render API\Component</Filter>
     </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>소스 파일\Core\Render API\Component</Filter>
+    </ClCompile>
     <ClCompile Include="SphereColliderComponent.cpp">
       <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
@@ -278,6 +281,9 @@
       <Filter>헤더 파일\Core\Render API\Component</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
+      <Filter>헤더 파일\Core\Render API\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
       <Filter>헤더 파일\Core\Render API\Component</Filter>
     </ClInclude>
     <ClInclude Include="UserScriptsCommon.h">

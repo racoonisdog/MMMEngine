@@ -36,24 +36,41 @@ namespace MMMEngine {
 
 	void RenderManager::ApplyMatToContext(ID3D11DeviceContext4* _context, Material* _material)
 	{
-		auto VS = _material->GetVShader()->m_pVShader;
-		auto PS = _material->GetPShader()->m_pPShader;
+		if (_material->GetFilePath().empty())
+			return;
+
+		auto VS = _material->GetVShader();
+		auto PS = _material->GetPShader();
+		_context->VSSetShader(VS->m_pVShader.Get(), nullptr, 0);
+		_context->PSSetShader(PS->m_pPShader.Get(), nullptr, 0);
+
+		// TODO::인풋레이아웃 ShaderInfo 사용해 자동등록 시키기
 		_context->IASetInputLayout(_material->GetVShader()->m_pInputLayout.Get());
-		_context->VSSetShader(VS.Get(), nullptr, 0);
-		_context->PSSetShader(PS.Get(), nullptr, 0);
+
+		// TODO::샘플러 ShaderInfo 사용해 자동등록화 시키기 (UpdateProperty 사용, 프로퍼티로 샘플러 관리하기)
 		_context->PSSetSamplers(0, 1, m_pDafaultSamplerLinear.GetAddressOf());
 
-		// TODO::ShaderInfo 사용해 정적버퍼, 텍스쳐버퍼 업데이트 자동화 시키기
-		// 메테리얼 등록(Texture2D만 받는다)
+		// 메테리얼
 			for (auto& [prop, val] : _material->GetProperties()) {
-				int idx = ShaderInfo::Get().PropertyToIdx(ShaderType::S_PBR, prop);
+				ShaderType type = ShaderInfo::Get().GetShaderType(PS->GetFilePath());
 
-				if (auto tex = std::get_if<ResPtr<Texture2D>>(&val)) {
-					if (*tex) {
-						ID3D11ShaderResourceView* srv = (*tex)->m_pSRV.Get();
-						m_pDeviceContext->PSSetShaderResources(idx, 1, &srv);
-					}
-				}
+				std::visit([&](auto&& arg)
+					{
+						using T = std::decay_t<decltype(arg)>;
+
+						if constexpr (std::is_same_v<T, int> ||
+							std::is_same_v<T, float> ||
+							std::is_same_v<T, DirectX::SimpleMath::Vector3> ||
+							std::is_same_v<T, DirectX::SimpleMath::Matrix>)
+						{
+							ShaderInfo::Get().UpdateProperty(m_pDeviceContext.Get(), type, prop, &arg);
+						}
+						else if constexpr (std::is_same_v<T, ResPtr<MMMEngine::Texture2D>>)
+						{
+							ID3D11ShaderResourceView* srv = arg->m_pSRV.Get();
+							ShaderInfo::Get().UpdateProperty(m_pDeviceContext.Get(), type, prop, srv);
+						}
+					}, val);
 			}
 	}
 
@@ -103,6 +120,8 @@ namespace MMMEngine {
 					// UpdateBoneIndexConstantBuffer(cmd.boneMatIndex);
 				}
 
+				// TODO::ShaderInfo 사용하여 상수버퍼 등록
+
 				// 월드매트릭스 버퍼집어넣기
 				Render_TransformBuffer transformBuffer;
 				transformBuffer.mWorld = XMMatrixTranspose(m_objWorldMatMap[cmd.worldMatIndex]);
@@ -130,7 +149,7 @@ namespace MMMEngine {
 			auto renderer = m_renInitQueue.front();
 			m_renInitQueue.pop();
 
-			if (!renderer->isEnabled)
+			if (!renderer->IsActiveAndEnabled())
 				m_renInitQueue.push(renderer);
 			else
 				renderer->Init();
@@ -140,7 +159,7 @@ namespace MMMEngine {
 	void RenderManager::UpdateRenderers()
 	{
 		for (auto& renderer : m_renderers) {
-			if (renderer->isEnabled) {
+			if (renderer->IsActiveAndEnabled()) {
 				renderer->Render();
 			}
 		}
@@ -653,6 +672,27 @@ namespace MMMEngine {
 		{
 			std::swap(m_renderers[_idx], m_renderers.back());
 			m_renderers[_idx]->renderIndex = _idx;
+			m_renderers.pop_back();
+		}
+	}
+
+	int RenderManager::AddLight(Light* _obj)
+	{
+		if (_obj == nullptr)
+			return -1;
+
+		int index = static_cast<int>(m_lights.size());
+		m_lights.push_back(_obj);
+
+		return index;
+	}
+
+	void RenderManager::RemoveLight(int _idx)
+	{
+		if (_idx < m_lights.size() && _idx >= 0)
+		{
+			std::swap(m_lights[_idx], m_lights.back());
+			m_lights[_idx]->lightIndex = _idx;
 			m_renderers.pop_back();
 		}
 	}

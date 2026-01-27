@@ -20,6 +20,8 @@ namespace MMMEngine {
 	public:
 		bool GetEnabled() { return isEnabled; }
 		void SetEnabled(bool _val) { isEnabled = _val; }
+
+		bool IsActiveAndEnabled();
 	};
 }
 
