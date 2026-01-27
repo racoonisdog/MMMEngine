@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <physx/PxPhysicsAPI.h>
 #include "Component.h"
 #include "SimpleMath.h"
@@ -22,13 +22,13 @@ namespace MMMEngine
 
 		enum class ShapeMode : uint8_t
 		{
-			Simulation,   // ¹°¸® Ãæµ¹(Á¢ÃË/¹İÀÛ¿ë)
-			Trigger,      // ¿À¹ö·¦ ÀÌº¥Æ®¸¸(¹Ğ¸²/¹İÀÛ¿ë ¾øÀ½)
-			QueryOnly,    // ·¹ÀÌÄ³½ºÆ®/½ºÀ¬/¿À¹ö·¦¿¡¸¸ ÀâÈû(¹°¸®/Æ®¸®°Å ÀÌº¥Æ® ¾øÀ½)
-			Disabled      // ¾Æ¹«°Íµµ ¾È ÇÔ(ÀÓ½Ã·Î ²ô±â¿ë)
+			Simulation,   // ë¬¼ë¦¬ ì¶©ëŒ(ì ‘ì´‰/ë°˜ì‘ìš©)
+			Trigger,      // ì˜¤ë²„ë© ì´ë²¤íŠ¸ë§Œ(ë°€ë¦¼/ë°˜ì‘ìš© ì—†ìŒ)
+			QueryOnly,    // ë ˆì´ìºìŠ¤íŠ¸/ìŠ¤ìœ•/ì˜¤ë²„ë©ì—ë§Œ ì¡í˜(ë¬¼ë¦¬/íŠ¸ë¦¬ê±° ì´ë²¤íŠ¸ ì—†ìŒ)
+			Disabled      // ì•„ë¬´ê²ƒë„ ì•ˆ í•¨(ì„ì‹œë¡œ ë„ê¸°ìš©)
 		};
 
-		// Äİ¶óÀÌ´õ Á¾·ùº°·Î shape ¸¸µå´Â °¡»óÇÔ¼ö
+		// ì½œë¼ì´ë” ì¢…ë¥˜ë³„ë¡œ shape ë§Œë“œëŠ” ê°€ìƒí•¨ìˆ˜
 		virtual void BuildShape(physx::PxPhysics* physics, physx::PxMaterial* material) = 0;
 
 		void Initialize() override;
@@ -37,7 +37,7 @@ namespace MMMEngine
 		ShapeMode GetShapeMode() const { return m_Mode; }
 
 
-		// °øÅë ¼³Á¤(Shape »ı¼º Àü/ÈÄ µÑ ´Ù ¾ÈÀüÇÏ°Ô µ¿ÀÛ)
+		// ê³µí†µ ì„¤ì •(Shape ìƒì„± ì „/í›„ ë‘˜ ë‹¤ ì•ˆì „í•˜ê²Œ ë™ì‘)
 		void SetShapeMode(ShapeMode mode);
 		//void SetLocalPose(const physx::PxTransform& t);
 
@@ -51,7 +51,7 @@ namespace MMMEngine
 		void SetFilterData(const physx::PxFilterData& sim, const physx::PxFilterData& query);
 
 
-		//overlayer ¼³Á¤
+		//overlayer ì„¤ì •
 		void SetOverrideLayer(bool enable);
 		bool IsOverrideLayer() const { return m_OverrideLayer; }
 
@@ -60,7 +60,7 @@ namespace MMMEngine
 
 		uint32_t GetEffectiveLayer();
 
-		//shape °ª º¯°æ½Ã flag¿ë bool
+		//shape ê°’ ë³€ê²½ì‹œ flagìš© bool
 		bool IsGeometryDirty() const { return m_geometryDirty; }
 		void SetGeometryDirty(bool value) { m_geometryDirty = value; }
 		bool IsFilterDirty()   const { return m_filterDirty; }
@@ -78,17 +78,17 @@ namespace MMMEngine
 
 		void RefreshCommonProps() { ApplyAll(); }
 
-		//µğ¹ö±×¸¦ Âï±âÀ§ÇÑ ÇÔ¼ö
-		//¿ùµå pose ¾ò±â
+		//ë””ë²„ê·¸ë¥¼ ì°ê¸°ìœ„í•œ í•¨ìˆ˜
+		//ì›”ë“œ pose ì–»ê¸°
 		physx::PxTransform GetWorldPosPx() const;
 
 
-		//µğ¹ö±× ÇÔ¼ö
+		//ë””ë²„ê·¸ í•¨ìˆ˜
 		virtual void PrintFilter() {};
 
 
 	protected:
-		// ÆÄ»ı Å¬·¡½º°¡ shape »ı¼º ÈÄ ¹İµå½Ã È£Ãâ
+		// íŒŒìƒ í´ë˜ìŠ¤ê°€ shape ìƒì„± í›„ ë°˜ë“œì‹œ í˜¸ì¶œ
 		void SetShape(physx::PxShape* shape, bool owned = true);
 
 		void ApplyAll();
@@ -112,19 +112,19 @@ namespace MMMEngine
 
 
 		ShapeMode m_Mode = ShapeMode::Simulation;
-		//ÀÌ shape°¡ Scene Query½Ã½ºÅÛ¿¡ Æ÷ÇÔµÉÁö Á¤ÇÔ
-		//Raycast, Sweep, Overlap µî¿¡ Æ÷ÇÔµÉÁö
+		//ì´ shapeê°€ Scene Queryì‹œìŠ¤í…œì— í¬í•¨ë ì§€ ì •í•¨
+		//Raycast, Sweep, Overlap ë“±ì— í¬í•¨ë ì§€
 		bool m_SceneQueryEnabled = false;
 
 
-		//¿ÀÇÁ¼Â
+		//ì˜¤í”„ì…‹
 		physx::PxTransform m_LocalPose = physx::PxTransform(physx::PxIdentity);
 		Vector3 m_LocalCenter;
 		Quaternion m_LocalQuater;
 
 
 
-		//Ãæµ¹ ·¹ÀÌ¾î / ¸¶½ºÅ©
+		//ì¶©ëŒ ë ˆì´ì–´ / ë§ˆìŠ¤í¬
 		physx::PxFilterData m_SimFilter{};
 		physx::PxFilterData m_QueryFilter{};
 
@@ -133,6 +133,32 @@ namespace MMMEngine
 
 		bool m_geometryDirty = true;
 
-		bool m_filterDirty = true;
+		bool m_filterDirty = true;		
+
+	//ì½œë¦¬ë” shape return ê°€ìƒí•¨ìˆ˜
+	public:
+
+		enum class DebugColliderType { Box, Capsule, Sphere, Unknown };
+
+		struct DebugColliderShapeDesc
+		{
+			DebugColliderType type = DebugColliderType::Unknown;
+
+			// ê³µí†µ
+			Vector3 localCenter{ 0,0,0 };
+			Quaternion localRotation = Quaternion::Identity;
+
+			// Box
+			Vector3 halfExtents{ 0.5f, 0.5f, 0.5f };
+
+			// Capsule
+			float radius = 0.5f;
+			float halfHeight = 1.0f;
+
+			// Sphere
+			float sphereRadius = 0.5f;
+		};
+
+		virtual DebugColliderShapeDesc GetDebugShapeDesc() const = 0;
 	};
 }

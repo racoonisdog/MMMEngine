@@ -182,8 +182,8 @@ void MMMEngine::RigidBodyComponent::PushToPhysics()
 {
 	if (!m_Actor) return;
 	if (!GetGameObject().IsValid()) return;
-	PushPoseIfDirty();
 	PushStateChanges();
+	PushPoseIfDirty();
 	PushForces();
 	PushWakeUp();
 }
@@ -203,12 +203,12 @@ void MMMEngine::RigidBodyComponent::PullFromPhysics()
 	//키네마틱은 코드 포지션 기준이라 Pull로 덮어쓰지 않음
 	//동기화 옵션을 두고 켤 수있도록 가능
 	//지금은 키네마틱이면 덮어쓰지 않도록 
-	if (m_Desc.isKinematic)
-	{
-		// const physx::PxTransform pxPose = t_dynamic->getGlobalPose(); 동기화 옵션용
-		// ApplyPoseToEngine(pxPose);
-		return;
-	}
+	//if (m_Desc.isKinematic)
+	//{
+	//	// const physx::PxTransform pxPose = t_dynamic->getGlobalPose(); 동기화 옵션용
+	//	// ApplyPoseToEngine(pxPose);
+	//	return;
+	//}
 
 	// PhysX -> Engine Transform
 	const physx::PxTransform pxPose = t_dynamic->getGlobalPose();
@@ -297,9 +297,10 @@ void MMMEngine::RigidBodyComponent::SetKinematicTarget(const Vector3& worldPos, 
 	m_KinematicTarget.rotation = Quater;
 
 	m_HasKinematicTarget = true;
-	m_WakeRequested = true;
 
-	// 만약 호출 시점에 키네마틱 전환까지 같이 보장하고 싶으면 (까먹엇을수도 있으니깐)
+
+	//m_WakeRequested = true;
+	// 만약 호출 시점에 키네마틱 전환까지 같이 보장한다면
 	// m_Desc.isKinematic = true; 
 	// m_DescDirty = true;
 }

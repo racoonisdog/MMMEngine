@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ColliderComponent.h"
 
 namespace MMMEngine
@@ -17,6 +17,8 @@ namespace MMMEngine
 		void PrintFilter() override;
 
 		void BuildShape(physx::PxPhysics* physics, physx::PxMaterial* material) override;
+
+		DebugColliderShapeDesc GetDebugShapeDesc() const override;
 	private:
 		Vector3 m_halfExtents = { 0.5f, 0.5f, 0.5f };
 	};

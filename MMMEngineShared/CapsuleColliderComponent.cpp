@@ -1,6 +1,7 @@
-#include "CapsuleColliderComponent.h"
+﻿#include "CapsuleColliderComponent.h"
 #include "rttr/registration"
 #include "PhysxManager.h"
+#include "PhysxHelper.h"
 
 RTTR_REGISTRATION
 {
@@ -81,6 +82,18 @@ void MMMEngine::CapsuleColliderComponent::BuildShape(physx::PxPhysics* physics, 
     // Y-up 캡슐이 필요하면 아래코드로
     // SetLocalPose( physx::PxTransform(physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0,0,1))) * m_LocalPose );
 	//m_Shape->userData = this;
+}
+
+MMMEngine::ColliderComponent::DebugColliderShapeDesc MMMEngine::CapsuleColliderComponent::GetDebugShapeDesc() const
+{
+	DebugColliderShapeDesc s_Desc;
+	s_Desc.type = DebugColliderType::Capsule;
+	s_Desc.radius = m_radius;
+	s_Desc.halfHeight = m_halfHeight;
+
+	s_Desc.localCenter = ToVec(m_LocalPose.p);
+	s_Desc.localRotation = ToQuat(m_LocalPose.q);
+	return s_Desc;
 }
 
 //void MMMEngine::ColliderComponent::Initialize()

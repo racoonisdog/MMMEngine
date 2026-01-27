@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ColliderComponent.h"
 
 namespace MMMEngine
@@ -16,6 +16,8 @@ namespace MMMEngine
 		bool UpdateShapeGeometry() override;
 
 		void BuildShape(physx::PxPhysics* physics, physx::PxMaterial* material) override;
+
+		DebugColliderShapeDesc GetDebugShapeDesc() const override;
 	private:
 		float m_radius = 0.5f;
 	};

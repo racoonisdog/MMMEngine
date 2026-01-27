@@ -1,6 +1,7 @@
-#include "BoxColliderComponent.h"
+﻿#include "BoxColliderComponent.h"
 #include "rttr/registration"
 #include "PhysxManager.h"
+#include "PhysxHelper.h"
 
 RTTR_REGISTRATION
 {
@@ -72,4 +73,16 @@ void MMMEngine::BoxColliderComponent::BuildShape(physx::PxPhysics* physics, phys
 	if (!shape) return;
 
 	SetShape(shape, true);
+}
+
+MMMEngine::ColliderComponent::DebugColliderShapeDesc MMMEngine::BoxColliderComponent::GetDebugShapeDesc() const
+{
+	DebugColliderShapeDesc s_Desc;
+	s_Desc.type = DebugColliderType::Box;
+	s_Desc.halfExtents = m_halfExtents;
+
+	// 로컬 포즈가 있으면 같이
+	s_Desc.localCenter = ToVec(m_LocalPose.p);
+	s_Desc.localRotation = ToQuat(m_LocalPose.q);
+	return s_Desc;
 }
