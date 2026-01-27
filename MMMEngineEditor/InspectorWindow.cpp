@@ -11,14 +11,153 @@ using namespace DirectX;
 #include "StringHelper.h"
 #include "ProjectManager.h"
 #include "ResourceManager.h"
-
+#include <rttr/variant_sequential_view.h>
 #include <optional>
+#include <iterator> 
 
 using namespace MMMEngine;
 using namespace MMMEngine::Editor;
 using namespace MMMEngine::Utility;
 
+static rttr::variant MakeDefaultElement(rttr::type elemType)
+{
+    // 기본 생성이 가능한 타입이어야 함 (POD/기본형/기본생성자 있는 struct 등)
+    if (elemType.is_arithmetic())
+    {
+        if (elemType == rttr::type::get<int>())   return 0;
+        if (elemType == rttr::type::get<float>()) return 0.0f;
+        if (elemType == rttr::type::get<bool>())  return false;
+    }
+    if (elemType == rttr::type::get<DirectX::SimpleMath::Vector3>())
+        return DirectX::SimpleMath::Vector3(0, 0, 0);
 
+    // 그 외는 RTTR create()
+    return elemType.create(); // 실패하면 invalid 가능
+}
+
+static bool DrawElementPOD(const char* label, rttr::variant& elem, rttr::type elemType, bool readOnly)
+{
+    bool changed = false;
+
+    if (elemType == rttr::type::get<int>())
+    {
+        int v = elem.to_int();
+        if (readOnly) ImGui::BeginDisabled(true);
+        changed = ImGui::DragInt(label, &v);
+        if (readOnly) ImGui::EndDisabled();
+        if (changed && !readOnly) elem = v;
+    }
+    else if (elemType == rttr::type::get<float>())
+    {
+        float v = elem.to_double(); // float로도 안전
+        if (readOnly) ImGui::BeginDisabled(true);
+        changed = ImGui::DragFloat(label, &v, 0.1f);
+        if (readOnly) ImGui::EndDisabled();
+        if (changed && !readOnly) elem = v;
+    }
+    else if (elemType == rttr::type::get<bool>())
+    {
+        bool v = elem.to_bool();
+        if (readOnly) ImGui::BeginDisabled(true);
+        changed = ImGui::Checkbox(label, &v);
+        if (readOnly) ImGui::EndDisabled();
+        if (changed && !readOnly) elem = v;
+    }
+    else if (elemType == rttr::type::get<DirectX::SimpleMath::Vector3>())
+    {
+        auto v = elem.get_value<DirectX::SimpleMath::Vector3>();
+        float d[3] = { v.x, v.y, v.z };
+        if (readOnly) ImGui::BeginDisabled(true);
+        changed = ImGui::DragFloat3(label, d, 0.1f);
+        if (readOnly) ImGui::EndDisabled();
+        if (changed && !readOnly) elem = DirectX::SimpleMath::Vector3(d[0], d[1], d[2]);
+    }
+    else
+    {
+        ImGui::TextDisabled("%s (unsupported: %s)", label, elemType.get_name().to_string().c_str());
+    }
+
+    return changed;
+}
+
+static void DrawSequentialProperty_UnityLike(const std::string& name,
+    rttr::variant& containerVar,
+    const rttr::property& prop,
+    rttr::instance inst,
+    bool readOnly)
+{
+    auto view = containerVar.create_sequential_view();
+    if (!view.is_valid()) return;
+
+    const bool dynamic = view.is_dynamic();
+    rttr::type elemType = view.get_value_type();
+
+    // 1. 프로퍼티 헤더를 오른쪽으로 밀기
+    ImGui::Indent(ImGui::GetTreeNodeToLabelSpacing());
+
+    // 2. ID 충돌 방지: 레이블 뒤에 ##을 붙여 ID를 고정합니다.
+    // 사이즈가 변해도 name이 같으면 열림 상태가 유지됩니다.
+    std::string headerLabel = name + "  [" + std::to_string(view.get_size()) + "]###" + name;
+
+    bool opened = ImGui::CollapsingHeader(headerLabel.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+
+    if (opened)
+    {
+        // 내부 아이템 들여쓰기
+        ImGui::Indent(ImGui::GetTreeNodeToLabelSpacing());
+
+        // --- Size UI ---
+        int size = (int)view.get_size();
+        int newSize = size;
+        bool sizeEditable = (!readOnly && dynamic);
+
+        if (!sizeEditable) ImGui::BeginDisabled(true);
+        ImGui::SetNextItemWidth(120);
+        // Size 필드에도 고유 ID 부여
+        if (ImGui::InputInt(("Size##" + name).c_str(), &newSize))
+        {
+            if (sizeEditable)
+            {
+                newSize = std::max(0, newSize);
+                view.set_size((size_t)newSize);
+            }
+        }
+        if (!sizeEditable) ImGui::EndDisabled();
+
+        // --- Elements Loop ---
+        int idx = 0;
+        for (auto it = view.begin(); it != view.end();)
+        {
+            ImGui::PushID(idx);
+
+            rttr::variant elem = (*it);
+            rttr::variant unwrapped = elem.extract_wrapped_value();
+            if (unwrapped.is_valid()) elem = unwrapped;
+
+            std::string label = "Element " + std::to_string(idx);
+
+            rttr::variant edited = elem;
+            bool changed = DrawElementPOD(label.c_str(), edited, elemType, readOnly);
+
+            if (changed && !readOnly)
+            {
+                view.set_value((size_t)idx, edited);
+            }
+
+            ++it;
+            ++idx;
+            ImGui::PopID();
+        }
+
+        ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
+    }
+
+    // 3. 들여쓰기 복구
+    ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
+
+    if (!readOnly)
+        prop.set_value(inst, containerVar);
+}
 
 static std::string MakeStringKey(const rttr::instance& inst, const rttr::property& prop)
 {
@@ -151,6 +290,11 @@ void MMMEngine::Editor::InspectorWindow::RenderProperties(rttr::instance inst)
             if (readOnly) ImGui::EndDisabled();
         }
 
+        else if (var.is_sequential_container())
+        {
+            // 읽기 전용 여부
+            DrawSequentialProperty_UnityLike(name, var, prop, inst, readOnly);
+        }
         else if (var.is_type<float>())
         {
             float f = var.get_value<float>();
@@ -184,6 +328,35 @@ void MMMEngine::Editor::InspectorWindow::RenderProperties(rttr::instance inst)
             if (changed && !readOnly)
                 prop.set_value(inst, ntger);
         }
+        else if (var.is_type<Color>())
+        {
+            Color c = var.get_value<Color>();
+            float rgba[4] = { c.x, c.y, c.z, c.w };
+
+            if (readOnly) ImGui::BeginDisabled(true);
+
+            // ColorEdit4는 0~1 범위 기대 (HDR 원하면 ColorEditFlags_HDR)
+            bool changed = ImGui::ColorEdit4(name.c_str(), rgba,
+                ImGuiColorEditFlags_Float | ImGuiColorEditFlags_AlphaBar);
+
+            if (readOnly) ImGui::EndDisabled();
+
+            if (changed && !readOnly)
+                prop.set_value(inst, Color(rgba[0], rgba[1], rgba[2], rgba[3]));
+        }
+        else if (var.is_type<Vector4>())
+        {
+            Vector4 v = var.get_value<Vector4>();
+            float data[4] = { v.x, v.y, v.z, v.w };
+
+            if (readOnly) ImGui::BeginDisabled(true);
+            bool changed = ImGui::DragFloat4(name.c_str(), data, 0.1f);
+            if (readOnly) ImGui::EndDisabled();
+
+            if (changed && !readOnly)
+                prop.set_value(inst, Vector4(data[0], data[1], data[2], data[3]));
+        }
+
         else if (propType.get_name().to_string().find("shared_ptr") != std::string::npos)
         {
             auto args = propType.get_template_arguments();
