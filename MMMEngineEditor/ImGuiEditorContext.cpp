@@ -8,7 +8,7 @@
 
 #include "SceneManager.h"
 #include "SceneSerializer.h"
-
+#include "ProjectManager.h"
 #include "EditorRegistry.h"
 #include "StringHelper.h"
 
@@ -27,6 +27,7 @@ using namespace MMMEngine::Utility;
 #include "PhysicsSettingsWindow.h"
 #include "PlayerBuildWindow.h"
 #include "SceneNameWindow.h"
+#include "SceneChangeWindow.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -331,6 +332,21 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
         {
             if (ImGui::BeginMenu(u8"파일"))
             {
+                if (ImGui::MenuItem(u8"새 프로젝트"))
+                {
+                    p_open = false;
+                }
+                if (ImGui::MenuItem(u8"프로젝트 불러오기"))
+                {
+                    p_open = false;
+                }
+                if (ImGui::MenuItem(u8"프로젝트 저장"))
+                {
+                    ProjectManager::Get().SetLastSceneIndex(SceneManager::Get().GetCurrentScene().id);
+                    ProjectManager::Get().SaveActiveProject();
+                    p_open = false;
+                }
+                ImGui::Separator();
                 if (ImGui::MenuItem(u8"씬 리스트"))
                 {
                     g_editor_window_scenelist = true;
@@ -342,6 +358,7 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
                     auto sceneRaw = SceneManager::Get().GetSceneRaw(sceneRef);
 
                     SceneSerializer::Get().Serialize(*sceneRaw, SceneManager::Get().GetSceneListPath() + L"/" + StringHelper::StringToWString(sceneRaw->GetName()) + L".scene");
+                    SceneManager::Get().ReloadSnapShotCurrentScene();
                     SceneSerializer::Get().ExtractScenesList(SceneManager::Get().GetAllSceneToRaw(), SceneManager::Get().GetSceneListPath());
                     p_open = false;
                 }
@@ -350,6 +367,11 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
                     g_editor_window_sceneName = true;
                     p_open = false;
                 }
+                if (ImGui::MenuItem(u8"씬 전환"))
+                {
+                    g_editor_window_sceneChange = true;
+                    p_open = false;
+				}
 
                 ImGui::EndMenu();
             }
@@ -698,6 +720,7 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
     ScriptBuildWindow::Get().Render();
     SceneListWindow::Get().Render();
 	SceneNameWindow::Get().Render();
+	SceneChangeWindow::Get().Render();
     HierarchyWindow::Get().Render();
     InspectorWindow::Get().Render();
     GameViewWindow::Get().Render();

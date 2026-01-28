@@ -195,6 +195,9 @@
     <ClInclude Include="SceneNameWindow.h">
       <Filter>헤더 파일\EditorWindow\Popup</Filter>
     </ClInclude>
+    <ClInclude Include="SceneChangeWindow.h">
+      <Filter>헤더 파일\EditorWindow\Popup</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -282,6 +285,9 @@
       <Filter>소스 파일\EditorWIndow\Popup</Filter>
     </ClCompile>
     <ClCompile Include="SceneNameWindow.cpp">
+      <Filter>소스 파일\EditorWIndow\Popup</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneChangeWindow.cpp">
       <Filter>소스 파일\EditorWIndow\Popup</Filter>
     </ClCompile>
   </ItemGroup>

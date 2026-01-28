@@ -102,6 +102,14 @@ namespace MMMEngine::Editor
         return *m_project;
     }
 
+    void ProjectManager::SetLastSceneIndex(uint32_t sceneIndex)
+    {
+        if (m_project)
+        {
+            m_project->lastSceneIndex = sceneIndex;
+		}
+    }
+
     fs::path ProjectManager::GetProjectFilePath(const fs::path& root) const
     {
         return root / "ProjectSettings" / "project.json";

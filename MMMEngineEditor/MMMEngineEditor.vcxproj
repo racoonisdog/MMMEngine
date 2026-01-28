@@ -179,6 +179,7 @@
     <ClInclude Include="PlayerBuildWindow.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="ProjectManager.h" />
+    <ClInclude Include="SceneChangeWindow.h" />
     <ClInclude Include="SceneListWindow.h" />
     <ClInclude Include="SceneNameWindow.h" />
     <ClInclude Include="SceneViewWindow.h" />
@@ -212,6 +213,7 @@
     <ClCompile Include="PhysicsSettingsWindow.cpp" />
     <ClCompile Include="PlayerBuildWindow.cpp" />
     <ClCompile Include="ProjectManager.cpp" />
+    <ClCompile Include="SceneChangeWindow.cpp" />
     <ClCompile Include="SceneListWindow.cpp" />
     <ClCompile Include="SceneNameWindow.cpp" />
     <ClCompile Include="SceneViewWindow.cpp" />

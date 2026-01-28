@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Singleton.hpp"
 #include "Project.h"
@@ -11,17 +11,18 @@ namespace MMMEngine::Editor
     class ProjectManager : public Utility::Singleton<ProjectManager>
     {
     public:
-        // ¿¡µğÅÍ ½ÃÀÛ ½Ã
-        bool Boot(); // Âü ¹İÈ¯ ½Ã ÇÁ·ÎÁ§Æ®´Â ÁØºñµÈ »óÅÂ
+        // ì—ë””í„° ì‹œì‘ ì‹œ
+        bool Boot(); // ì°¸ ë°˜í™˜ ì‹œ í”„ë¡œì íŠ¸ëŠ” ì¤€ë¹„ëœ ìƒíƒœ
 
         bool HasActiveProject() const;
         const Project& GetActiveProject() const;
+		void SetLastSceneIndex(uint32_t sceneIndex);
 
         // Project operations
         bool OpenProject(const std::filesystem::path& projectFile);
         bool CreateNewProject(const std::filesystem::path& projectRootDir);
 
-        // ÀúÀå °æ·Î: projectRoot/ProjectSettings/project.json
+        // ì €ì¥ ê²½ë¡œ: projectRoot/ProjectSettings/project.json
         std::optional<std::filesystem::path> SaveActiveProject();
 
 
@@ -39,7 +40,7 @@ namespace MMMEngine::Editor
 
         void EnsureUserScriptsFolders(const std::filesystem::path& projectRootDir) const;
         bool GenerateUserScriptsVcxproj(const std::filesystem::path& projectRootDir) const;
-        bool GenerateUserScriptsFilters(const std::filesystem::path& projectRootDir) const; // ¼±ÅÃ(ÀÖÀ¸¸é VS¿¡¼­ º¸±â ÁÁÀ½)
+        bool GenerateUserScriptsFilters(const std::filesystem::path& projectRootDir) const; // ì„ íƒ(ìˆìœ¼ë©´ VSì—ì„œ ë³´ê¸° ì¢‹ìŒ)
         void GenerateDefaultScriptIfEmpty(const std::filesystem::path& projectRootDir) const;
 
     };
