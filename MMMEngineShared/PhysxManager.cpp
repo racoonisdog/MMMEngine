@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 #include "GameObject.h"
 #include "BehaviourManager.h"
+#include "PhysxHelper.h"
 
 DEFINE_SINGLETON(MMMEngine::PhysxManager)
 
@@ -506,7 +507,7 @@ void MMMEngine::PhysxManager::UnbindScene()
 
 void MMMEngine::PhysxManager::DispatchPhysicsEvents()
 {
-    // 1) Contact (충돌)
+    // Contact (충돌)
     const auto& contacts = m_PhysScene.GetFrameContacts();
     for (const auto& e : contacts)
     {
@@ -527,9 +528,43 @@ void MMMEngine::PhysxManager::DispatchPhysicsEvents()
         const bool exit = (e.events & physx::PxPairFlag::eNOTIFY_TOUCH_LOST) != 0;
 
 
-        if (enter) Callback_Que.push_back({ goA, goB, P_EvenType::C_enter });
-        if (stay)  Callback_Que.push_back({ goA, goB, P_EvenType::C_stay });
-        if (exit)  Callback_Que.push_back({ goA, goB, P_EvenType::C_out });
+        //로직변경 코드
+        // ContactEvent에서 채워 넣은 정보(PhysX에서 뽑아둔 값)
+        const Vector3 nA = ToVec(e.normal); // A 기준 normal
+        const Vector3 p = ToVec(e.point);
+        const float depth = e.penetrationDepth;
+
+        auto PushCollisionBoth = [&](CollisionPhase phase)
+            {
+                // A -> B
+                CollisionInfo infoA;
+                infoA.self = goA;
+                infoA.other = goB;
+                infoA.selfCollider = colA;
+                infoA.otherCollider = colB;
+                infoA.normal = nA;
+                infoA.point = p;
+                infoA.penetrationDepth = depth;
+                infoA.phase = phase;
+                Callback_Que.emplace_back(infoA);
+
+                // B -> A (normal 반전)
+                CollisionInfo infoB;
+                infoB.self = goB;
+                infoB.other = goA;
+                infoB.selfCollider = colB;
+                infoB.otherCollider = colA;
+                infoB.normal = -nA;
+                infoB.point = p;
+                infoB.penetrationDepth = depth;
+                infoB.phase = phase;
+                Callback_Que.emplace_back(infoB);
+            };
+
+        if (enter) PushCollisionBoth(CollisionPhase::Enter);
+        if (stay)  PushCollisionBoth(CollisionPhase::Stay);
+        if (exit)  PushCollisionBoth(CollisionPhase::Exit);
+        //
     }
 
     // 2) Trigger
@@ -544,20 +579,29 @@ void MMMEngine::PhysxManager::DispatchPhysicsEvents()
         auto goO = otherCol->GetGameObject();
         if (!goT.IsValid() || !goO.IsValid()) continue;
 
-        if (t.isEnter)
-        {
-            Callback_Que.push_back({ goT, goO, P_EvenType::T_enter });
+        const TriggerPhase phase = t.isEnter ? TriggerPhase::Enter : TriggerPhase::Exit;
 
-        }
-        else
-        {
-            Callback_Que.push_back({ goT, goO, P_EvenType::T_out });
-        }
+        // 트리거도 양쪽에 이벤트를 주고 싶으면 2개 push
+        TriggerInfo infoT;
+        infoT.self = goT;
+        infoT.other = goO;
+        infoT.selfCollider = triggerCol;
+        infoT.otherCollider = otherCol;
+        infoT.phase = phase;
+        Callback_Que.emplace_back(infoT);
+
+        TriggerInfo infoO;
+        infoO.self = goO;
+        infoO.other = goT;
+        infoO.selfCollider = otherCol;
+        infoO.otherCollider = triggerCol;
+        infoO.phase = phase;
+        Callback_Que.emplace_back(infoO);
     }
 }
-
 
 void MMMEngine::PhysxManager::Shutdown()
 {
     UnbindScene();
 }
+

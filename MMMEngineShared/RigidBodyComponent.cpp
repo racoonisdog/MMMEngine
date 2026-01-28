@@ -523,7 +523,7 @@ Quaternion MMMEngine::RigidBodyComponent::Px_GetWorldRotation() const
 
 Vector3 MMMEngine::RigidBodyComponent::Px_GetForward() const
 {
-	Vector3 forward(0.f, 0.f, -1.f); // 엔진 정면 기준 (-Z)
+	Vector3 forward(0.f, 0.f, 1.f); // 엔진 정면 기준 (-Z)
 
 	if (m_Actor)
 	{

@@ -10,19 +10,46 @@
 
 
 #include <iostream>
-#include <tuple>
+#include <variant>
+
 
 
 namespace MMMEngine
 {
-	enum class P_EvenType
+	struct CollisionInfo
 	{
-		C_enter,		//contact 진입
-		C_stay,			//contact 중
-		C_out,			//contact 종료
-		T_enter,		//trigger 진입
-		T_out			//trigger 종료
+		ObjPtr<GameObject> self;
+		ObjPtr<GameObject> other;
+
+		Vector3 normal;          // self 기준 (중요)
+		Vector3 point;           // 월드 접촉점(대표값)
+		float penetrationDepth;  // >= 0
+
+		ColliderComponent* selfCollider = nullptr;
+		ColliderComponent* otherCollider = nullptr;
+
+		bool isTrigger = false; // collision이면 false
+
+		CollisionPhase phase = CollisionPhase::Stay;
 	};
+
+	struct TriggerInfo
+	{
+		ObjPtr<GameObject> self;
+		ObjPtr<GameObject> other;
+
+		ColliderComponent* selfCollider = nullptr;
+		ColliderComponent* otherCollider = nullptr;
+
+		bool isEnter = false;
+
+		TriggerPhase phase = TriggerPhase::Enter;
+	};
+
+
+	enum class CollisionPhase { Enter, Stay, Exit };
+	enum class TriggerPhase { Enter, Exit };
+
 	class MMMENGINE_API PhysxManager : public Utility::ExportSingleton<PhysxManager>
 	{
 	public:
@@ -54,12 +81,14 @@ namespace MMMEngine
 
 		MMMEngine::PhysScene* getPScene() { return &m_PhysScene; }
 
-		std::vector<std::tuple<ObjPtr<GameObject>, ObjPtr<GameObject>, P_EvenType>>& GetCallbackQue() { return Callback_Que; }
+		
 
 		void SetSceneGravity(float x, float y, float z);
 
 
 		void SetLayerCollision(uint32_t layerA, uint32_t layerB, bool canCollide);
+
+		std::vector<std::variant<CollisionInfo, TriggerInfo>> GetCallbackQue() { return Callback_Que; }
 
 	private:
 		// 내부에서만 쓰는 헬퍼
@@ -91,7 +120,8 @@ namespace MMMEngine
 		bool HasAnyCollider(ObjPtr<GameObject> go) const;
 
 		//이벤트보관함수
-		std::vector<std::tuple<ObjPtr<GameObject>, ObjPtr<GameObject>, P_EvenType>> Callback_Que;
+		//std::vector<std::tuple<ObjPtr<GameObject>, ObjPtr<GameObject>, P_EvenType>> Callback_Que;
+		std::vector<std::variant<CollisionInfo, TriggerInfo>> Callback_Que;
 
 		void Shutdown();
 	private:

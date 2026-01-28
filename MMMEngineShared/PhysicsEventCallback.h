@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <physx/PxPhysicsAPI.h>
 #include <iostream>
 #include <vector>
@@ -13,7 +13,7 @@ namespace MMMEngine
 	public:
 		~PhysXSimulationCallback() override = default;
 
-		//Trigger°¡ ¾Æ´Ñ ¡®¹°¸® Á¢ÃË(Contact)¡¯¿¡¼­ ¹ß»ı, µÎ ¾×ÅÍ°¡ ½ÇÁ¦·Î ¹°¸®ÀûÀ¸·Î ¸Â´ê¾ÒÀ» ¶§ Ãæµ¹ ½ÃÀÛ / À¯Áö / Á¾·á »óÅÂ¸¦ ´ã±â À§ÇÑ ÀÌº¥Æ® µ¥ÀÌÅÍ
+		//Triggerê°€ ì•„ë‹Œ â€˜ë¬¼ë¦¬ ì ‘ì´‰(Contact)â€™ì—ì„œ ë°œìƒ, ë‘ ì•¡í„°ê°€ ì‹¤ì œë¡œ ë¬¼ë¦¬ì ìœ¼ë¡œ ë§ë‹¿ì•˜ì„ ë•Œ ì¶©ëŒ ì‹œì‘ / ìœ ì§€ / ì¢…ë£Œ ìƒíƒœë¥¼ ë‹´ê¸° ìœ„í•œ ì´ë²¤íŠ¸ ë°ì´í„°
 		struct ContactEvent
 		{
 			physx::PxActor* a;
@@ -24,14 +24,19 @@ namespace MMMEngine
 
 			physx::PxU32 events;
 
-			ContactEvent(physx::PxActor* _a, physx::PxActor* _b, physx::PxShape* _ashape , physx::PxShape* _bshape, physx::PxU32 _events)
-				: a(_a), b(_b), aShape(_ashape), bShape(_bshape), events(_events) {
+			physx::PxVec3 normal{ 0, 0, 0 };     // A ê¸°ì¤€ ëŒ€í‘œ noraml
+			physx::PxVec3 point{ 0, 0, 0 };      // ëŒ€í‘œ contact point
+			float penetrationDepth = 0.0f;   // >= 0 (ì¹¨íˆ¬ ê¹Šì´)
+
+			ContactEvent(physx::PxActor* _a, physx::PxActor* _b, physx::PxShape* _ashape , physx::PxShape* _bshape, physx::PxU32 _events,
+				const physx::PxVec3& _normal, const physx::PxVec3& _point, float _depth)
+				: a(_a), b(_b), aShape(_ashape), bShape(_bshape), events(_events), normal(_normal), point(_point), penetrationDepth(_depth) {
 			}
 		};
-		//events¿¡´Â Found, Persists, lost °°Àº »óÅÂ Á¸Àç
+		//eventsì—ëŠ” Found, Persists, lost ê°™ì€ ìƒíƒœ ì¡´ì¬
 
 		
-		//Æ®¸®°Å °´Ã¼, ÀÏ¹İ°´Ã¼¸¦ ´ã´Â ÄÁÅ×ÀÌ³Ê
+		//íŠ¸ë¦¬ê±° ê°ì²´, ì¼ë°˜ê°ì²´ë¥¼ ë‹´ëŠ” ì»¨í…Œì´ë„ˆ
 		struct TriggerEvent
 		{
 			physx::PxActor* triggerActor;
@@ -42,16 +47,16 @@ namespace MMMEngine
 
 			bool isEnter;			
 		};
-		//physx::PxU32 events; Æ®¸®°Å¿¡¼­ events¸¦ ¾È¾²´Â ÀÌÀ¯´Â Áö±İ´Ü°è¿¡¼­´Â event enter/exit·Î¸¸ ³ª´³À½
+		//physx::PxU32 events; íŠ¸ë¦¬ê±°ì—ì„œ eventsë¥¼ ì•ˆì“°ëŠ” ì´ìœ ëŠ” ì§€ê¸ˆë‹¨ê³„ì—ì„œëŠ” event enter/exitë¡œë§Œ ë‚˜ëˆ´ìŒ
 
-		//Äİ¹é ³»ºÎ¿¡¼­´Â ¼öÁı¸¸ ÇÔ
+		//ì½œë°± ë‚´ë¶€ì—ì„œëŠ” ìˆ˜ì§‘ë§Œ í•¨
 
 		void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override;
 
 		void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) override;
 
 		
-		//´ã¾ÆµĞ ÇÔ¼öµéÀ» ²¨³»¼­ ¾²±âÀ§ÇÑ GetÇÔ¼ö
+		//ë‹´ì•„ë‘” í•¨ìˆ˜ë“¤ì„ êº¼ë‚´ì„œ ì“°ê¸°ìœ„í•œ Getí•¨ìˆ˜
 		const std::vector<ContactEvent>& GetContacts() const { return m_contacts; }
 		const std::vector<TriggerEvent>& GetTriggers() const { return m_triggers; }
 
@@ -62,16 +67,17 @@ namespace MMMEngine
 		void Clear();
 
 
-		//¾Æ·¡´Â ÀÌ¹ø ÇÁ·ÎÁ§Æ®¿¡¼­ »ç¿ë ¾ÈÇÏ´Â ¿ëµµ
-		//constrainbreakÀÇ °æ¿ì ·ÎÇÁ²÷±è, ºÎ·¯Áö´Â ¿¬°á, ·¡±×µ¹ °üÀı ÆÄ¼Õµî¿¡ »ç¿ë ( ÀÌ¹ø ÇÁ·ÎÁ§Æ® »ç¿ë ¾ÈÇÔ )
-		//constraint´Â µÎ ¹°Ã¼¸¦ Æ¯Á¤ ±ÔÄ¢À¸·Î ¹­´ÂÀåÄ¡ - ÀÌ¶§ ÀÏÁ¤ÀÌ»ó ÈûÀ» ÁÖ¸é ²÷¾îÁöµµ·Ï ÀÓ°èÄ¡ ¼³Á¤ÇÏ´Âµ¥ ÀÓ°èÄ¡¸¦ ³ÑÀ¸¸é ÀÌ ÀÌº¥Æ® È£Ãâ
+
+		//ì•„ë˜ëŠ” ì´ë²ˆ í”„ë¡œì íŠ¸ì—ì„œ ì‚¬ìš© ì•ˆí•˜ëŠ” ìš©ë„
+		//constrainbreakì˜ ê²½ìš° ë¡œí”„ëŠê¹€, ë¶€ëŸ¬ì§€ëŠ” ì—°ê²°, ë˜ê·¸ëŒ ê´€ì ˆ íŒŒì†ë“±ì— ì‚¬ìš© ( ì´ë²ˆ í”„ë¡œì íŠ¸ ì‚¬ìš© ì•ˆí•¨ )
+		//constraintëŠ” ë‘ ë¬¼ì²´ë¥¼ íŠ¹ì • ê·œì¹™ìœ¼ë¡œ ë¬¶ëŠ”ì¥ì¹˜ - ì´ë•Œ ì¼ì •ì´ìƒ í˜ì„ ì£¼ë©´ ëŠì–´ì§€ë„ë¡ ì„ê³„ì¹˜ ì„¤ì •í•˜ëŠ”ë° ì„ê³„ì¹˜ë¥¼ ë„˜ìœ¼ë©´ ì´ ì´ë²¤íŠ¸ í˜¸ì¶œ
 		void onConstraintBreak(physx::PxConstraintInfo*, physx::PxU32) override {};
 
-		//¼º´ÉÃÖÀûÈ­, µğ¹ö±× ¿ëµµ·Î »ç¿ë
+		//ì„±ëŠ¥ìµœì í™”, ë””ë²„ê·¸ ìš©ë„ë¡œ ì‚¬ìš©
 		void onWake(physx::PxActor**, physx::PxU32) override {};
 		void onSleep(physx::PxActor**, physx::PxU32) override {};
 
-		//½Ã¹Ä·¹ÀÌ¼Ç °á°ú pose°¡ ÁØºñµÈ ½ÃÁ¡¿¡ °á°ú pose ¹è¿­À» Äİ¹éÀ¸·Î ³Ñ°ÜÁÖ´Â ¸ŞÄ¿´ÏÁò
+		//ì‹œë®¬ë ˆì´ì…˜ ê²°ê³¼ poseê°€ ì¤€ë¹„ëœ ì‹œì ì— ê²°ê³¼ pose ë°°ì—´ì„ ì½œë°±ìœ¼ë¡œ ë„˜ê²¨ì£¼ëŠ” ë©”ì»¤ë‹ˆì¦˜
 		void onAdvance(const physx::PxRigidBody* const*, const physx::PxTransform*, const physx::PxU32) override {};
 	private:
 		std::mutex m_mtx;

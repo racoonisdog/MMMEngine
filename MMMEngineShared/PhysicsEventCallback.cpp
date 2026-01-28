@@ -1,6 +1,6 @@
-#include "PhysicsEventCallback.h"
+ï»¿#include "PhysicsEventCallback.h"
 
-//¹°¸® Á¢ÃË ÀÌº¥Æ® ¼öÁı
+//ë¬¼ë¦¬ ì ‘ì´‰ ì´ë²¤íŠ¸ ìˆ˜ì§‘
 void MMMEngine::PhysXSimulationCallback::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs)
 {
     std::lock_guard<std::mutex> lock(m_mtx);
@@ -12,14 +12,14 @@ void MMMEngine::PhysXSimulationCallback::onContact(const physx::PxContactPairHea
     {
         const physx::PxContactPair& cp = pairs[i];
 
-        // »èÁ¦µÈ shape °ü·ÃÀÌ¸é ½ºÅµÇÏµµ·Ï
+        // ì‚­ì œëœ shape ê´€ë ¨ì´ë©´ ìŠ¤í‚µí•˜ë„ë¡
         if (cp.flags & (physx::PxContactPairFlag::eREMOVED_SHAPE_0 |
             physx::PxContactPairFlag::eREMOVED_SHAPE_1))
         {
             continue;
         }
 
-        // FOUND/PERSISTS/LOST Áß ¾Æ¹«°Íµµ ¾Æ´Ï¸é ½ºÅµ
+        // FOUND/PERSISTS/LOST ì¤‘ ì•„ë¬´ê²ƒë„ ì•„ë‹ˆë©´ ìŠ¤í‚µ
         const bool hasTouchEvent =
             (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) ||
             (cp.events & physx::PxPairFlag::eNOTIFY_TOUCH_PERSISTS) ||
@@ -31,11 +31,43 @@ void MMMEngine::PhysXSimulationCallback::onContact(const physx::PxContactPairHea
         physx::PxShape* shapeA = cp.shapes[0];
         physx::PxShape* shapeB = cp.shapes[1];
 
-        //¼ø¼­º¸ÀåÀÌ ¾ÈµÉ¼öµµ ÀÖÀ¸´Ï ¾ÈÀüÄÚµå
+        //ìˆœì„œë³´ì¥ì´ ì•ˆë ìˆ˜ë„ ìˆìœ¼ë‹ˆ ì•ˆì „ì½”ë“œ
         if (shapeA && shapeA->getActor() != actorA)
             std::swap(shapeA, shapeB);
 
-        m_contacts.emplace_back(actorA, actorB, shapeA, shapeB, static_cast<physx::PxU32>(cp.events));
+        //physxì—ì„œë¶€í„° ë„˜ê²¨ë°›ëŠ” ë²•ì„ , ì ‘ì´‰ ì§€ì , ì¹¨íˆ¬ê¹Šì´ ë“± //ë³€ê²½ì½”ë“œ
+        physx::PxVec3 bestNormal(0.f, 0.f, 0.f);
+        physx::PxVec3 bestPoint(0.f, 0.f, 0.f);
+        float bestDepth = 0.f;
+
+        // LOSTì˜ ê²½ìš° ì ‘ì´‰ì ì´ ì—†ì„ ìˆ˜ ìˆìœ¼ë‹ˆ ë°©ì–´ì½”ë“œ í•„ìš”
+        // contact point ì¶”ì¶œ
+        physx::PxContactPairPoint cps[16];
+        const physx::PxU32 nbContacts = cp.extractContacts(cps, 16);
+
+        if (nbContacts > 0)
+        {
+            // ê°€ì¥ ê¹Šê²Œ ë°•íŒ contact ì„ íƒ: separationì´ ê°€ì¥ ì‘ì€ ê²ƒ(ê°€ì¥ ìŒìˆ˜)
+            float minSeparation = cps[0].separation;
+            physx::PxU32 bestIdx = 0;
+
+            for (physx::PxU32 k = 1; k < nbContacts; ++k)
+            {
+                if (cps[k].separation < minSeparation)
+                {
+                    minSeparation = cps[k].separation;
+                    bestIdx = k;
+                }
+            }
+
+            bestNormal = cps[bestIdx].normal;      // A ê¸°ì¤€ normal
+            bestPoint = cps[bestIdx].position;
+
+            // penetrationDepth: separationì´ ìŒìˆ˜ë©´ ì¹¨íˆ¬
+            bestDepth = (cps[bestIdx].separation < 0.f) ? -cps[bestIdx].separation : 0.f;
+        }
+
+        m_contacts.emplace_back(actorA, actorB, shapeA, shapeB, static_cast<physx::PxU32>(cp.events), bestNormal, bestPoint, bestDepth);
     }
 }
 
@@ -59,7 +91,7 @@ void MMMEngine::PhysXSimulationCallback::onTrigger(physx::PxTriggerPair* pairs, 
         if (!isEnter && !isExit)
             continue;
 
-        // Enter/Exit µÑ ´Ù ¿Ã ¼ö ÀÖÀ¸´Ï, µÑ ´Ù ±â·ÏÇÏ·Á¸é 2¹ø pushÇÏ´Â °Ô ¾ÈÀü
+        // Enter/Exit ë‘˜ ë‹¤ ì˜¬ ìˆ˜ ìˆìœ¼ë‹ˆ, ë‘˜ ë‹¤ ê¸°ë¡í•˜ë ¤ë©´ 2ë²ˆ pushí•˜ëŠ” ê²Œ ì•ˆì „
         if (isEnter)
         {
             m_triggers.push_back(TriggerEvent{ p.triggerActor, p.otherActor, p.triggerShape, p.otherShape, true });
@@ -78,7 +110,7 @@ void MMMEngine::PhysXSimulationCallback::DrainContacts(std::vector<ContactEvent>
         std::lock_guard<std::mutex> lock(m_mtx);
         tmp.swap(m_contacts);
     }
-    // ¶ô ¹Û¿¡¼­ out¿¡ ÇÕÄ¡±â
+    // ë½ ë°–ì—ì„œ outì— í•©ì¹˜ê¸°
     out.insert(out.end(), tmp.begin(), tmp.end());
 
     //out.insert(out.end(), m_contacts.begin(), m_contacts.end());
