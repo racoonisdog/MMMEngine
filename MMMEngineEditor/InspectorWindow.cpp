@@ -364,8 +364,6 @@ void MMMEngine::Editor::InspectorWindow::RenderProperties(rttr::instance inst)
             MMMEngine::Object* obj = nullptr;
             std::string refName = "nullptr";
 
-
-
             if (var.convert(obj) && obj != nullptr)
             {
                 if (auto compConvert = dynamic_cast<Component*>(obj))
@@ -383,6 +381,9 @@ void MMMEngine::Editor::InspectorWindow::RenderProperties(rttr::instance inst)
                         refName = name;
                 }
             }
+
+
+
             // 프로퍼티 이름
             std::string ptrPropType = propType.get_name().to_string() + " " + prop.get_name().to_string();
             ptrPropType = std::regex_replace(ptrPropType, std::regex("ObjPtr"), "");
