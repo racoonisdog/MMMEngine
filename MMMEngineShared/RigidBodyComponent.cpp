@@ -275,6 +275,26 @@ void MMMEngine::RigidBodyComponent::PushForces()
 	t_dynamic->wakeUp();
 }
 
+void MMMEngine::RigidBodyComponent::SnapRotation(const Quaternion& q)
+{
+	if (!m_Actor) return;
+	if (m_Desc.type == Type::Static) return;
+
+	physx::PxTransform pose = m_Actor->getGlobalPose();
+	pose.q = ToPxQuat(q);
+	m_Actor->setGlobalPose(pose);
+
+	if (auto* d = m_Actor->is<physx::PxRigidDynamic>())
+	{
+		if (!m_Desc.isKinematic)
+		{
+			d->setAngularVelocity(physx::PxVec3(0));
+			// 선형 속도는 유지: d->getLinearVelocity() 그대로 둠
+		}
+	}
+	m_WakeRequested = true;
+}
+
 
 
 void MMMEngine::RigidBodyComponent::Teleport(const Vector3& worldPos, const Quaternion& Quater)
@@ -288,7 +308,8 @@ void MMMEngine::RigidBodyComponent::Teleport(const Vector3& worldPos, const Quat
 void MMMEngine::RigidBodyComponent::SetKinematicTarget(const Vector3& worldPos, const Quaternion& Quater)
 {
 	// 키네마틱 호출용 방어코드 다이나믹일경우 아웃
-	if (m_Desc.type != Type::Dynamic) return;
+	//if (m_Desc.type != Type::Dynamic) return;
+	if (!m_Desc.isKinematic) return;
 
 	// 키네마틱 설정이 되었고 키네마틱좌표를 저장
 	m_KinematicTarget.position = worldPos;
@@ -474,6 +495,57 @@ void MMMEngine::RigidBodyComponent::OffPendingType()
 	m_TypeChangePending = false;
 }
 
+Vector3 MMMEngine::RigidBodyComponent::Px_GetWorldPosition() const
+{
+	Vector3 temp_Posion{};
+
+	if (m_Actor)
+	{
+		physx::PxTransform px = m_Actor->getGlobalPose();
+		
+		temp_Posion = ToVec(px.p);
+	}
+	return temp_Posion;
+}
+
+Quaternion MMMEngine::RigidBodyComponent::Px_GetWorldRotation() const
+{
+	Quaternion temp_Quat{};
+
+	if (m_Actor)
+	{
+		physx::PxTransform px = m_Actor->getGlobalPose();
+
+		temp_Quat = ToQuat(px.q);
+	}
+	return Quaternion();
+}
+
+Vector3 MMMEngine::RigidBodyComponent::Px_GetForward() const
+{
+	Vector3 forward(0.f, 0.f, -1.f); // 엔진 정면 기준 (-Z)
+
+	if (m_Actor)
+	{
+		physx::PxTransform px = m_Actor->getGlobalPose();
+		physx::PxVec3 f = px.q.rotate(physx::PxVec3(0, 0, 1));
+		forward = Vector3(f.x, f.y, f.z);
+	}
+
+	//// 캐릭터용: y 제거
+	//forward.y = 0.f;
+	//if (forward.LengthSquared() > 0.f)
+	//	forward.Normalize();
+
+	return forward;
+}
+
+float MMMEngine::RigidBodyComponent::Px_GetYaw() const
+{
+	Vector3 fwd = Px_GetForward();
+	return std::atan2(fwd.x, fwd.z);
+}
+
 
 
 void MMMEngine::RigidBodyComponent::BindTeleport()
@@ -499,7 +571,7 @@ physx::PxForceMode::Enum MMMEngine::RigidBodyComponent::ToPxForceMode(ForceMode 
 void MMMEngine::RigidBodyComponent::SetUseGravity(bool value)
 {
 	auto it  = MMMEngine::PhysxManager::Get().getPScene();
-
+	
 
 	if (&(it->GetScene()) == nullptr)
 	{
@@ -509,6 +581,7 @@ void MMMEngine::RigidBodyComponent::SetUseGravity(bool value)
 		physx::PxActorTypeFlag::eRIGID_DYNAMIC);
 
 	std::cout << count << std::endl;*/
+
 	m_Desc.useGravity = value; m_DescDirty = true; m_WakeRequested = true;
 }
 

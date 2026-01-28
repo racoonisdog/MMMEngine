@@ -1,4 +1,4 @@
-#define NOMINMAX
+﻿#define NOMINMAX
 #include <iostream>
 
 #include "GlobalRegistry.h"
@@ -8,7 +8,7 @@
 #include "InputManager.h"
 #include "TimeManager.h"
 #include "ResourceManager.h"
-#include "BehaviourManager.h"
+#include "BehaviourManager.h"	
 #include "ObjectManager.h"
 #include "SceneManager.h"
 
@@ -22,7 +22,7 @@ void Initialize()
 	GlobalRegistry::g_pApp->OnWindowSizeChanged.AddListener<InputManager, &InputManager::HandleWindowResize>(&InputManager::Get());
 
 	SceneManager::Get().StartUp(L"Data", 0, false);
-	BehaviourManager::Get().StartUp(L"UserScripts");
+	BehaviourManager::Get().StartUp("UserScripts");
 }
 
 void Update()
@@ -42,7 +42,7 @@ void Update()
 		BehaviourManager::Get().AllBroadCastBehaviourMessage("OnSceneLoaded");
 	}
 
-	BehaviourManager::Get().InitializeBehaviours();    // Awake, OnEnable, Start �޽��� ���� (����������)
+	BehaviourManager::Get().InitializeBehaviours();    // Awake, OnEnable, Start
 
 	TimeManager::Get().ConsumeFixedSteps([&](float fixedDt)
 	{

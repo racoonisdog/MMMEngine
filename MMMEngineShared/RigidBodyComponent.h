@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <physx/PxPhysicsAPI.h>
 #include "Component.h"
 #include "SimpleMath.h"
@@ -86,6 +86,9 @@ namespace MMMEngine {
 
 		void PushForces();
 
+		//Dynamic이지만 회전은 즉각 변경하는 로직
+		void SnapRotation(const Quaternion& q);
+
 
 		void Teleport(const DirectX::SimpleMath::Vector3& worldPos, const DirectX::SimpleMath::Quaternion& Quater);
 		void SetKinematicTarget(const DirectX::SimpleMath::Vector3& worldPos, const DirectX::SimpleMath::Quaternion& Quater);
@@ -142,6 +145,18 @@ namespace MMMEngine {
 		void SetType_Internal();
 		bool HasPendingTypeChange();
 		void OffPendingType();
+
+
+		//모델의 물리영역에서의 worldpose, forward, yaw 반환 함수
+		Vector3 Px_GetWorldPosition() const;
+
+		Quaternion Px_GetWorldRotation() const;
+
+		// 바라보는 방향 (월드 기준, y=0 보정 포함 권장)
+		Vector3 Px_GetForward() const;
+
+		// 요 각도 (라디안)
+		float Px_GetYaw() const;
 
 	private:
 		Desc m_Desc;
