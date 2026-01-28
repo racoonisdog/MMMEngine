@@ -37,14 +37,18 @@ void MMMEngine::PhysxManager::BindScene(MMMEngine::Scene* scene)
     }
 }
 
+void MMMEngine::PhysxManager::SetStep()
+{
+    if (!m_IsInitialized) return;
+    FlushCommands_PreStep();     // 등록/부착 등
+    ApplyFilterConfigIfDirty();  // dirty면 정책 갱신 + 전체 재적용 지시
+    FlushDirtyColliders_PreStep(); //collider의 shape가 에디터 단계에서 변형되면 내부적으로 실행
+}
+
 void MMMEngine::PhysxManager::StepFixed(float dt)
 {
     if (!m_IsInitialized) return;
     if (dt <= 0.f) return;
-    FlushCommands_PreStep();     // 등록/부착 등
-
-    ApplyFilterConfigIfDirty();  // dirty면 정책 갱신 + 전체 재적용 지시
-    FlushDirtyColliders_PreStep(); //collider의 shape가 에디터 단계에서 변형되면 내부적으로 실행
 
     m_PhysScene.PushRigidsToPhysics(); //등록된 rb목록을 순회하면서 pushtoPhysics를 호출
     m_PhysScene.Step(dt);       // simulate/fetch

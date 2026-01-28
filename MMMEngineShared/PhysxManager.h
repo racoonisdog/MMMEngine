@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Scene.h"
 #include "TimeManager.h"
 #include "PhysX.h"
@@ -28,6 +28,9 @@ namespace MMMEngine
 	public:
 		// 현재 씬 바인딩 (Scene이 PhysScene을 보유함)
 		void BindScene(MMMEngine::Scene* scene);
+
+		//rigid , collider 등록
+		void SetStep();
 
 		// fixed step에서 호출되는 진입점
 		void StepFixed(float dt);
