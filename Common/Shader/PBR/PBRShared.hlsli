@@ -3,7 +3,7 @@ TextureCube _specular : register(t20);
 TextureCube _irradiance : register(t21);
 Texture2D _brdflut : register(t22);
 
-Texture2D _metallic : register(t30);
+Texture2D _metalic : register(t30);
 Texture2D _roughness : register(t31);
 Texture2D _ambientOcclusion : register(t32);
 
