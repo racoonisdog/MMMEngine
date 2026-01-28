@@ -641,7 +641,7 @@ RTTR_PLUGIN_REGISTRATION
 	using namespace MMMEngine;
 
 	registration::class_<)" << scriptName << R"(>(")" << scriptName << R"(")
-        (rttr::metadata("wrapper_type", rttr::type::get<ObjPtr<)" << scriptName << R"(>>()));
+        (rttr::metadata("wrapper_type_name", "ObjPtr<)" << scriptName << R"("));
 
 	registration::class_<ObjPtr<)" << scriptName << R"(>>("ObjPtr<)" << scriptName << R"(>")
 		.constructor(
