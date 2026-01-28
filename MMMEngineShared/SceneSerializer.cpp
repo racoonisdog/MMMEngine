@@ -714,9 +714,9 @@ void MMMEngine::SceneSerializer::SerializeToMemory(const Scene& scene, SnapShot&
         json compJson;
         json compArray = json::array();
         compJson["Type"] = "Transform";
-        compJson["Props"]["Position"] = json::array({ 0, 0, 0 });
-        compJson["Props"]["Rotation"] = json::array({ 0, 0, 0, 1 });
-        compJson["Props"]["Scale"] = json::array({ 1.0f, 1.0f, 1.0f });
+        compJson["Props"]["Position"]["z"] = 5.0f;
+        compJson["Props"]["Rotation"]["y"] = -1.0f;
+        compJson["Props"]["Rotation"]["w"] = 0.0f;
         compJson["Props"]["MUID"] = Utility::MUID::NewMUID().ToString();
         compJson["Props"]["Parent"] = nullptr;
 

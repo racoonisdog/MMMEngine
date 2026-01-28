@@ -25,8 +25,8 @@ void MMMEngine::Editor::SceneViewWindow::Initialize(ID3D11Device* device, ID3D11
 	if (!m_pCam)
 	{
 		m_pCam = std::make_unique<EditorCamera>();
-		m_pCam->SetPosition(0.0f, 5.0f, -10.0f);
-		m_pCam->SetEulerRotation(DirectX::SimpleMath::Vector3(15.0f, 0.0f, 0.0f));
+		m_pCam->SetPosition(0.0f, 5.0f, 10.0f);
+		m_pCam->SetEulerRotation(DirectX::SimpleMath::Vector3(15.0f, 180.0f, 0.0f));
 		m_pCam->SetFOV(60.0f);
 		m_pCam->SetNearPlane(0.1f);
 		m_pCam->SetFarPlane(1000.0f);
@@ -152,7 +152,12 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 
 		auto viewMat = m_pCam->GetViewMatrix();
 		auto projMat = m_pCam->GetProjMatrix();
-		auto modelMat = g_selectedGameObject->GetTransform()->GetWorldMatrix(); // 값이라도 로컬에 저장
+		
+		auto modelMat = Matrix::Identity;
+			
+		if(g_selectedGameObject.IsValid() && !g_selectedGameObject->IsDestroyed()
+			&& g_selectedGameObject->GetTransform().IsValid() && !g_selectedGameObject->GetTransform()->IsDestroyed())
+			modelMat = g_selectedGameObject->GetTransform()->GetWorldMatrix(); // 값이라도 로컬에 저장
 
 		float* viewPtr = &viewMat.m[0][0];
 		float* projPtr = &projMat.m[0][0];

@@ -150,45 +150,45 @@ void Update()
 	}
 
 	TimeManager::Get().ConsumeFixedSteps([&](float fixedDt)
+	{
+		if (!EditorRegistry::g_editor_scene_playing
+			|| EditorRegistry::g_editor_scene_pause)
+			return;
+
+		BehaviourManager::Get().BroadCastBehaviourMessage("FixedUpdate");
+		PhysxManager::Get().StepFixed(fixedDt);
+
+		std::vector<std::tuple<ObjPtr<GameObject>, ObjPtr<GameObject>, P_EvenType>> vec;
+
+		std::swap(vec, PhysxManager::Get().GetCallbackQue());
+
+		for (auto& [A, B, Event] : vec)
 		{
-			if (!EditorRegistry::g_editor_scene_playing
-				|| EditorRegistry::g_editor_scene_pause)
-				return;
-
-			BehaviourManager::Get().BroadCastBehaviourMessage("FixedUpdate");
-			PhysxManager::Get().StepFixed(fixedDt);
-
-			std::vector<std::tuple<ObjPtr<GameObject>, ObjPtr<GameObject>, P_EvenType>> vec;
-
-			std::swap(vec, PhysxManager::Get().GetCallbackQue());
-
-			for (auto& [A, B, Event] : vec)
+			switch (Event)
 			{
-				switch (Event)
-				{
-				case P_EvenType::C_enter:
-					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnCollisionEnter", B);
-					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnCollisionEnter", A);
-					break;
-				case P_EvenType::C_stay:
-					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnCollisionStay", B);
-					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnCollisionStay", A);
-					break;
-				case P_EvenType::C_out:
-					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnCollisionExit", B);
-					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnCollisionExit", A);
-					break;
-				case P_EvenType::T_enter:
-					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnTriggerEnter", B);
-					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnTriggerEnter", A);
-					break;															
-				case P_EvenType::T_out:											
-					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnTriggerEnter", B);
-					BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnTriggerEnter", A);
-					break;
-				}
+			case P_EvenType::C_enter:
+				BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnCollisionEnter", B);
+				BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnCollisionEnter", A);
+				break;
+			case P_EvenType::C_stay:
+				BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnCollisionStay", B);
+				BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnCollisionStay", A);
+				break;
+			case P_EvenType::C_out:
+				BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnCollisionExit", B);
+				BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnCollisionExit", A);
+				break;
+			case P_EvenType::T_enter:
+				BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnTriggerEnter", B);
+				BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnTriggerEnter", A);
+				break;															
+			case P_EvenType::T_out:											
+				BehaviourManager::Get().SpecificBroadCastBehaviourMessage(A, "OnTriggerEnter", B);
+				BehaviourManager::Get().SpecificBroadCastBehaviourMessage(B, "OnTriggerEnter", A);
+				break;
 			}
-		});
+		}
+	});
 
 
 	if (EditorRegistry::g_editor_scene_playing
