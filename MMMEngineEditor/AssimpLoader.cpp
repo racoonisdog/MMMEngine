@@ -85,9 +85,9 @@ MMMEngine::ResPtr<MMMEngine::StaticMesh> MMMEngine::AssimpLoader::ConvertStaticM
 		for (const auto& [sementic, ref] : mat.textures) {
 			if (!ConvertMaterial(sementic, &ref, material.get()))
 				throw std::runtime_error("AssimpLoader::MaterialMapping Failed!!");
+			material->SetPShader(ShaderInfo::Get().GetDefaultPShader());
+			material->SetVShader(ShaderInfo::Get().GetDefaultVShader());
 		}
-		material->SetPShader(ShaderInfo::Get().GetDefaultPShader());
-		material->SetVShader(ShaderInfo::Get().GetDefaultVShader());
 		matList.push_back(material);
 	}
 	
@@ -733,9 +733,6 @@ void MMMEngine::AssimpLoader::RegisterModel(const std::wstring path, ModelType t
 	if (fPath.has_stem()) {
 		filename = fPath.stem().wstring();
 	}
-
-	//TODO::ExportPath 변경 필요시 제거
-	m_exportPath = fPath.parent_path();
 
 	switch (type)
 	{
