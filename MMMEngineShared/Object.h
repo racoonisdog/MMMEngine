@@ -9,6 +9,9 @@
 
 namespace MMMEngine
 {
+    class GameObject;
+    class Component;
+
     class MMMENGINE_API Object
 	{
 	private:
@@ -58,6 +61,12 @@ namespace MMMEngine
 
         template<typename T>
         static std::vector<ObjPtr<T>> FindObjectsByType();
+
+        static ObjPtr<GameObject> Instantiate(const ObjPtr<GameObject>& original);
+        static ObjPtr<Component> Instantiate(const ObjPtr<Component>& original);
+
+        template<typename T>
+        static ObjPtr<T> Instantiate(const ObjPtr<T>& original);
 
         static void DontDestroyOnLoad(const ObjPtrBase& objPtr);
 

@@ -87,7 +87,7 @@ namespace MMMEngine
 
 		void SetLayerCollision(uint32_t layerA, uint32_t layerB, bool canCollide);
 
-		std::vector<std::variant<CollisionInfo, TriggerInfo>> GetCallbackQue() { return Callback_Que; }
+		std::vector<std::variant<CollisionInfo, TriggerInfo>>& GetCallbackQue() { return Callback_Que; }
 
 	private:
 		// 내부에서만 쓰는 헬퍼

@@ -414,14 +414,16 @@ std::vector<MMMEngine::ObjPtr< MMMEngine::GameObject>> MMMEngine::SceneManager::
 			}
 		}
 	}
-	const auto& ddol_gameobjs_cache = m_dontDestroyOnLoadScene->GetGameObjects();
-	for (auto& ddol_go : ddol_gameobjs_cache)
+	if (m_dontDestroyOnLoadScene.get())
 	{
-		if (ddol_go->GetTag() == tag)
+		const auto& ddol_gameobjs_cache = m_dontDestroyOnLoadScene->GetGameObjects();
+		for (auto& ddol_go : ddol_gameobjs_cache)
 		{
-			cache.push_back(ddol_go);
+			if (ddol_go->GetTag() == tag)
+			{
+				cache.push_back(ddol_go);
+			}
 		}
 	}
-
 	return cache;
 }

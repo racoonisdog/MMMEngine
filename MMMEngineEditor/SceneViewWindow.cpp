@@ -426,6 +426,22 @@ bool MMMEngine::Editor::SceneViewWindow::CreateRenderTargets(ID3D11Device* devic
 	// 카메라 aspect ratio 업데이트
 	m_pCam->SetAspectRatio((float)width, (float)height);
 
+
+	D3D11_TEXTURE2D_DESC idDesc = {};
+	idDesc.Width = width;
+	idDesc.Height = height;
+	idDesc.MipLevels = 1;
+	idDesc.ArraySize = 1;
+	idDesc.Format = DXGI_FORMAT_R32_UINT;           // 핵심
+	idDesc.SampleDesc.Count = 1;
+	idDesc.SampleDesc.Quality = 0;
+	idDesc.Usage = D3D11_USAGE_DEFAULT;
+	idDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+	device->CreateTexture2D(&idDesc, nullptr, m_pIdTexture.GetAddressOf());
+	device->CreateRenderTargetView(m_pIdTexture.Get(), nullptr, m_pIdRTV.GetAddressOf());
+	device->CreateShaderResourceView(m_pIdTexture.Get(), nullptr, m_pIdSRV.GetAddressOf());
+
 	return true;
 }
 
@@ -445,7 +461,8 @@ void MMMEngine::Editor::SceneViewWindow::RenderSceneToTexture(ID3D11DeviceContex
 
 	ID3D11RenderTargetView* rtv = m_pSceneRTV.Get();
 	ID3D11DepthStencilView* dsv = m_pSceneDSV.Get();
-	context->OMSetRenderTargets(1, &rtv, dsv);
+	ID3D11RenderTargetView* rtvs[2] = { m_pSceneRTV.Get(), m_pIdRTV.Get() };
+	context->OMSetRenderTargets(2, rtvs, dsv);
 
 	// Viewport
 	D3D11_VIEWPORT viewport{};

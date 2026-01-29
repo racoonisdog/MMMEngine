@@ -483,25 +483,35 @@ void DeserializeVariant(rttr::variant& target, const json& j, type target_type)
     DeserializeObject(target, j);
 }
 
-void DeserializeComponent(const json& compJson, ObjPtr<GameObject> obj)
+struct PendingComponentProps
 {
-    std::string typeName = compJson["Type"].get<std::string>();
+    ObjPtr<Component> comp;
+    const json* props = nullptr;
+};
 
+ObjPtr<Component> CreateComponentForDeserialize(const json& compJson, ObjPtr<GameObject> obj, bool& outIsMissing)
+{
+    outIsMissing = false;
+
+    if (!compJson.contains("Type"))
+        return {};
+
+    std::string typeName = compJson["Type"].get<std::string>();
     type compType = type::get_by_name(typeName);
+
+    const json* propsPtr = compJson.contains("Props") ? &compJson["Props"] : nullptr;
 
     if (!compType.is_valid())
     {
-        const json& props = compJson["Props"];
         compType = rttr::type::get<MissingScriptBehaviour>();
 
-        // 이게 터진거면 Missing 스크립트 소스가 잘못된 것
-        auto compVar = obj->AddComponent(compType); // ObjPtr<Component> variant 반환한다고 가정
+        auto compVar = obj->AddComponent(compType);
         if (!compVar.IsValid())
-            return;
+            return {};
 
-        if (props.contains("MUID"))
+        if (propsPtr && propsPtr->contains("MUID"))
         {
-            std::string muid = props["MUID"].get<std::string>();
+            std::string muid = (*propsPtr)["MUID"].get<std::string>();
             g_objectTable[muid] = ObjPtr<Object>(compVar);
         }
 
@@ -509,25 +519,28 @@ void DeserializeComponent(const json& compJson, ObjPtr<GameObject> obj)
         if (missing.IsValid())
         {
             missing->SetOriginalTypeName(typeName);
-            std::vector<uint8_t> packed = json::to_msgpack(props);
-            missing->SetOriginalPropsMsgPack(std::move(packed));
+            if (propsPtr)
+            {
+                std::vector<uint8_t> packed = json::to_msgpack(*propsPtr);
+                missing->SetOriginalPropsMsgPack(std::move(packed));
+            }
         }
 
-        // ❗ Missing엔 실제 프로퍼티가 없으니 DeserializeObject 돌리지 않음(데이터 손실 방지)
-        return;
+        outIsMissing = true;
+        return compVar;
     }
 
     auto comp = obj->AddComponent(compType);
-    // Component의 MUID를 먼저 테이블에 등록
-    const json& props = compJson["Props"];
-    if (props.contains("MUID"))
+    if (!comp.IsValid())
+        return {};
+
+    if (propsPtr && propsPtr->contains("MUID"))
     {
-        std::string muid = props["MUID"].get<std::string>();
+        std::string muid = (*propsPtr)["MUID"].get<std::string>();
         g_objectTable[muid] = ObjPtr<Object>(comp);
     }
 
-    // 속성 복원 (ObjPtr도 바로 처리됨)
-    DeserializeObject(*comp, props);
+    return comp;
 }
 
 void DeserializeTransform(Transform& tr, const json& j)
@@ -632,7 +645,9 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
             pendingParent[trMUID] = trProps["Parent"].get<std::string>();
     }
 
-    // 2-pass: 일반 컴포넌트 생성/복원 (Transform은 제외 + RectTransform도 제외)
+    std::vector<PendingComponentProps> pendingComponentProps;
+
+    // 2-pass: 일반 컴포넌트 생성 + MUID 등록 (Transform은 제외)
     for (const auto& goJson : gameObjects)
     {
         std::string goMUID = goJson["MUID"].get<std::string>();
@@ -644,15 +659,41 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
         const json& components = goJson["Components"];
         for (const auto& compJson : components)
         {
+            if (!compJson.contains("Type"))
+                continue;
+
             std::string typeName = compJson["Type"].get<std::string>();
             if (typeName == "Transform") // 정확 일치로 스킵 권장
                 continue;
 
-            DeserializeComponent(compJson, go);
+            bool isMissing = false;
+            ObjPtr<Component> comp = CreateComponentForDeserialize(compJson, go, isMissing);
+            if (!comp.IsValid())
+                continue;
+
+            if (!isMissing && compJson.contains("Props"))
+            {
+                PendingComponentProps pending;
+                pending.comp = comp;
+                pending.props = &compJson["Props"];
+                pendingComponentProps.push_back(std::move(pending));
+            }
         }
     }
 
-    // 3-pass: Parent 연결 (Transform MUID 기준)
+    // 3-pass: 일반 컴포넌트 프로퍼티 복원 (모든 ObjPtr이 테이블에 등록된 뒤)
+    for (auto& pending : pendingComponentProps)
+    {
+        if (!pending.comp.IsValid() || pending.comp->IsDestroyed())
+            continue;
+
+        if (!pending.props)
+            continue;
+
+        DeserializeObject(*pending.comp, *pending.props);
+    }
+
+    // 4-pass: Parent 연결 (Transform MUID 기준)
     for (auto& [childTrMUID, parentTrMUID] : pendingParent)
     {
         auto itChild = g_objectTable.find(childTrMUID);

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ObjectManager.h"
 #include "Object.h"
 
@@ -9,6 +9,33 @@ namespace MMMEngine
     {
         return ObjectManager::Get()
             .NewObject<T>(std::forward<Args>(args)...);
+    }
+
+    template<typename T>
+    ObjPtr<T> Object::Instantiate(const ObjPtr<T>& original)
+    {
+        static_assert(std::is_base_of_v<Object, T>,
+            "Instantiate<T>() : T는 Object를 상속받아야 합니다.");
+
+        if constexpr (std::is_base_of_v<Component, T>)
+        {
+            ObjPtr<Component> base = Object::Instantiate(ObjPtr<Component>(original));
+            if (!base.IsValid())
+                return ObjPtr<T>();
+
+            return base.Cast<T>();
+        }
+        else
+        {
+            static_assert(std::is_same_v<T, GameObject>,
+                "Instantiate<T>() : GameObject 또는 Component 계열만 지원합니다.");
+
+            ObjPtr<GameObject> cloned = Object::Instantiate(ObjPtr<GameObject>(original));
+            if (!cloned.IsValid())
+                return ObjPtr<T>();
+
+            return cloned.Cast<T>();
+        }
     }
 
     template<typename T>

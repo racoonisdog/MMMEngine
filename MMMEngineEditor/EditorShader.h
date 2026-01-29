@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 namespace MMMEngine::EditorShader
 {
@@ -20,18 +20,18 @@ PS_INPUT VS_Main(VS_INPUT input)
     return output;
 }
 
-// Pixel Shader Constant Buffer (C++ÀÇ PSSetConstantBuffers(0, ...)¿¡ ¸ÂÃã)
+// Pixel Shader Constant Buffer (C++ì˜ PSSetConstantBuffers(0, ...)ì— ë§ì¶¤)
 cbuffer CameraBuffer : register(b1)
 {
     float3 cameraPosition;
     float cb_padding;
 };
 
-// 'line' ´ë½Å 'gridVal' º¯¼ö¸í »ç¿ë (¿¹¾à¾î Ãæµ¹ ¹æÁö)
+// 'line' ëŒ€ì‹  'gridVal' ë³€ìˆ˜ëª… ì‚¬ìš© (ì˜ˆì•½ì–´ ì¶©ëŒ ë°©ì§€)
 float drawGrid(float2 uv, float thickness)
 {
     float2 derivative = fwidth(uv);
-    derivative = max(derivative, float2(0.0001, 0.0001)); // 0 ³ª´©±â ¹æÁö
+    derivative = max(derivative, float2(0.0001, 0.0001)); // 0 ë‚˜ëˆ„ê¸° ë°©ì§€
     
     float2 gridPos = abs(frac(uv - 0.5) - 0.5) / derivative;
     float gridVal = min(gridPos.x, gridPos.y);
@@ -53,15 +53,15 @@ float4 PS_Main(PS_INPUT input) : SV_TARGET
     float dist = length(input.worldPosition - cameraPosition);
     float fade = 1.0 - smoothstep(15.0, 45.0, dist);
 
-    // --- grid ¸ÕÀú ---
+    // --- grid ë¨¼ì € ---
     float g1 = drawGrid(uv, 1.0);
     float g2 = drawGrid(uv * 0.1, 1.0);
     float gridA = max(g1 * 0.15, g2 * 0.4) * fade;
     float3 gridRGB = float3(0.5, 0.5, 0.5);
 
-    // --- axis ¸¶½ºÅ© ---
+    // --- axis ë§ˆìŠ¤í¬ ---
     float pixelAxisWidth   = 1.0;
-    float maxAxisWorldWide = 0.5; // Æ©´× Æ÷ÀÎÆ®
+    float maxAxisWorldWide = 0.5; // íŠœë‹ í¬ì¸íŠ¸
 
     float zMask = axisLine(abs(input.worldPosition.x), d.x, pixelAxisWidth, maxAxisWorldWide);
     float xMask = axisLine(abs(input.worldPosition.z), d.y, pixelAxisWidth, maxAxisWorldWide);
@@ -71,16 +71,34 @@ float4 PS_Main(PS_INPUT input) : SV_TARGET
 
     float axisA = max(zMask, xMask) * fade;
 
-    // Ãà »ö(¿øÁ¡Àº ¼¯ÀÌ°Ô)
+    // ì¶• ìƒ‰(ì›ì ì€ ì„ì´ê²Œ)
     float3 axisRGB = (zRGB * zMask + xRGB * xMask);
     axisRGB = (axisRGB / max(zMask + xMask, 1e-4));
 
-    // --- ÇÕ¼º: ±×¸®µå À§¿¡ Ãà ---
+    // --- í•©ì„±: ê·¸ë¦¬ë“œ ìœ„ì— ì¶• ---
     float3 outRGB = lerp(gridRGB, axisRGB, max(zMask, xMask));
     float  outA   = max(gridA, axisA);
 
     if (outA < 0.01) discard;
     return float4(outRGB, outA);
+}
+)";
+    inline const char* g_shader_id = R"(
+cbuffer TransformBuffer : register(b1)
+{
+    float4x4 gWorld;
+    float4x4 gNormalMatrix;
+    uint     gObjectId;   // align ë§ì¶”ê¸° ìœ„í•´ float4ë¡œ ë¬¶ì–´ë„ ë¬´ë°©
+};
+
+float4 PSMain(PS_IN input) : SV_Target0
+{
+    // ê¸°ì¡´ ì»¬ëŸ¬ ê³„ì‚°
+}
+
+uint PSId(PS_IN input) : SV_Target1
+{
+    return gObjectId;
 }
 )";
 }
