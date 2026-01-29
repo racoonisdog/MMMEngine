@@ -60,9 +60,6 @@
     <ClCompile Include="RenderStateGuard.cpp">
       <Filter>소스 파일\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>소스 파일\Core\Render API\Component</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>소스 파일\Core\Render API\Component</Filter>
     </ClCompile>
@@ -85,6 +82,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="SkySphere.cpp">
+      <Filter>소스 파일\Core\Render API\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
       <Filter>소스 파일\Core\Render API\Component</Filter>
     </ClCompile>
   </ItemGroup>
@@ -228,9 +228,6 @@
     </Filter>
     <Filter Include="소스 파일\Core\Render API\Resource">
       <UniqueIdentifier>{6b2389a3-5afb-4b2f-ac7d-4b8c86d92fa1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Render API\Renderer">
-      <UniqueIdentifier>{e46f436c-e8ee-434c-b526-196ceb6d57fa}</UniqueIdentifier>
     </Filter>
     <Filter Include="헤더 파일\Core\Behaviour API\ScriptLoader">
       <UniqueIdentifier>{26e64790-fb4f-41a4-ab03-f82ee13aa8ad}</UniqueIdentifier>
@@ -518,9 +515,6 @@
     <ClCompile Include="RenderManager.cpp">
       <Filter>소스 파일\Core\Render API</Filter>
     </ClCompile>
-    <ClCompile Include="MeshRenderer.cpp">
-      <Filter>소스 파일\Core\Render API\Component</Filter>
-    </ClCompile>
     <ClCompile Include="RendererTools.cpp">
       <Filter>소스 파일\Core\Render API\Tools</Filter>
     </ClCompile>
@@ -582,5 +576,10 @@
     <Filter Include="소스 파일\Core\Physcis API">
       <UniqueIdentifier>{e66850de-f491-4f75-9843-c4ad5567a533}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MMMEngineShared.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

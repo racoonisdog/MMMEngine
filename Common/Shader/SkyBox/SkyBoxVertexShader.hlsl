@@ -11,7 +11,7 @@ VS_SKYOUT main(VS_SKYIN input)
     output.PosH = float4(mul((float3) input.Pos, viewRot), 1.0f); // S, R
     output.PosH = mul(output.PosH, mProjection);
     
-    output.PosH.z = output.PosH.w;
+    output.PosH.z = output.PosH.w - 0.001f;
     
     return output;
 }

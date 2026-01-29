@@ -57,7 +57,7 @@ float4 main(PS_INPUT input) : SV_TARGET
     // 벡터
     float3 N = normalize(mul(normalMap, tbn));
     float3 V = normalize(mCamPos.xyz - input.W_Pos.xyz);
-    float3 L = normalize(-mLightDir.xyz);
+    float3 L = normalize(mLightDir.xyz);
     float3 H = normalize(V + L);
     
     // 기본반사율 구하기

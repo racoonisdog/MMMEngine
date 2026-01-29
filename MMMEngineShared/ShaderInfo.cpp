@@ -129,6 +129,7 @@ void MMMEngine::ShaderInfo::StartUp()
 
 	// 쉐이더 리플렉션 등록 (상수버퍼 개별업데이트 사용하기 위함)
 	CreatePShaderReflection(L"Shader/PBR/PS/BRDFShader.hlsl");
+	CreatePShaderReflection(L"Shader/SkyBox/SkyBoxPixelShader.hlsl");
 
 	// 기본 쉐이더 정의
 	m_pDefaultVShader = ResourceManager::Get().Load<VShader>(L"Shader/PBR/VS/SkeletalVertexShader.hlsl");
@@ -200,7 +201,6 @@ void MMMEngine::ShaderInfo::UpdateProperty(ID3D11DeviceContext4* context,
 			return;
 
 		const CBPropertyInfo& cbInfo = cbIt->second;
-
 		auto bufIt = m_CBBufferMap.find(cbInfo.bufferName);
 		if (bufIt == m_CBBufferMap.end())
 			return;
@@ -224,6 +224,7 @@ void MMMEngine::ShaderInfo::UpdateProperty(ID3D11DeviceContext4* context,
 		ID3D11SamplerState* sampler = reinterpret_cast<ID3D11SamplerState*>(const_cast<void*>(data));
 		context->PSSetSamplers(pinfo.bufferIndex, 1, &sampler);
 	}
+
 }
 
 const int MMMEngine::ShaderInfo::PropertyToIdx(const ShaderType _type, const std::wstring& _propertyName, PropertyInfo* _out /*= nullptr*/) const

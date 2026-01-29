@@ -8,7 +8,7 @@ RTTR_REGISTRATION
 	using namespace MMMEngine;
 
 	registration::class_<Renderer>("Renderer")
-		(rttr::metadata("wrapper_type_name", "ObjPtr<Renderer>"))
+		(rttr::metadata("wrapper_type_name", "ObjPtr<Renderer>"))(rttr::metadata("INSPECTOR", "DONT_ADD_COMP"))
 		.property("isEnabled", &Renderer::GetEnabled, &Renderer::SetEnabled);
 
 
