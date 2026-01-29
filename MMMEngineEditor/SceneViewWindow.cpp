@@ -527,7 +527,7 @@ void MMMEngine::Editor::SceneViewWindow::RenderSceneToTexture(ID3D11DeviceContex
 				{
 					BoundingSphere sphere;
 					sphere.Center = desc.localCenter;
-					sphere.Radius = desc.radius;
+					sphere.Radius = desc.sphereRadius;
 					DX::Draw(m_batch.get(), sphere, go->GetTransform()->GetWorldMatrix(), Colors::LightGreen);
 					break;
 				}
