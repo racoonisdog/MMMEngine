@@ -1,10 +1,11 @@
-#include "Texture2D.h"
+ï»¿#include "Texture2D.h"
 #include <wrl/client.h>
 #include <d3d11_4.h>
 #include "RenderManager.h"
 #include <DirectXTex.h>
 #include <RendererTools.h>
 #include <WICTextureLoader.h>
+#include <DDSTextureLoader.h>
 
 #include <rttr/registration>
 
@@ -17,21 +18,47 @@ RTTR_REGISTRATION
 	using namespace MMMEngine;
 
 	registration::class_<Texture2D>("Texture2D")
+		.constructor<>()(policy::ctor::as_std_shared_ptr)
 		.property_readonly("GetFilePath",&Texture2D::GetFilePath);
+
+	type::register_converter_func(
+		[](std::shared_ptr<Resource> from, bool& ok) -> std::shared_ptr<Texture2D>
+		{
+			if (!from) {  // nullptr í—ˆìš©
+				ok = true;
+				return nullptr;
+			}
+			auto result = std::dynamic_pointer_cast<Texture2D>(from);
+			ok = (result != nullptr);
+			return result;
+		}
+	);
 }
 
-// SRV ¸¸µé¾îÁÖ´Â ÇÔ¼ö
+// SRV ë§Œë“¤ì–´ì£¼ëŠ” í•¨ìˆ˜
 void MMMEngine::Texture2D::CreateResourceView(std::filesystem::path& _path, ID3D11ShaderResourceView** _out)
 {
-	// µð¹ÙÀÌ½º °¡Á®¿À±â
+	// ë””ë°”ì´ìŠ¤ ê°€ì ¸ì˜¤ê¸°
 	auto m_pDevice = RenderManager::Get().GetDevice();
 
-	// TGAÆÄÀÏ È®ÀÎ
+	// TGAíŒŒì¼ í™•ì¸
 	if (_path.extension() == L".tga") {
 		DirectX::ScratchImage image;
 		DirectX::TexMetadata meta;
 		HR_T(DirectX::LoadFromTGAFile(_path.wstring().c_str(), &meta, image));
 		HR_T(DirectX::CreateShaderResourceView(m_pDevice.Get(), image.GetImages(), image.GetImageCount(), meta, _out));
+	}
+	else if (_path.extension() == L".dds") {
+		ID3D11DeviceContext* context = nullptr;
+		m_pDevice->GetImmediateContext(&context);
+
+		HR_T(DirectX::CreateDDSTextureFromFile(
+			m_pDevice.Get(),
+			context,
+			_path.wstring().c_str(),
+			nullptr, // ID3D11Resource** (í•„ìš” ì—†ìœ¼ë©´ nullptr)
+			_out     // ID3D11ShaderResourceView** ë°˜í™˜
+		));
 	}
 	else {
 		ID3D11DeviceContext* context = nullptr;
@@ -54,6 +81,8 @@ void MMMEngine::Texture2D::CreateResourceView(std::filesystem::path& _path, ID3D
 bool MMMEngine::Texture2D::LoadFromFilePath(const std::wstring& filePath)
 {
 	fs::path fPath(filePath);
+	if (!fs::exists(fPath))
+		throw std::runtime_error("Texture2D::File does not Exist !!!");
 
 	WRL::ComPtr<ID3D11ShaderResourceView> srv;
 	CreateResourceView(fPath, srv.GetAddressOf());

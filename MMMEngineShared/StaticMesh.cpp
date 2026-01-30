@@ -95,6 +95,10 @@ Microsoft::WRL::ComPtr<ID3D11Buffer> CreateIndexBuffer(const std::vector<UINT>& 
 
 bool MMMEngine::StaticMesh::LoadFromFilePath(const std::wstring& filePath)
 {
+	std::filesystem::path fPath(filePath);
+	if (!std::filesystem::exists(fPath))
+		throw std::runtime_error("StaticMesh::File does not exist!!");
+
 	// 역직렬화
 	ResourceSerializer::Get().DeSerialize_StaticMesh(this, filePath);
 

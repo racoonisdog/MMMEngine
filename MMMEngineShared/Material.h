@@ -35,8 +35,8 @@ namespace MMMEngine {
 		ResPtr<PShader> m_pPShader;
 
 	public:
-		void AddProperty(const std::wstring& _name, const PropertyValue& _value);
-		void SetProperty(const std::wstring& _name, const PropertyValue& _value);
+		void AddProperty(const std::wstring _name, const PropertyValue& _value);
+		void SetProperty(const std::wstring _name, const PropertyValue& _value);
 		void RemoveProperty(const std::wstring& _name);
 		PropertyValue GetProperty(const std::wstring& name) const;
 		const std::unordered_map<std::wstring, PropertyValue>& GetProperties() { return m_properties; }

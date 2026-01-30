@@ -2,5 +2,5 @@
 
 float4 main(VS_SKYOUT input) : SV_TARGET
 {
-    return _cubemap.Sample(_sample, input.Dir);
+    return _cubemap.Sample(_sp0, input.Dir);
 }

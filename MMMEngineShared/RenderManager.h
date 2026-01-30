@@ -49,6 +49,9 @@ namespace MMMEngine
 		// 라이트 저장
 		std::vector<Light*> m_lights;
 
+		// 스카이박스 메테리얼 참조
+		std::weak_ptr<Material> m_pSkyboxMaterial;
+
 		void ApplyMatToContext(ID3D11DeviceContext4* _context, Material* _material);
 		void ApplyLightToMat(ID3D11DeviceContext4* _context, Light* _light, Material* _mat);
 		void ExcuteCommands();
@@ -143,11 +146,14 @@ namespace MMMEngine
 
 		ObjPtr<Camera> GetCamera() { return m_pMainCamera; }
 		void SetCamera(const ObjPtr<Camera> _camera) { if(_camera) m_pMainCamera = _camera; }
-		int AddRenderer(Renderer* _renderer);
+		uint32_t AddRenderer(Renderer* _renderer);
 		void RemoveRenderer(int _idx);
 
 		int AddLight(Light* _obj);
 		void RemoveLight(int _idx);
+
+		UINT GetSceneWidth() { return m_sceneWidth; }
+		UINT GetSceneHeight() { return m_sceneHeight; }
 
 		const Microsoft::WRL::ComPtr<ID3D11Device5> GetDevice() const { return m_pDevice; }
 		const Microsoft::WRL::ComPtr<ID3D11DeviceContext4> GetContext() const { return m_pDeviceContext; }

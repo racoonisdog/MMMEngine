@@ -219,6 +219,7 @@
     <ClInclude Include="MMMTime.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="resource2.h" />
     <ClInclude Include="ResourceSerializer.h" />
     <ClInclude Include="RigidBodyComponent.h" />
     <ClInclude Include="SafeRelease.h" />
@@ -231,7 +232,7 @@
     <ClInclude Include="SerializableEvent.h" />
     <ClInclude Include="ShaderInfo.h" />
     <ClInclude Include="SkeletalMesh.h" />
-    <ClInclude Include="SkySphere.h" />
+    <ClInclude Include="SkyRenderer.h" />
     <ClInclude Include="SphereColliderComponent.h" />
     <ClInclude Include="StaticMesh.h" />
     <ClInclude Include="UserScriptsCommon.h" />
@@ -299,7 +300,7 @@
     <ClCompile Include="ScriptBehaviour.cpp" />
     <ClCompile Include="ShaderInfo.cpp" />
     <ClCompile Include="SkeletalMesh.cpp" />
-    <ClCompile Include="SkySphere.cpp" />
+    <ClCompile Include="SkyRenderer.cpp" />
     <ClCompile Include="SphereColliderComponent.cpp" />
     <ClCompile Include="StaticMesh.cpp" />
     <ClCompile Include="VShader.cpp" />
@@ -313,6 +314,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Object.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MMMEngineShared.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
