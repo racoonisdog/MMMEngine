@@ -5,6 +5,7 @@
 
 #include "EditorRegistry.h"
 #include "ProjectManager.h"
+#include "BuildManager.h"
 
 using namespace MMMEngine::EditorRegistry;
 
@@ -610,12 +611,12 @@ namespace MMMEngine
     public:
         )" << scriptName << R"(()
         {
-            REGISTER_BEHAVIOUR_MESSAGE(Start)
-            REGISTER_BEHAVIOUR_MESSAGE(Update)
         }
 
+        USCRIPT_MESSAGE()
         void Start();
 
+        USCRIPT_MESSAGE()
         void Update();
     };
 }
@@ -632,24 +633,6 @@ namespace MMMEngine
             R"(#include "Export.h"
 #include "ScriptBehaviour.h"
 #include ")" << scriptName << R"(.h"
-#include "rttr/registration"
-#include "rttr/detail/policies/ctor_policies.h"
-
-RTTR_PLUGIN_REGISTRATION
-{
-	using namespace rttr;
-	using namespace MMMEngine;
-
-	registration::class_<)" << scriptName << R"(>(")" << scriptName << R"(")
-        (rttr::metadata("wrapper_type_name", "ObjPtr<)" << scriptName << R"("));
-
-	registration::class_<ObjPtr<)" << scriptName << R"(>>("ObjPtr<)" << scriptName << R"(>")
-		.constructor(
-			[]() {
-				return Object::NewObject<)" << scriptName << R"(>();
-			})
-        .method("Inject", &ObjPtr<)" << scriptName << R"()>::Inject);
-}
 
 void MMMEngine::)" << scriptName << R"(::Start()
 {
@@ -667,27 +650,20 @@ void MMMEngine::Editor::FilesWindow::OpenFileInEditor(const fs::path& filePath)
 {
     std::string ext = filePath.extension().string();
 
-    // C++ 소스 파일인 경우 Visual Studio로 열기
+    // C++ 소스 파일인 경우 Visual Studio로 열기 (/edit = 기존 창에 열기, 없으면 1회만 실행)
     if (ext == ".cpp" || ext == ".h" || ext == ".hpp" || ext == ".c")
     {
-        // 프로젝트 경로 가져오기
-        const auto& project = ProjectManager::Get().GetActiveProject();
-        fs::path projectRoot = fs::path(project.rootPath);
-        fs::path vcxprojPath = projectRoot / "Source" / "UserScripts" / "UserScripts.vcxproj";
-
-        if (fs::exists(vcxprojPath))
-        {
 #ifdef _WIN32
-            // Visual Studio에서 프로젝트와 파일을 함께 열기
-            std::string cmd = "start devenv \"" + vcxprojPath.string() + "\" \"" + filePath.string() + "\"";
+        fs::path devenvPath = BuildManager::Get().FindDevEnv();
+        if (!devenvPath.empty())
+        {
+            // /edit: 이미 떠 있는 VS에 파일만 열기. 없으면 VS 한 번 띄우고 그 창에 열림
+            std::string cmd = "start \"\" \"" + devenvPath.string() + "\" /edit \"" + filePath.string() + "\"";
             int result = system(cmd.c_str());
-
             if (result == 0)
-            {
-                return; // 성공적으로 열렸으면 종료
-            }
-#endif
+                return;
         }
+#endif
     }
 
     // 기본 에디터로 열기 (폴백)

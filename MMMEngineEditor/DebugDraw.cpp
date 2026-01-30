@@ -6,7 +6,7 @@
 //-------------------------------------------------------------------------------------
 
 #include "DebugDraw.h"
-
+#include <vector>
 #include <algorithm>
 
 using namespace DirectX;
@@ -91,6 +91,78 @@ void XM_CALLCONV DX::Draw(
     DrawRing(batch, origin, xaxis, zaxis, color);
     DrawRing(batch, origin, xaxis, yaxis, color);
     DrawRing(batch, origin, yaxis, zaxis, color);
+}
+
+void XM_CALLCONV DX::DrawArc(
+    DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* batch,
+    DirectX::FXMVECTOR origin,
+    DirectX::FXMVECTOR majorAxis,
+    DirectX::FXMVECTOR minorAxis,
+    DirectX::GXMVECTOR color,
+    float startAngle,
+    float endAngle,
+    size_t segments = 16)
+{
+    using namespace DirectX;
+
+    if (segments < 2)
+        segments = 2;
+
+    std::vector<VertexPositionColor> verts;
+    verts.resize(segments + 1);
+
+    const float angleRange = (endAngle - startAngle);
+    const float fAngleDelta = angleRange / float(segments);
+
+    // 시작 각도의 sin/cos
+    float s0, c0;
+    XMScalarSinCos(&s0, &c0, startAngle);
+
+    XMVECTOR incrementalSin = XMVectorReplicate(s0);
+    XMVECTOR incrementalCos = XMVectorReplicate(c0);
+
+    // 증분 회전용 sin/cos
+    const XMVECTOR cosDelta = XMVectorReplicate(cosf(fAngleDelta));
+    const XMVECTOR sinDelta = XMVectorReplicate(sinf(fAngleDelta));
+
+    for (size_t i = 0; i <= segments; ++i)
+    {
+        XMVECTOR pos = XMVectorMultiplyAdd(majorAxis, incrementalCos, origin);
+        pos = XMVectorMultiplyAdd(minorAxis, incrementalSin, pos);
+
+        XMStoreFloat3(&verts[i].position, pos);
+        XMStoreFloat4(&verts[i].color, color);
+
+        // 마지막 점은 회전 갱신 불필요
+        if (i == segments) break;
+
+        // (cos, sin) 회전 갱신
+        const XMVECTOR newCos =
+            XMVectorSubtract(XMVectorMultiply(incrementalCos, cosDelta),
+                XMVectorMultiply(incrementalSin, sinDelta));
+
+        const XMVECTOR newSin =
+            XMVectorAdd(XMVectorMultiply(incrementalCos, sinDelta),
+                XMVectorMultiply(incrementalSin, cosDelta));
+
+        incrementalCos = newCos;
+        incrementalSin = newSin;
+    }
+
+    batch->Draw(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP, verts.data(), static_cast<UINT>(verts.size()));
+}
+
+// 편의용: 반원
+void XM_CALLCONV DX::DrawHalfRing(
+    DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* batch,
+    DirectX::FXMVECTOR origin,
+    DirectX::FXMVECTOR majorAxis,
+    DirectX::FXMVECTOR minorAxis,
+    DirectX::GXMVECTOR color,
+    size_t segments = 16)
+{
+    // 0 ~ PI (sin>=0인 반원)
+    DX::DrawArc(batch, origin, majorAxis, minorAxis, color, 0.0f, DirectX::XM_PI, segments);
 }
 
 void XM_CALLCONV DX::Draw(PrimitiveBatch<VertexPositionColor>* batch,

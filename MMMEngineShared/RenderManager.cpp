@@ -37,11 +37,12 @@ namespace MMMEngine {
 
 	void RenderManager::ApplyMatToContext(ID3D11DeviceContext4* _context, Material* _material)
 	{
-		if (_material->GetFilePath().empty())
+		if (!_material->GetPShader())
 			return;
 
 		auto VS = _material->GetVShader();
 		auto PS = _material->GetPShader();
+		ShaderType type = ShaderInfo::Get().GetShaderType(PS->GetFilePath());
 		_context->VSSetShader(VS->m_pVShader.Get(), nullptr, 0);
 		_context->PSSetShader(PS->m_pPShader.Get(), nullptr, 0);
 
@@ -52,10 +53,9 @@ namespace MMMEngine {
 		_context->PSSetSamplers(0, 1, m_pDafaultSamplerLinear.GetAddressOf());
 
 		// 메테리얼
-			for (auto& [prop, val] : _material->GetProperties()) {
-				ShaderType type = ShaderInfo::Get().GetShaderType(PS->GetFilePath());
-				UpdateProperty(prop, val, type);
-			}
+		for (auto& [prop, val] : _material->GetProperties()) {
+			UpdateProperty(prop, val, type);
+		}
 	}
 
 	void RenderManager::ApplyLightToMat(ID3D11DeviceContext4* _context, Light* _light, Material* _mat)
@@ -87,28 +87,50 @@ namespace MMMEngine {
 						return a.camDistance > b.camDistance;
 					});
 			}
+			else if (type == RenderType::R_SKYBOX)
+			{
+				if (m_pSkyboxMaterial.expired()) {
+					m_pSkyboxMaterial = commands[0].material;
+
+					if(m_pSkyboxMaterial.expired())
+						continue;
+
+					// 공용 리소스 등록
+					for (auto& [prop, val] : m_pSkyboxMaterial.lock()->GetProperties())
+						ShaderInfo::Get().AddGlobalPropVal(S_PBR, prop, val);
+				}
+			}
 			else
 			{
 				// 불투명 오브젝트: 머티리얼 기준 정렬
 				std::sort(commands.begin(), commands.end(),
 					[](const RenderCommand& a, const RenderCommand& b)
 					{
-						return a.material < b.material;
+						if (a.material.expired() || b.material.expired())
+							return false;
+						return a.material.lock() < b.material.lock();
 					});
 			}
 
 			// 정렬된 커맨드 실행
-			Material* lastMaterial = nullptr;
+			std::weak_ptr<Material> lastMaterial;
 			for (auto& cmd : commands)
 			{
-				if (cmd.material != lastMaterial)
+				if (cmd.material.expired())
+					continue;
+
+				auto lMat = lastMaterial.lock();
+				auto cMat = cmd.material.lock();
+
+				if (cMat != lMat)
 				{
 					// TODO::포인트라이트 만들시 밖으로 빼야함
 					for (auto& light : m_lights)
-						ApplyLightToMat(m_pDeviceContext.Get(), light, cmd.material);
+						ApplyLightToMat(m_pDeviceContext.Get(), light, cMat.get());
 
-					ApplyMatToContext(m_pDeviceContext.Get(), cmd.material);
+					ApplyMatToContext(m_pDeviceContext.Get(), cMat.get());
 					lastMaterial = cmd.material;
+					lMat = cMat;
 				}
 
 
@@ -124,7 +146,7 @@ namespace MMMEngine {
 				}
 
 				// 상수버퍼 등록
-				auto sType = ShaderInfo::Get().GetShaderType(lastMaterial->GetPShader()->GetFilePath());
+				auto sType = ShaderInfo::Get().GetShaderType(lMat->GetPShader()->GetFilePath());
 
 				// 상수버퍼 일렬업데이트
 				ShaderInfo::Get().UpdateCBuffers(sType);
@@ -427,6 +449,9 @@ namespace MMMEngine {
 				}
 				else if constexpr (std::is_same_v<T, ResPtr<MMMEngine::Texture2D>>)
 				{
+					if (arg == nullptr)
+						return;
+
 					ID3D11ShaderResourceView* srv = arg->m_pSRV.Get();
 					ShaderInfo::Get().UpdateProperty(m_pDeviceContext.Get(), _type, _propName, srv);
 				}
@@ -658,6 +683,8 @@ namespace MMMEngine {
 		// 씬렌더 해제
 		m_pDeviceContext->RSSetViewports(1, &m_swapViewport);
 		m_pDeviceContext->OMSetRenderTargets(1, reinterpret_cast<ID3D11RenderTargetView* const*>(m_pRenderTargetView.GetAddressOf()), nullptr);
+
+		// TODO::백버퍼에다 씬 즉시 드로우 (풀스크린 트라이앵글)
 	}
 
 	void RenderManager::RenderOnlyRenderer()
@@ -670,6 +697,8 @@ namespace MMMEngine {
 
 		// 리소스 업데이트
 		m_pDeviceContext->UpdateSubresource1(m_pCambuffer.Get(), 0, nullptr, &m_camMat, 0, 0, D3D11_COPY_DISCARD);
+
+		// ID 만드는 
 
 		// 기본 렌더셋팅
 		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -694,15 +723,16 @@ namespace MMMEngine {
 		m_pSwapChain->Present(m_rSyncInterval, 0);
 	}
 
-	int RenderManager::AddRenderer(Renderer* _renderer)
+	uint32_t RenderManager::AddRenderer(Renderer* _renderer)
 	{
-		int index = static_cast<int>(m_renderers.size());
+		static uint32_t index = 0;
+
 		if (_renderer == nullptr)
-			return -1;
+			return UINT32_MAX;
 		
 		m_renderers.push_back(_renderer);
 		m_renInitQueue.push(_renderer);
-		return index;
+		return index++;
 	}
 
 	void RenderManager::RemoveRenderer(int _idx)

@@ -1,0 +1,10 @@
+{
+    "MUID": "54686641-fc4a-4c98-bbe9-87ff5ffe715e",
+    "properties": {},
+    "pshader": {
+        "file": "Shader/SkyBox/SkyBoxPixelShader.hlsl"
+    },
+    "vshader": {
+        "file": "Shader/SkyBox/SkyBoxVertexShader.hlsl"
+    }
+}

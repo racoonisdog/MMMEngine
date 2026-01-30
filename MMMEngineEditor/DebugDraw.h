@@ -29,6 +29,10 @@ namespace DX
         DirectX::XMMATRIX world,
         DirectX::FXMVECTOR color);
 
+    void XM_CALLCONV DrawArc(DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* batch, DirectX::FXMVECTOR origin, DirectX::FXMVECTOR majorAxis, DirectX::FXMVECTOR minorAxis, DirectX::GXMVECTOR color, float startAngle, float endAngle, size_t segments);
+
+    void XM_CALLCONV DrawHalfRing(DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* batch, DirectX::FXMVECTOR origin, DirectX::FXMVECTOR majorAxis, DirectX::FXMVECTOR minorAxis, DirectX::GXMVECTOR color, size_t segments);
+
     void XM_CALLCONV Draw(DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* batch,
         const DirectX::BoundingBox& box,
         DirectX::FXMVECTOR color = DirectX::Colors::White);

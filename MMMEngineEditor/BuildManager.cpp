@@ -1,4 +1,5 @@
 ﻿#include "BuildManager.h"
+#include "UserScriptsGenerator.h"
 #include <Windows.h>
 #include <array>
 #include <thread>
@@ -500,6 +501,53 @@ namespace MMMEngine::Editor
         return {};
     }
 
+    fs::path BuildManager::FindDevEnv() const
+    {
+        fs::path msbuild = FindMSBuild();
+        if (!msbuild.empty())
+        {
+            // MSBuild: ...\MSBuild\Current\Bin\MSBuild.exe -> ...\Common7\IDE\devenv.exe
+            fs::path vsRoot = msbuild.parent_path().parent_path().parent_path().parent_path();
+            fs::path devenv = vsRoot / "Common7" / "IDE" / "devenv.exe";
+            if (fs::exists(devenv))
+                return devenv;
+        }
+
+        const char* vswhere = R"(C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe)";
+        if (fs::exists(vswhere))
+        {
+            std::string cmd = std::string(vswhere) +
+                R"( -latest -requires Microsoft.Component.MSBuild -find Common7\IDE\devenv.exe)";
+            FILE* pipe = _popen(cmd.c_str(), "r");
+            if (pipe)
+            {
+                char buffer[512];
+                if (fgets(buffer, sizeof(buffer), pipe))
+                {
+                    std::string result = buffer;
+                    if (!result.empty() && result.back() == '\n') result.pop_back();
+                    if (!result.empty() && result.back() == '\r') result.pop_back();
+                    _pclose(pipe);
+                    if (fs::exists(result))
+                        return fs::path(result);
+                }
+                _pclose(pipe);
+            }
+        }
+
+        std::array<const char*, 3> candidates = {
+            R"(C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.exe)",
+            R"(C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\devenv.exe)",
+            R"(C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.exe)"
+        };
+        for (const auto& path : candidates)
+        {
+            if (fs::exists(path))
+                return fs::path(path);
+        }
+        return {};
+    }
+
     BuildOutput BuildManager::ExecuteBuild(
         const fs::path& msbuildPath,
         const fs::path& vcxprojPath,
@@ -671,6 +719,18 @@ namespace MMMEngine::Editor
     )
     {
         BuildOutput output;
+
+        // 0. 유저 스크립트 헤더 분석 + gen.cpp / 생성자 주입
+        try
+        {
+            if (!UserScriptsGenerator::Generate(projectRootDir) && m_progressCallbackString)
+                m_progressCallbackString(u8"[UserScriptsGenerator] 생성 실패 또는 스크립트 없음");
+        }
+        catch (const std::exception& e)
+        {
+            if (m_progressCallbackString)
+                m_progressCallbackString(std::string(u8"[UserScriptsGenerator] ") + e.what());
+        }
 
         // 1. vcxproj 파일 경로
         fs::path vcxprojPath = projectRootDir / "Source" / "UserScripts" / "UserScripts.vcxproj";

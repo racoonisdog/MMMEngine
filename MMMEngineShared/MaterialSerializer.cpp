@@ -69,7 +69,7 @@ void MMMEngine::MaterialSerializer::to_json(json& j, const MMMEngine::PropertyVa
 }
 
 
-fs::path MMMEngine::MaterialSerializer::Serealize(Material* _material, std::wstring _path, std::wstring _name, int _index)
+std::filesystem::path MMMEngine::MaterialSerializer::Serealize(Material* _material, std::wstring _path, std::wstring _name, int _index)
 {
 	json snapshot;
 	auto matMUID = _material->GetMUID().IsEmpty() ? Utility::MUID::NewMUID() : _material->GetMUID();
@@ -94,7 +94,7 @@ fs::path MMMEngine::MaterialSerializer::Serealize(Material* _material, std::wstr
 		snapshot["pshader"] = { {"file", ""} };
 	
 	
-	std::vector<uint8_t> v = json::to_msgpack(snapshot);
+	//std::vector<uint8_t> v = json::to_msgpack(snapshot);
 
 	fs::path savePath(ResourceManager::Get().GetCurrentRootPath());
 
@@ -107,14 +107,16 @@ fs::path MMMEngine::MaterialSerializer::Serealize(Material* _material, std::wstr
 		fs::create_directories(savePath.parent_path());
 	}
 
-	std::ofstream file(savePath.string(), std::ios::binary);
+	//std::ofstream file(savePath.string(), std::ios::binary);
+	std::ofstream file(savePath.string());
 	if (!file.is_open()) {
 		throw std::runtime_error("파일을 열 수 없습니다: " + Utility::StringHelper::WStringToString(_path));
 	}
 
-	file.write(reinterpret_cast<const char*>(v.data()), v.size());
+	//file.write(reinterpret_cast<const char*>(v.data()), v.size());
+	file << snapshot.dump(4);
 	file.close();
-	return p;
+	return p.filename();
 }
 
 void MMMEngine::MaterialSerializer::UnSerealize(Material* _material, std::wstring _path)
@@ -124,17 +126,22 @@ void MMMEngine::MaterialSerializer::UnSerealize(Material* _material, std::wstrin
 	loadPath = loadPath / _path;
 
 	// 파일 읽기
-	std::ifstream inFile(loadPath.wstring(), std::ios::binary);
+	//std::ifstream inFile(loadPath.wstring(), std::ios::binary);
+	std::ifstream inFile(loadPath.wstring());
 	if (!inFile.is_open()) {
 		throw std::runtime_error("파일을 열수 없습니다.");
 	}
 
 	// 파일 전체를 메모리에 로드
-	std::vector<uint8_t> buffer((std::istreambuf_iterator<char>(inFile)),
-		std::istreambuf_iterator<char>());
+	/*std::vector<uint8_t> buffer((std::istreambuf_iterator<char>(inFile)),
+		std::istreambuf_iterator<char>());*/
 
 	// MessagePack → JSON 변환
-	nlohmann::json snapshot = nlohmann::json::from_msgpack(buffer);
+	//nlohmann::json snapshot = nlohmann::json::from_msgpack(buffer);
+
+	// JSON 파싱
+	//nlohmann::json snapshot;
+	nlohmann::json snapshot = nlohmann::json::parse(inFile);
 
 	// Properties
 	if (snapshot.contains("properties")) {

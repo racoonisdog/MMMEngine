@@ -1,4 +1,4 @@
-﻿// ProjectManager.cpp
+// ProjectManager.cpp
 #include "ProjectManager.h"
 
 #include <fstream>
@@ -248,7 +248,7 @@ namespace MMMEngine::Editor
         std::ofstream out(file, std::ios::binary);
         if (!out) return;
 
-        // NOTE: ScriptBehaviour.h include는 vcxproj의 AdditionalIncludeDirectories에 의해 해결된다고 가정
+        // NOTE: gen.cpp가 RTTR 등록. USCRIPT_MESSAGE / USCRIPT_PROPERTY 로 생성기가 인식.
         out <<
             R"(#include "rttr/type"
 #include "ScriptBehaviour.h"
@@ -265,18 +265,23 @@ namespace MMMEngine
     public:
         ExampleBehaviour()
         {
-            REGISTER_BEHAVIOUR_MESSAGE(Start)
-            REGISTER_BEHAVIOUR_MESSAGE(Update)
         }
 
+        USCRIPT_PROPERTY()
         bool isCustomBool = true;
+        USCRIPT_PROPERTY()
         float customFloat = 14.0f;
-        int customInt = 2.0f;
+        USCRIPT_PROPERTY()
+        int customInt = 2;
+        USCRIPT_PROPERTY()
         std::string customString = "Hello, World!";
 
+        USCRIPT_PROPERTY_HIDDEN()
         bool isDontShowBool = false;
 
+        USCRIPT_MESSAGE()
         void Start();
+        USCRIPT_MESSAGE()
         void Update();
     };
 }
@@ -286,33 +291,11 @@ namespace MMMEngine
         std::ofstream out2(file2, std::ios::binary);
         if (!out2) return;
 
-        // NOTE: ScriptBehaviour.h include는 vcxproj의 AdditionalIncludeDirectories에 의해 해결된다고 가정
+        // NOTE: RTTR 등록은 gen.cpp에서 자동. .cpp에는 구현만 둠.
         out2 <<
             R"(#include "Export.h"
 #include "ScriptBehaviour.h"
 #include "ExampleBehaviour.h"
-#include "rttr/registration"
-#include "rttr/detail/policies/ctor_policies.h"
-
-RTTR_PLUGIN_REGISTRATION
-{
-	using namespace rttr;
-	using namespace MMMEngine;
-
-	registration::class_<ExampleBehaviour>("ExampleBehaviour")
-        (rttr::metadata("wrapper_type_name", "ObjPtr<ExampleBehaviour>"))
-        .property("IsCustomBool",&ExampleBehaviour::isCustomBool)
-        .property("CustomFloat",&ExampleBehaviour::customFloat)
-        .property("CustomInt",&ExampleBehaviour::customInt)
-        .property("CustomString",&ExampleBehaviour::customString);
-
-	registration::class_<ObjPtr<ExampleBehaviour>>("ObjPtr<ExampleBehaviour>")
-		.constructor(
-			[]() {
-				return Object::NewObject<ExampleBehaviour>();
-			})
-        .method("Inject", &ObjPtr<ExampleBehaviour>::Inject);
-}
 
 void MMMEngine::ExampleBehaviour::Start()
 {

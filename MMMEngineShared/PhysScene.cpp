@@ -115,6 +115,22 @@ void MMMEngine::PhysScene::ApplyInterpolation(float alpha)
 	}
 }
 
+void MMMEngine::PhysScene::SyncRigidsFromTransforms()
+{
+	for (auto* rb : m_rigids)
+	{
+		if (!rb) continue;
+		if (!rb->GetGameObject().IsValid()) continue;
+
+		auto tr = rb->GetTransform();
+		if (!tr) continue;
+
+		const Vector3 pos = tr->GetWorldPosition();
+		const Quaternion rot = tr->GetWorldRotation();
+		rb->Editor_changeTrans(pos, rot);
+	}
+}
+
 void MMMEngine::PhysScene::DrainEvents()
 {
 	m_frameContacts.clear();

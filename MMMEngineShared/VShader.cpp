@@ -1,4 +1,4 @@
-#include "VShader.h"
+ï»¿#include "VShader.h"
 #include "RenderManager.h"
 #include "RendererTools.h"
 #include <d3dcompiler.h>
@@ -12,7 +12,7 @@ bool MMMEngine::VShader::LoadFromFilePath(const std::wstring& filePath)
 
 	auto m_pDevice = RenderManager::Get().GetDevice();
 
-	// VS½¦ÀÌ´õ ÄÄÆÄÀÏ
+	// VSì‰ì´ë” ì»´íŒŒì¼
 	Microsoft::WRL::ComPtr<ID3D10Blob> errorBlob;
 
 	HR_T(D3DCompileFromFile(
@@ -31,20 +31,8 @@ bool MMMEngine::VShader::LoadFromFilePath(const std::wstring& filePath)
 		nullptr,
 		m_pVShader.GetAddressOf()));
 
-	// ±âº» InputLayout »ı¼º
-	// TODO :: ÇÏµåÄÚµùÀ¸·Î »ı¼ºÇÏÁö¸»°í ¸®ÇÃ·º¼Ç »ç¿ëÇÏ´Â¹æ¹ı ¾Ë¾Æº¸±â
-	D3D11_INPUT_ELEMENT_DESC layout[] = {
-   { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-   { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-   { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-   { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-   { "BONEINDEX", 0, DXGI_FORMAT_R32G32B32A32_SINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-   { "BONEWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-	HR_T(m_pDevice->CreateInputLayout(
-		layout, ARRAYSIZE(layout), m_pBlob->GetBufferPointer(),
-		m_pBlob->GetBufferSize(), m_pInputLayout.GetAddressOf()
-	));
+	// InputLayout ìƒì„±
+	m_pInputLayout = ShaderInfo::Get().CreateVShaderLayout(m_pBlob.Get());
 
 	return true;
 }

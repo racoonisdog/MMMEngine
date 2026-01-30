@@ -1,5 +1,5 @@
 TextureCube _cubemap : register(t0);
-SamplerState _sample : register(s0);
+SamplerState _sp0 : register(s0);
 
 cbuffer Cambuffer : register(b0)
 {

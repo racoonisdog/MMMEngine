@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Export.h"
 #include "Component.h"
 #include "rttr/type"
@@ -38,7 +38,8 @@ namespace MMMEngine
 	public:
 		virtual ~Transform() = default;
 
-		Utility::Event<Transform, void(void)> onMatrixUpdate{this};
+		Utility::Event<Transform, void(void)> onMatrixUpdate{ this };
+		Utility::Event<Transform, void(void)> onDetachFromParent{ this };
 
 		const DirectX::SimpleMath::Matrix& GetLocalMatrix() const;
 		const DirectX::SimpleMath::Matrix& GetWorldMatrix() const;
