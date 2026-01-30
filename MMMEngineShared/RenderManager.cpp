@@ -50,27 +50,11 @@ namespace MMMEngine {
 		_context->IASetInputLayout(_material->GetVShader()->m_pInputLayout.Get());
 
 		// TODO::샘플러 ShaderInfo 사용해 자동등록화 시키기 (UpdateProperty 사용, 프로퍼티로 샘플러 관리하기)
-		_context->PSSetSamplers(0, 1, m_pDafaultSamplerLinear.GetAddressOf());
+		_context->PSSetSamplers(0, 1, m_pDafaultSampler.GetAddressOf());
 
 		// 메테리얼
 		for (auto& [prop, val] : _material->GetProperties()) {
 			UpdateProperty(prop, val, type);
-		}
-	}
-
-	void RenderManager::ApplyLightToMat(ID3D11DeviceContext4* _context, Light* _light, Material* _mat)
-	{
-		if (_mat->GetFilePath().empty())
-			return;
-
-		if (_light->m_lightIndex < 0)
-			return;
-
-		for (auto& [prop, val] : _light->m_properties) {
-			auto it = _mat->m_properties.find(prop);
-			if (it != _mat->m_properties.end()) {
-				it->second = val;
-			}
 		}
 	}
 
@@ -124,10 +108,6 @@ namespace MMMEngine {
 
 				if (cMat != lMat)
 				{
-					// TODO::포인트라이트 만들시 밖으로 빼야함
-					for (auto& light : m_lights)
-						ApplyLightToMat(m_pDeviceContext.Get(), light, cMat.get());
-
 					ApplyMatToContext(m_pDeviceContext.Get(), cMat.get());
 					lastMaterial = cmd.material;
 					lMat = cMat;
@@ -346,7 +326,7 @@ namespace MMMEngine {
 		sampDesc.MinLOD = 0;
 		sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-		HR_T(m_pDevice->CreateSamplerState(&sampDesc, m_pDafaultSamplerLinear.GetAddressOf()));
+		HR_T(m_pDevice->CreateSamplerState(&sampDesc, m_pDafaultSampler.GetAddressOf()));
 
 
 		// === Scene 렌더타겟 초기화 ===
@@ -519,22 +499,22 @@ namespace MMMEngine {
 		HR_T(m_pDevice->CreateDepthStencilView(m_pDepthStencilBuffer.Get(), nullptr, m_pDepthStencilView.GetAddressOf()));
 	}
 
-	void RenderManager::ResizeSceneSize(int _width, int _height, int _sceneWidth, int _sceneHeight)
+	void RenderManager::ResizeSceneSize(int _sceneWidth, int _sceneHeight)
 	{
 		m_sceneWidth = _sceneWidth;
 		m_sceneHeight = _sceneHeight;
 
 		// 기존 리소스 해제
-		if (m_pSceneRTV) { m_pSceneRTV->Release();      m_pSceneRTV = nullptr; }
-		if (m_pSceneTexture) { m_pSceneTexture->Release();  m_pSceneTexture = nullptr; }
-		if (m_pSceneSRV) { m_pSceneSRV->Release();      m_pSceneSRV = nullptr; }
-		if (m_pSceneDSV) { m_pSceneDSV->Release();      m_pSceneDSV = nullptr; }
-		if (m_pSceneDSB) { m_pSceneDSB->Release();		m_pSceneDSB = nullptr; }
+		if (m_pSceneRTV) { m_pSceneRTV->Release(); }
+		if (m_pSceneTexture) { m_pSceneTexture->Release(); }
+		if (m_pSceneSRV) { m_pSceneSRV->Release(); }
+		if (m_pSceneDSV) { m_pSceneDSV->Release(); }
+		if (m_pSceneDSB) { m_pSceneDSB->Release(); }
 
 		// 컬러 텍스처 설명
 		D3D11_TEXTURE2D_DESC1 colorDesc = {};
-		colorDesc.Width = _width;
-		colorDesc.Height = _height;
+		colorDesc.Width = _sceneWidth;
+		colorDesc.Height = _sceneHeight;
 		colorDesc.MipLevels = 1;
 		colorDesc.ArraySize = 1;
 		colorDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT; // HDR 지원 포맷
@@ -554,8 +534,8 @@ namespace MMMEngine {
 
 		// Depth/Stencil 버퍼 설명
 		D3D11_TEXTURE2D_DESC1 depthDesc = {};
-		depthDesc.Width = _width;
-		depthDesc.Height = _height;
+		depthDesc.Width = _sceneWidth;
+		depthDesc.Height = _sceneHeight;
 		depthDesc.MipLevels = 1;
 		depthDesc.ArraySize = 1;
 		depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -570,36 +550,20 @@ namespace MMMEngine {
 		// DSV 생성
 		HR_T(m_pDevice->CreateDepthStencilView(m_pSceneDSB.Get(), nullptr, m_pSceneDSV.GetAddressOf()));
 		
-		float sceneAspect = (float)_sceneWidth / (float)_sceneHeight;
-		float backAspect = (float)_width / (float)_height;
-
-		float drawW, drawH;
-
-		if (backAspect > sceneAspect) {
-			drawH = (float)_height;
-			drawW = (float)_width * sceneAspect;
-		}
-		else {
-			drawW = (float)_width;
-			drawH = (float)_width / sceneAspect;
-		}
-
-		float offsetX = ((float)_width - drawW) * 0.5f;
-		float offsetY = ((float)_height - drawH) * 0.5f;
 
 		// 뷰포트 갱신
-		m_sceneViewport.Width = drawW;
-		m_sceneViewport.Height = drawH;
+		m_sceneViewport.Width = _sceneWidth;
+		m_sceneViewport.Height = _sceneHeight;
 		m_sceneViewport.MinDepth = 0.0f;
 		m_sceneViewport.MaxDepth = 1.0f;
-		m_sceneViewport.TopLeftX = offsetX;
-		m_sceneViewport.TopLeftY = offsetY;
+		m_sceneViewport.TopLeftX = 0;
+		m_sceneViewport.TopLeftY = 1;
 
 		// todo : 렌더러 작업자에게 꼭 고지하기
 		// 카메라 Aspect Ratio 변경
 		if (m_pMainCamera.IsValid())
 		{
-			m_pMainCamera->SetAspect(drawW / drawH);
+			m_pMainCamera->SetAspect(_sceneWidth / _sceneHeight);
 		}
 	}
 
@@ -626,6 +590,9 @@ namespace MMMEngine {
 		// Clear
 		m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView.Get(), m_backColor);
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+		// TODO :: 글로벌 쉐이더인포 삭제하기 (라이트는 관리했는데 스카이박스 데이터는 관리안함 바꾸셈)
+		ShaderInfo::Get().ClearWorldPropertyDatas();
 
 		// 렌더러 컨트롤
 		InitRenderers();
@@ -660,7 +627,7 @@ namespace MMMEngine {
 		Render_CamBuffer m_camMat = {};
 		m_camMat.mView = XMMatrixTranspose(m_pMainCamera->GetViewMatrix());
 		m_camMat.mProjection = XMMatrixTranspose(m_pMainCamera->GetProjMatrix());
-		m_camMat.camPos = XMMatrixInverse(nullptr, m_camMat.mView).r[3];
+		m_camMat.camPos = XMMatrixInverse(nullptr, m_pMainCamera->GetViewMatrix()).r[3];
 
 		// 리소스 업데이트
 		m_pDeviceContext->UpdateSubresource1(m_pCambuffer.Get(), 0, nullptr, &m_camMat, 0, 0, D3D11_COPY_DISCARD);
@@ -684,7 +651,51 @@ namespace MMMEngine {
 		m_pDeviceContext->RSSetViewports(1, &m_swapViewport);
 		m_pDeviceContext->OMSetRenderTargets(1, reinterpret_cast<ID3D11RenderTargetView* const*>(m_pRenderTargetView.GetAddressOf()), nullptr);
 
-		// TODO::백버퍼에다 씬 즉시 드로우 (풀스크린 트라이앵글)
+		// (풀스크린 트라이앵글)
+		if (useBackBuffer) {
+			m_pDeviceContext->OMSetRenderTargets(1, reinterpret_cast<ID3D11RenderTargetView* const*>(m_pRenderTargetView.GetAddressOf()), nullptr);
+
+			auto& vs = ShaderInfo::Get().GetFullScreenVShader();
+			auto& ps = ShaderInfo::Get().GetFullScreenPShader();
+			m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_pDeviceContext->IASetInputLayout(nullptr);
+			m_pDeviceContext->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
+			m_pDeviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0);
+			m_pDeviceContext->VSSetShader(vs->m_pVShader.Get(), nullptr, 0);
+			m_pDeviceContext->PSSetShader(ps->m_pPShader.Get(), nullptr, 0);
+
+			ID3D11ShaderResourceView* sceneSRV = m_pSceneSRV.Get();
+			m_pDeviceContext->PSSetShaderResources(0, 1, &sceneSRV);
+			m_pDeviceContext->PSSetSamplers(0, 1, m_pDafaultSampler.GetAddressOf());
+
+			// 씬 뷰포트 설정
+			float sceneAspect = (float)m_sceneWidth / (float)m_sceneHeight;
+			float swapchainAspect = (float)m_clientWidth / (float)m_clientHeight;
+
+			float drawW, drawH;
+
+			if (swapchainAspect > sceneAspect) {
+				drawH = (float)m_clientHeight;
+				drawW = (float)m_clientHeight * sceneAspect;
+			}
+			else {
+				drawW = (float)m_clientWidth;
+				drawH = (float)m_clientWidth / sceneAspect;
+			}
+
+			float offsetX = ((float)m_clientWidth - drawW) * 0.5f;
+			float offsetY = ((float)m_clientHeight - drawH) * 0.5f;
+
+
+			m_swapViewport.TopLeftX = offsetX;
+			m_swapViewport.TopLeftY = offsetY;
+			m_swapViewport.Width = drawW;
+			m_swapViewport.Height = drawH;
+			m_swapViewport.MinDepth = 0.0f;
+			m_swapViewport.MaxDepth = 1.0f;
+
+			m_pDeviceContext->Draw(3, 0);
+		}
 	}
 
 	void RenderManager::RenderOnlyRenderer()

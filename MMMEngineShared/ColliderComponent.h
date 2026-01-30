@@ -120,6 +120,7 @@ namespace MMMEngine
 
 
 		virtual void ApplyLocalPose();
+		void SetRigidOffsetPose(const physx::PxTransform& pose);
 
 		void ApplyShapeModeFlags();
 		void ApplyMaterial();
@@ -145,6 +146,7 @@ namespace MMMEngine
 
 		//오프셋
 		physx::PxTransform m_LocalPose = physx::PxTransform(physx::PxIdentity);
+		physx::PxTransform m_RigidOffsetPose = physx::PxTransform(physx::PxIdentity);
 		Vector3 m_LocalCenter;
 		Quaternion m_LocalQuater;
 

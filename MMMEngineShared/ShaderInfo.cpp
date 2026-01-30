@@ -94,6 +94,7 @@ void MMMEngine::ShaderInfo::StartUp()
 	// 쉐이더 타입정보정의
 	m_typeInfoMap[L"Shader/PBR/PS/BRDFShader.hlsl"] = { ShaderType::S_PBR, RenderType::R_GEOMETRY };
 	m_typeInfoMap[L"Shader/SkyBox/SkyBoxPixelShader.hlsl"] = { ShaderType::S_SKYBOX, RenderType::R_SKYBOX };
+	//m_typeInfoMap[L"Shader/SkyBox/SkyBoxPixelShader.hlsl"] = { ShaderType::S_PP, RenderType::R_NONE };
 
 	// 타입별 레지스터 번호 등록
 	m_propertyInfoMap[ShaderType::S_PBR][L"_albedo"] = { PropertyType::Texture, 0 };
@@ -137,6 +138,9 @@ void MMMEngine::ShaderInfo::StartUp()
 	// 기본 쉐이더 정의
 	m_pDefaultVShader = ResourceManager::Get().Load<VShader>(L"Shader/PBR/VS/SkeletalVertexShader.hlsl");
 	m_pDefaultPShader = ResourceManager::Get().Load<PShader>(L"Shader/PBR/PS/BRDFShader.hlsl");
+
+	m_pFullScreenVS = ResourceManager::Get().Load<VShader>(L"Shader/PP/FullScreenVS.hlsl");
+	m_pFullScreenPS = ResourceManager::Get().Load<PShader>(L"Shader/PP/FullScreenPS.hlsl");
 	// --- JSON 템플릿 ---
 
 	// Json 읽기
@@ -154,14 +158,24 @@ void MMMEngine::ShaderInfo::ShutDown()
 	m_CBBufferMap.clear();
 }
 
-std::wstring MMMEngine::ShaderInfo::GetDefaultVShader()
+MMMEngine::ResPtr<MMMEngine::VShader> MMMEngine::ShaderInfo::GetDefaultVShader()
 {
-	return m_pDefaultVShader->GetFilePath();
+	return m_pDefaultVShader;
 }
 
-std::wstring MMMEngine::ShaderInfo::GetDefaultPShader()
+MMMEngine::ResPtr<MMMEngine::PShader> MMMEngine::ShaderInfo::GetDefaultPShader()
 {
-	return m_pDefaultPShader->GetFilePath();
+	return m_pDefaultPShader;
+}
+
+MMMEngine::ResPtr<MMMEngine::VShader> MMMEngine::ShaderInfo::GetFullScreenVShader()
+{
+	return m_pFullScreenVS;
+}
+
+MMMEngine::ResPtr<MMMEngine::PShader> MMMEngine::ShaderInfo::GetFullScreenPShader()
+{
+	return m_pFullScreenPS;
 }
 
 const MMMEngine::RenderType MMMEngine::ShaderInfo::GetRenderType(const std::wstring& _shaderPath)
@@ -429,7 +443,27 @@ void MMMEngine::ShaderInfo::ConvertMaterialType(const ShaderType _type, Material
 
 void MMMEngine::ShaderInfo::AddGlobalPropVal(const ShaderType _type, const std::wstring _propName, const PropertyValue& _value)
 {
+	// 인포맵에 있는지 확인
+	auto tit = m_propertyInfoMap.find(_type);
+	if (tit == m_propertyInfoMap.end())
+		return;
+	auto nit = tit->second.find(_propName);
+	if (nit == tit->second.end())
+		return;
+
 	m_globalPropMap[_type][_propName] = _value;
+}
+
+void MMMEngine::ShaderInfo::AddAllGlobalPropVal(const std::wstring _propName, const PropertyValue& _value)
+{
+	// 인포맵에 있는지 확인
+	for (auto& [key, map] : m_propertyInfoMap) {
+		auto it = map.find(_propName);
+		if(it == map.end())
+			continue;
+
+		m_globalPropMap[key][_propName] = _value;
+	}
 }
 
 void MMMEngine::ShaderInfo::SetGlobalPropVal(const ShaderType _type, const std::wstring _propName, const PropertyValue& _value)
@@ -447,6 +481,19 @@ void MMMEngine::ShaderInfo::SetGlobalPropVal(const ShaderType _type, const std::
 	}
 }
 
+void MMMEngine::ShaderInfo::SetAllGlobalPropVal(const std::wstring _propName, const PropertyValue& _value)
+{
+	for (auto& [key, map] : m_globalPropMap) {
+		auto it = map.find(_propName);
+		if (it == map.end())
+			continue;
+
+		if (it->second.index() == _value.index()) {
+			it->second = _value;
+		}
+	}
+}
+
 void MMMEngine::ShaderInfo::RemoveGlobalPropVal(const ShaderType _type, const std::wstring _propName)
 {
 	auto tit = m_globalPropMap.find(_type);
@@ -458,6 +505,17 @@ void MMMEngine::ShaderInfo::RemoveGlobalPropVal(const ShaderType _type, const st
 		return;
 
 	tit->second.erase(nit);
+}
+
+void MMMEngine::ShaderInfo::RemoveAllGlobalPropVal(const std::wstring _propName)
+{
+	for (auto& [key, map] : m_globalPropMap) {
+		auto it = map.find(_propName);
+		if (it == map.end())
+			continue;
+
+		map.erase(it);
+	}
 }
 
 Microsoft::WRL::ComPtr<ID3D11InputLayout> MMMEngine::ShaderInfo::CreateVShaderLayout(ID3D10Blob* _blob)

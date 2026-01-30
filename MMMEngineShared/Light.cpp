@@ -59,11 +59,23 @@ void MMMEngine::Light::Initialize()
 	m_properties[L"mLightDir"] = GetTransform()->GetWorldMatrix().Forward();
 	m_properties[L"mLightColor"] = GetNormalizedColor();
 	m_properties[L"mIntensity"] = m_lightIntensity;
+
+	for (auto& [prop, val] : m_properties) {
+		for (int i = 0; i < static_cast<int>(ShaderType::S_END); i++) {
+			ShaderInfo::Get().AddAllGlobalPropVal(prop, val);
+		}
+	}
 }
 
 void MMMEngine::Light::UnInitialize()
 {
 	RenderManager::Get().RemoveLight(m_lightIndex);
+
+	for (auto& [prop, val] : m_properties) {
+		for (int i = 0; i < static_cast<int>(ShaderType::S_END); i++) {
+			ShaderInfo::Get().RemoveAllGlobalPropVal(prop);
+		}
+	}
 }
 
 void MMMEngine::Light::Render()
@@ -71,6 +83,12 @@ void MMMEngine::Light::Render()
 	m_properties[L"mLightDir"] = GetTransform()->GetWorldMatrix().Forward();
 	m_properties[L"mLightColor"] = GetNormalizedColor();
 	m_properties[L"mIntensity"] = m_lightIntensity;
+
+	for (auto& [prop, val] : m_properties) {
+		for (int i = 0; i < static_cast<int>(ShaderType::S_END); i++) {
+			ShaderInfo::Get().AddAllGlobalPropVal(prop, val);
+		}
+	}
 }
 
 bool MMMEngine::Light::IsActiveAndEnabled()

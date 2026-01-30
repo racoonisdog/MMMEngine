@@ -85,8 +85,8 @@ void MMMEngine::SkyRenderer::Initialize()
 	m_pSkyMaterial->AddProperty(L"_brdflut", m_pSkyBrdf);
 	m_pSkyMaterial->AddProperty(L"_cubemap", m_pSkyTexture);
 
-	m_pSkyMaterial->SetVShader(L"Shader/SkyBox/SkyBoxVertexShader.hlsl");
-	m_pSkyMaterial->SetPShader(L"Shader/SkyBox/SkyBoxPixelShader.hlsl");
+	m_pSkyMaterial->SetVShader(ResourceManager::Get().Load<VShader>(L"Shader/SkyBox/SkyBoxVertexShader.hlsl"));
+	m_pSkyMaterial->SetPShader(ResourceManager::Get().Load<PShader>(L"Shader/SkyBox/SkyBoxPixelShader.hlsl"));
 
 	m_pMesh = ResourceManager::Get()
 		.Load<StaticMesh>(L"Shader/Resource/Default_Mesh/SkyBoxMesh_StaticMesh.staticmesh");
@@ -109,6 +109,10 @@ void MMMEngine::SkyRenderer::Render()
 	// 유효성 확인
 	if (!m_pMesh)
 		return;
+
+	// ShaderInfo 공용리소스 업데이트
+	for (auto& [prop, val] : m_pSkyMaterial->GetProperties())
+		ShaderInfo::Get().AddAllGlobalPropVal(prop, val);
 
 	for (auto& [matIdx, meshIndices] : m_pMesh->meshGroupData) {
 
@@ -138,8 +142,4 @@ void MMMEngine::SkyRenderer::UpdateSRVs()
 	m_pSkyMaterial->SetProperty(L"_irradiance", m_pSkyIrr);
 	m_pSkyMaterial->SetProperty(L"_brdflut", m_pSkyBrdf);
 	m_pSkyMaterial->SetProperty(L"_cubemap", m_pSkyTexture);
-
-	// ShaderInfo 공용리소스 업데이트
-	for (auto& [prop, val] : m_pSkyMaterial->GetProperties())
-		ShaderInfo::Get().SetGlobalPropVal(S_PBR, prop, val);
 }

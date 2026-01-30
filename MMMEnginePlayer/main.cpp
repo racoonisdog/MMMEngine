@@ -28,12 +28,13 @@ void Initialize()
 
 	fs::path dataPath = cwd / "Data";
 
-	SetConsoleOutputCP(CP_UTF8);
+	//SetConsoleOutputCP(CP_UTF8);
 	auto app = GlobalRegistry::g_pApp;
 	auto hwnd = app->GetWindowHandle();
 	auto windowInfo = app->GetWindowInfo();
 
 	RenderManager::Get().StartUp(hwnd, windowInfo.width, windowInfo.height);
+	RenderManager::Get().UseBackBufferDraw(true);
 	InputManager::Get().StartUp(hwnd);
 	app->OnWindowSizeChanged.AddListener<InputManager, &InputManager::HandleWindowResize>(&InputManager::Get());
 	app->OnMouseWheelUpdate.AddListener<InputManager, &InputManager::HandleMouseWheelEvent>(&InputManager::Get());
@@ -56,7 +57,7 @@ void Initialize()
 	ShaderInfo::Get().StartUp();
 
 	app->OnWindowSizeChanged.AddListener<RenderManager, &RenderManager::ResizeSwapChainSize>(&RenderManager::Get());
-	app->OnWindowSizeChanged.AddListenerLambda([](int width, int height) { RenderManager::Get().ResizeSceneSize(width, height, width, height); });
+	RenderManager::Get().ResizeSceneSize(1920, 1080);
 
 	ComPtr<ID3D11Device> device = RenderManager::Get().GetDevice();
 	ComPtr<ID3D11DeviceContext> context = RenderManager::Get().GetContext();

@@ -41,13 +41,10 @@ namespace MMMEngine {
 		PropertyValue GetProperty(const std::wstring& name) const;
 		const std::unordered_map<std::wstring, PropertyValue>& GetProperties() { return m_properties; }
 
-		void SetVShader(const std::wstring& _filePath);
-		void SetPShader(const std::wstring& _filePath);
-		const ResPtr<VShader> GetVShader();
-		const ResPtr<PShader> GetPShader();
-
-		const std::wstring& GetVShaderRttr();
-		const std::wstring& GetPShaderRttr();
+		void SetVShader(ResPtr<VShader> _vShader);
+		void SetPShader(ResPtr<PShader> _pShader);
+		ResPtr<VShader> GetVShader();
+		ResPtr<PShader> GetPShader();
 
 		void LoadTexture(const std::wstring& _name, const std::wstring& _filePath);
 

@@ -1,7 +1,9 @@
-#pragma once
+ï»¿#pragma once
 #include "Object.h"
+#include "GameObject.h"
 #include "rttr/type"
 #include "Export.h"
+#include "GameObject.h"
 
 namespace MMMEngine
 {
@@ -19,16 +21,16 @@ namespace MMMEngine
 		inline void SetGameObject(ObjPtr<GameObject> owner) { m_gameObject = owner; }
 	protected:
 		Component() = default;
-		virtual void Initialize() {};	//»ı¼ºÀÚ ÀÌÈÄ Ãß°¡ ÃÊ±âÈ­¿ë
+		virtual void Initialize() {};	//ìƒì„±ì ì´í›„ ì¶”ê°€ ì´ˆê¸°í™”ìš©
 		virtual void Dispose() final override;
-		virtual void UnInitialize() {};  //ÆÄ±« Á÷Àü ¸ğµç ÂüÁ¶ ²÷±â¿ë
+		virtual void UnInitialize() {};  //íŒŒê´´ ì§ì „ ëª¨ë“  ì°¸ì¡° ëŠê¸°ìš©
 	public:
 		virtual ~Component() = default;
 
 		inline ObjPtr<GameObject> GetGameObject() { return m_gameObject; };
 
 		template <typename T>
-		ObjPtr<T> GetComponent() { return m_gameObject->GetComponent<T>(); }
+		ObjPtr<T> GetComponent() { return m_gameObject->template GetComponent<T>(); }
 		ObjPtr<Transform> GetTransform();
 	};
 }

@@ -79,9 +79,6 @@
     <ClCompile Include="pch.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsSettings.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="SkyRenderer.cpp">
       <Filter>소스 파일\Core\Render API\Component</Filter>
     </ClCompile>
@@ -95,6 +92,9 @@
       <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
     <ClCompile Include="JoinColliderInfo.cpp">
+	</ClCompile>
+    <ClCompile Include="PhysicsSettings.cpp">
+	</ClCompile>
       <Filter>소스 파일\Core\Physcis API</Filter>
     </ClCompile>
   </ItemGroup>
@@ -598,10 +598,5 @@
     <Filter Include="소스 파일\Core\Physcis API">
       <UniqueIdentifier>{e66850de-f491-4f75-9843-c4ad5567a533}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="MMMEngineShared.rc">
-      <Filter>리소스 파일</Filter>
-    </ResourceCompile>
   </ItemGroup>
 </Project>
