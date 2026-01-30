@@ -136,6 +136,8 @@ void Update()
 	BehaviourManager::Get().BroadCastBehaviourMessage("Update");
 	BehaviourManager::Get().BroadCastBehaviourMessage("LateUpdate");
 
+	PhysxManager::Get().ApplyInterpolation(TimeManager::Get().GetInterpolationAlpha());
+
 	RenderManager::Get().BeginFrame();
 	RenderManager::Get().Render();
 	RenderManager::Get().EndFrame();

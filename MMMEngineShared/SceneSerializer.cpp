@@ -648,6 +648,8 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
     std::vector<PendingComponentProps> pendingComponentProps;
 
     // 2-pass: 일반 컴포넌트 생성 + MUID 등록 (Transform은 제외)
+    //         주의: Collider는 Initialize 시 자동으로 RigidBody를 만들 수 있으므로
+    //         RigidBody를 먼저 생성해 중복/파괴를 방지한다.
     for (const auto& goJson : gameObjects)
     {
         std::string goMUID = goJson["MUID"].get<std::string>();
@@ -655,15 +657,40 @@ void MMMEngine::SceneSerializer::Deserialize(Scene& scene, const SnapShot& snaps
         if (itGo == g_objectTable.end()) continue;
 
         ObjPtr<GameObject> go = itGo->second.get_value<ObjPtr<GameObject>>();
-
         const json& components = goJson["Components"];
+
+        // 2-1) RigidBodyComponent 선 생성
         for (const auto& compJson : components)
         {
             if (!compJson.contains("Type"))
                 continue;
 
             std::string typeName = compJson["Type"].get<std::string>();
-            if (typeName == "Transform") // 정확 일치로 스킵 권장
+            if (typeName != "RigidBodyComponent")
+                continue;
+
+            bool isMissing = false;
+            ObjPtr<Component> comp = CreateComponentForDeserialize(compJson, go, isMissing);
+            if (!comp.IsValid())
+                continue;
+
+            if (!isMissing && compJson.contains("Props"))
+            {
+                PendingComponentProps pending;
+                pending.comp = comp;
+                pending.props = &compJson["Props"];
+                pendingComponentProps.push_back(std::move(pending));
+            }
+        }
+
+        // 2-2) 나머지 컴포넌트 생성
+        for (const auto& compJson : components)
+        {
+            if (!compJson.contains("Type"))
+                continue;
+
+            std::string typeName = compJson["Type"].get<std::string>();
+            if (typeName == "Transform" || typeName == "RigidBodyComponent")
                 continue;
 
             bool isMissing = false;

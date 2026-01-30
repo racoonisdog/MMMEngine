@@ -43,6 +43,7 @@ namespace MMMEngine
 		void Step(float dt);
 
 		void PullRigidsFromPhysics();
+		void ApplyInterpolation(float alpha);
 
 		void DrainEvents();
 

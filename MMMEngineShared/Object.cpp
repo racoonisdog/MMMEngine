@@ -297,6 +297,8 @@ namespace
 			ctx.transformPairs.emplace_back(origTr, cloneTr);
 		}
 
+		// RigidBody를 먼저 만들고, 그 다음 나머지 컴포넌트를 생성한다.
+		// Collider가 먼저 만들어지면 자동으로 RigidBody가 생성되어 복제값이 덮이는 문제 방지.
 		for (auto& comp : original->GetAllComponents())
 		{
 			if (!comp.IsValid() || comp->IsDestroyed())
@@ -306,6 +308,29 @@ namespace
 				continue;
 
 			rttr::type compType = rttr::type::get(*comp);
+			if (compType.get_name().to_string() != "RigidBodyComponent")
+				continue;
+
+			ObjPtr<Component> clonedComp = clone->AddComponent(compType);
+			if (!clonedComp.IsValid())
+				continue;
+
+			ctx.objectMap.emplace(comp.operator->(), ObjPtr<Object>(clonedComp));
+			ctx.componentPairs.emplace_back(comp, clonedComp);
+		}
+
+		for (auto& comp : original->GetAllComponents())
+		{
+			if (!comp.IsValid() || comp->IsDestroyed())
+				continue;
+
+			if (comp.Cast<Transform>())
+				continue;
+
+			rttr::type compType = rttr::type::get(*comp);
+			if (compType.get_name().to_string() == "RigidBodyComponent")
+				continue;
+
 			ObjPtr<Component> clonedComp = clone->AddComponent(compType);
 			if (!clonedComp.IsValid())
 				continue;

@@ -38,6 +38,8 @@ bool MMMEngine::PhysScene::CreateScene()
 	pxDesc.cpuDispatcher = m_dispatcher;
 	pxDesc.filterShader = CustomFilterShader;
 	pxDesc.simulationEventCallback = &m_callback;
+	pxDesc.flags |= physx::PxSceneFlag::eENABLE_CCD;
+	pxDesc.solverType = physx::PxSolverType::eTGS;
 
 	m_scene = PhysicX::Get().GetPhysics().createScene(pxDesc);
 	if (m_scene == nullptr) return false;
@@ -98,6 +100,18 @@ void MMMEngine::PhysScene::PullRigidsFromPhysics()
 		if (!rb->GetPxActor()) continue;
 
 		rb->PullFromPhysics();
+	}
+}
+
+void MMMEngine::PhysScene::ApplyInterpolation(float alpha)
+{
+	for (auto* rb : m_rigids)
+	{
+		if (!rb) continue;
+		if (!rb->GetGameObject().IsValid()) continue;
+		if (!rb->GetPxActor()) continue;
+
+		rb->ApplyInterpolation(alpha);
 	}
 }
 
