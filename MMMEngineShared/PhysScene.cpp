@@ -508,6 +508,11 @@ void MMMEngine::PhysScene::ChangeRigidType(MMMEngine::RigidBodyComponent* rb, co
 		if (auto* oldActor = rb->GetPxActor())
 			m_scene->removeActor(*oldActor);
 	}
+	
+	for (auto* it : cols)
+	{
+		it->DetachShapeFromActor();
+	}
 
 	//기존 actor 파괴
 	rb->DestroyActor();
@@ -533,8 +538,7 @@ void MMMEngine::PhysScene::ChangeRigidType(MMMEngine::RigidBodyComponent* rb, co
 		uint32_t layer = col->GetEffectiveLayer();
 		col->SetFilterData(matrix.MakeSimFilter(layer), matrix.MakeQueryFilter(layer));
 
-		// actor에 shape만 붙이기 (rb->AttachCollider(관리형) 대신)
-		rb->AttachShapeOnly(shape);
+		rb->AttachCollider(col);
 	}
 
 	//씬에 다시 등록

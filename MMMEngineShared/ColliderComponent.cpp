@@ -333,3 +333,22 @@ void MMMEngine::ColliderComponent::UnInitialize()
     m_MaterialOwned = false;
 }
 
+void MMMEngine::ColliderComponent::DetachShapeFromActor()
+{
+    if (m_Shape)
+    {
+        if (auto* actor = m_Shape->getActor())
+            actor->detachShape(*m_Shape);
+    }
+}
+
+void MMMEngine::ColliderComponent::AttachShapeFromActor(physx::PxRigidActor* Actor)
+{
+
+    if (!Actor || !m_Shape) return;
+    
+    Actor->attachShape(*m_Shape);
+
+    return;
+}
+

@@ -87,6 +87,12 @@
     <ClCompile Include="SkySphere.cpp">
       <Filter>소스 파일\Core\Render API\Component</Filter>
     </ClCompile>
+    <ClCompile Include="JoinRigidInfo.cpp">
+      <Filter>소스 파일\Core\Physcis API</Filter>
+    </ClCompile>
+    <ClCompile Include="JoinColliderInfo.cpp">
+      <Filter>소스 파일\Core\Physcis API</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
@@ -306,6 +312,12 @@
     </ClInclude>
     <ClInclude Include="RenderShared.h">
       <Filter>헤더 파일\Core\Render API</Filter>
+    </ClInclude>
+    <ClInclude Include="JoinRigidInfo.h">
+      <Filter>헤더 파일\Core\Physics API</Filter>
+    </ClInclude>
+    <ClInclude Include="JoinColliderInfo.h">
+      <Filter>헤더 파일\Core\Physics API</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

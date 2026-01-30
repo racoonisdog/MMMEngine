@@ -36,6 +36,10 @@ namespace MMMEngine
 		void Initialize() override;
 		void UnInitialize() override;
 
+		//actor에서 셰이더 떼는용도 ( 삭제용도가 아닌 rigid를 옮길때 사용 )
+		void DetachShapeFromActor();
+		void AttachShapeFromActor(physx::PxRigidActor* Actor);
+
 		physx::PxShape* GetPxShape() const { return m_Shape; }
 		ShapeMode GetShapeMode() const { return m_Mode; }
 

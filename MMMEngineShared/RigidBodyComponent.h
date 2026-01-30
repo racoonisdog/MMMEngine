@@ -74,10 +74,11 @@ namespace MMMEngine {
 			Desc() = default;
 
 			Desc(Type _type, float _mass, float _linearDamping, float _angularDamping, bool _useGravity, bool _isKinematic,
-				CollisionDetectionMode _collisionMode, InterpolationMode _interpolation) :
+				bool _lockPosX , bool _lockPosY, bool _lockPosZ, bool _lockRotX, bool _lockRotY, bool _lockRotZ,
+				uint32_t _solverPositionIters, uint32_t _solverVelocityIters, CollisionDetectionMode _collisionMode, InterpolationMode _interpolation) :
 			type(_type), mass(_mass) , linearDamping(_linearDamping), angularDamping(_angularDamping), useGravity(_useGravity),
-			isKinematic(_isKinematic), collisionMode(_collisionMode), interpolation(_interpolation)
-			{}
+			isKinematic(_isKinematic), lockPosX(_lockPosX), lockPosY(_lockPosY), lockPosZ(_lockPosZ), lockRotX(_lockRotX), lockRotY(_lockRotY),
+				lockRotZ(_lockRotZ), solverPositionIters(_solverPositionIters), solverVelocityIters(_solverVelocityIters),  collisionMode(_collisionMode), interpolation(_interpolation) {}
 		};
 
 
@@ -142,8 +143,8 @@ namespace MMMEngine {
 
 		DirectX::SimpleMath::Vector3 GetAngularVelocity() const;
 
-		void SetisAutoRigid(bool value);
-		bool GetisAutoRigid();
+		//void SetisAutoRigid(bool value);
+		//bool GetisAutoRigid();
 
 		void WakeUp();
 
@@ -188,7 +189,7 @@ namespace MMMEngine {
 
 		Vector3 GetRequestedPos() { return m_RequestedPos; }
 		Quaternion GetRequestedRot() { return m_RequestedRot; }
-		void AttachShapeOnly(physx::PxShape* shape);
+		//void AttachShapeOnly(physx::PxShape* shape);
 		void SetType_Internal();
 		bool HasPendingTypeChange();
 		void OffPendingType();
@@ -260,8 +261,6 @@ namespace MMMEngine {
 		std::vector<TorqueCmd> m_TorqueQueue;
 
 		physx::PxPhysics* m_Physics = nullptr;
-
-		bool m_IsAutoRigid = false;
 
 		void BindTeleport();
 

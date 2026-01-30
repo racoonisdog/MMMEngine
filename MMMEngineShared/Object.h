@@ -118,6 +118,8 @@ namespace MMMEngine
         friend class ObjectManager;
         friend class ObjectSerializer;
         friend class PhysxManager;
+        friend class JoinColliderInfo;
+
         template<typename> friend class ObjPtr;
 
         T*          m_raw               = nullptr;

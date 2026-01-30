@@ -174,8 +174,7 @@ void MMMEngine::RigidBodyComponent::AttachCollider(ColliderComponent* collider)
 
 	if (!m_Actor) return;
 
-	if (auto* shape = collider->GetPxShape())
-		m_Actor->attachShape(*shape);
+	collider->AttachShapeFromActor(m_Actor);
 
 	MarkMassDirty();
 }
@@ -183,6 +182,7 @@ void MMMEngine::RigidBodyComponent::AttachCollider(ColliderComponent* collider)
 void MMMEngine::RigidBodyComponent::DetachCollider(ColliderComponent* collider)
 {
 	if (!collider) return;
+	collider->DetachShapeFromActor();
 	EraseOne(m_Colliders, collider);
 }
 
@@ -491,15 +491,15 @@ Vector3 MMMEngine::RigidBodyComponent::GetAngularVelocity() const
 	return Vector3();
 }
 
-void MMMEngine::RigidBodyComponent::SetisAutoRigid(bool value)
-{
-	m_IsAutoRigid = value;
-}
-
-bool MMMEngine::RigidBodyComponent::GetisAutoRigid()
-{
-	return m_IsAutoRigid;
-}
+//void MMMEngine::RigidBodyComponent::SetisAutoRigid(bool value)
+//{
+//	m_IsAutoRigid = value;
+//}
+//
+//bool MMMEngine::RigidBodyComponent::GetisAutoRigid()
+//{
+//	return m_IsAutoRigid;
+//}
 
 void MMMEngine::RigidBodyComponent::WakeUp()
 {
@@ -511,11 +511,11 @@ physx::PxRigidActor* MMMEngine::RigidBodyComponent::GetPxActor() const
 	return m_Actor;
 }
 
-void MMMEngine::RigidBodyComponent::AttachShapeOnly(physx::PxShape* shape)
-{
-	if (!m_Actor || !shape) return;
-	m_Actor->attachShape(*shape);
-}
+//void MMMEngine::RigidBodyComponent::AttachShapeOnly(physx::PxShape* shape)
+//{
+//	if (!m_Actor || !shape) return;
+//	m_Actor->attachShape(*shape);
+//}
 
 void MMMEngine::RigidBodyComponent::SetType_Internal()
 {
