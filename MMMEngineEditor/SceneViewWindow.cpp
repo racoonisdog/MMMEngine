@@ -563,53 +563,73 @@ void MMMEngine::Editor::SceneViewWindow::RenderSceneToTexture(ID3D11DeviceContex
 				}
 				case ColliderComponent::DebugColliderType::Capsule:
 				{
-					XMMATRIX worldMatrix = go->GetTransform()->GetWorldMatrix();
-					BoundingSphere sphere;
+					const auto& wm = go->GetTransform()->GetWorldMatrix();
 
-					// 상단 구체 (로컬 좌표)
-					sphere.Center = desc.localCenter + Vector3{ 0, desc.halfHeight, 0 };
-					sphere.Radius = desc.radius;
-					DX::Draw(m_batch.get(), sphere, worldMatrix, Colors::LightGreen);
+					const Vector3 upV = wm.Up();
+					const Vector3 rightV = wm.Right();
+					const Vector3 forwardV = wm.Forward();
 
-					// 하단 구체 (로컬 좌표)
-					sphere.Center = desc.localCenter - Vector3{ 0, desc.halfHeight, 0 };
-					sphere.Radius = desc.radius;
-					DX::Draw(m_batch.get(), sphere, worldMatrix, Colors::LightGreen);
+					const float r = desc.radius;
 
-					const Vector3 p0 = go->GetTransform()->GetWorldPosition() + go->GetTransform()->GetWorldMatrix().Up() * desc.halfHeight;
-					const Vector3 p1 = go->GetTransform()->GetWorldPosition() - go->GetTransform()->GetWorldMatrix().Up() * desc.halfHeight;
+					const Vector3 worldPos = go->GetTransform()->GetWorldPosition();
+					const Vector3 p0 = worldPos + upV * desc.halfHeight; // 상단 구 중심
+					const Vector3 p1 = worldPos - upV * desc.halfHeight; // 하단 구 중심
 
-					// 하나
+					const XMVECTOR color = Colors::LightGreen;
+
+					// 축 벡터를 XMVECTOR로 (ring/arc에 사용)
+					const XMVECTOR rightAxis = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&rightV)) * r;
+					const XMVECTOR forwardAxis = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&forwardV)) * r;
+					const XMVECTOR upAxis = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&upV)) * r;
+
+					// ---- A) 절단원 링 2개 (원기둥 위/아래 단면) ----
 					{
-						VertexPositionColor v0(p0 + go->GetTransform()->GetWorldMatrix().Left() * sphere.Radius, Colors::LightGreen);
-						VertexPositionColor v1(p1 + go->GetTransform()->GetWorldMatrix().Left() * sphere.Radius, Colors::LightGreen);
-						m_batch->DrawLine(v0, v1);
-					}
-					
+						const XMVECTOR o0 = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&p0));
+						const XMVECTOR o1 = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&p1));
 
-
-					{
-						VertexPositionColor v0(p0 + go->GetTransform()->GetWorldMatrix().Right() * sphere.Radius, Colors::LightGreen);
-						VertexPositionColor v1(p1 + go->GetTransform()->GetWorldMatrix().Right() * sphere.Radius, Colors::LightGreen);
-						m_batch->DrawLine(v0, v1);
+						// Up에 수직인 평면: major=Right*r, minor=Forward*r
+						DX::DrawRing(m_batch.get(), o0, rightAxis, forwardAxis, color);
+						DX::DrawRing(m_batch.get(), o1, rightAxis, forwardAxis, color);
 					}
 
+					// ---- B) 원기둥(측면) 4개 선 ----
 					{
+						m_batch->DrawLine(
+							VertexPositionColor(p0 + rightV * r, Colors::LightGreen),
+							VertexPositionColor(p1 + rightV * r, Colors::LightGreen));
 
-						VertexPositionColor v0(p0 + go->GetTransform()->GetWorldMatrix().Forward() * sphere.Radius, Colors::LightGreen);
-						VertexPositionColor v1(p1 + go->GetTransform()->GetWorldMatrix().Forward() * sphere.Radius, Colors::LightGreen);
-						m_batch->DrawLine(v0, v1);
+						m_batch->DrawLine(
+							VertexPositionColor(p0 - rightV * r, Colors::LightGreen),
+							VertexPositionColor(p1 - rightV * r, Colors::LightGreen));
+
+						m_batch->DrawLine(
+							VertexPositionColor(p0 + forwardV * r, Colors::LightGreen),
+							VertexPositionColor(p1 + forwardV * r, Colors::LightGreen));
+
+						m_batch->DrawLine(
+							VertexPositionColor(p0 - forwardV * r, Colors::LightGreen),
+							VertexPositionColor(p1 - forwardV * r, Colors::LightGreen));
 					}
 
-
+					// ---- C) 상단 반구: 하프링 2개 ----
 					{
-						VertexPositionColor v0(p0 + go->GetTransform()->GetWorldMatrix().Backward() * sphere.Radius, Colors::LightGreen);
-						VertexPositionColor v1(p1 + go->GetTransform()->GetWorldMatrix().Backward() * sphere.Radius, Colors::LightGreen);
-						m_batch->DrawLine(v0, v1);
+						const XMVECTOR o = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&p0));
+
+						// sin>=0 쪽이 +Up이므로 "상단" 반원
+						DX::DrawHalfRing(m_batch.get(), o, rightAxis, upAxis, color, 16);
+						DX::DrawHalfRing(m_batch.get(), o, forwardAxis, upAxis, color, 16);
 					}
 
-				
-					
+					// ---- D) 하단 반구: 하프링 2개 ----
+					{
+						const XMVECTOR o = XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&p1));
+
+						// 하단은 minorAxis를 -Up으로 뒤집으면 됨
+						const XMVECTOR downAxis = -upAxis;
+
+						DX::DrawHalfRing(m_batch.get(), o, rightAxis, downAxis, color, 16);
+						DX::DrawHalfRing(m_batch.get(), o, forwardAxis, downAxis, color, 16);
+					}
 
 					break;
 				}

@@ -1,4 +1,4 @@
-#include "ResourceSerializer.h"
+ï»¿#include "ResourceSerializer.h"
 #include "json/json.hpp"
 #include "StaticMesh.h"
 #include "RenderShared.h"
@@ -46,7 +46,7 @@ json SerializeMeshVariant(const rttr::variant& var) {
 
 			json val = SerializeMeshVariant(item);
 
-			// null °ªÀº Ãß°¡ÇÏÁö ¾ÊÀ½
+			// null ê°’ì€ ì¶”ê°€í•˜ì§€ ì•ŠìŒ
 			if (!val.is_null())
 				arr.push_back(val);
 		}
@@ -54,12 +54,12 @@ json SerializeMeshVariant(const rttr::variant& var) {
 	}
 
 	if (t.is_class()) {
-		// Vector2 ¡æ ¹è¿­ [x,y]
+		// Vector2 â†’ ë°°ì—´ [x,y]
         if (t == type::get<DirectX::SimpleMath::Vector2>()) {
             auto vec = var.get_value<DirectX::SimpleMath::Vector2>();
             return json::array({ vec.x, vec.y });
         }
-        // Vector3 ¡æ ¹è¿­ [x,y,z]
+        // Vector3 â†’ ë°°ì—´ [x,y,z]
         if (t == type::get<DirectX::SimpleMath::Vector3>()) {
             auto vec = var.get_value<DirectX::SimpleMath::Vector3>();
             return json::array({ vec.x, vec.y, vec.z });
@@ -171,7 +171,7 @@ fs::path MMMEngine::ResourceSerializer::Serialize_StaticMesh(const StaticMesh* _
 	meshgroupJson.push_back(SerializeMeshGroup(_in->meshGroupData));
 	snapshot["MeshGroup"] = meshgroupJson;
 
-	// Json Ãâ·Â
+	// Json ì¶œë ¥
 	std::vector<uint8_t> v = json::to_msgpack(snapshot);
 
 	fs::path p(ResourceManager::Get().GetCurrentRootPath());
@@ -185,7 +185,7 @@ fs::path MMMEngine::ResourceSerializer::Serialize_StaticMesh(const StaticMesh* _
 	std::ofstream file(p.string(), std::ios::binary);
 	//std::ofstream file(p.string());
 	if (!file.is_open()) {
-		throw std::runtime_error("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: " + Utility::StringHelper::WStringToString(_path));
+		throw std::runtime_error("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: " + Utility::StringHelper::WStringToString(_path));
 	}
 
 	/*file << snapshot.dump(4);
@@ -199,14 +199,14 @@ fs::path MMMEngine::ResourceSerializer::Serialize_StaticMesh(const StaticMesh* _
 
 void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std::wstring _path)
 {
-	//// ÆÄÀÏ ¿­±â
+	//// íŒŒì¼ ì—´ê¸°
 	//std::ifstream file(_path, std::ios::binary);
 	//if (!file.is_open())
 	//{
-	//	throw std::runtime_error("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: " + Utility::StringHelper::WStringToString(_path));
+	//	throw std::runtime_error("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: " + Utility::StringHelper::WStringToString(_path));
 	//}
 
-	//// ÆÄÀÏ ÀüÃ¼ ÀĞ±â
+	//// íŒŒì¼ ì „ì²´ ì½ê¸°
 	//std::vector<uint8_t> buffer((std::istreambuf_iterator<char>(file)),
 	//	std::istreambuf_iterator<char>());
 	std::ifstream file(_path, std::ios::binary | std::ios::ate);
@@ -217,44 +217,51 @@ void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std
 	file.read(buffer.data(), size);
 	file.close();
 
-	// msgpack ¡æ json º¯È¯
+	// msgpack â†’ json ë³€í™˜
 	json snapshot = json::from_msgpack(buffer);
 
-	// MUID º¹¿ø ( ¾ÆÁ÷ ¾È¾¸)
+	// MUID ë³µì› ( ì•„ì§ ì•ˆì”€)
 	/*if (snapshot.contains("MUID"))
 	{
 		const_cast<StaticMesh*>(_out)->SetMUID(muid);ss
 	}*/
 
-	// Materials º¹¿ø
+	// Materials ë³µì›
 	if (snapshot.contains("Materials"))
 	{
 		auto& matJson = snapshot["Materials"];
 		std::vector<ResPtr<Material>> mats;
 		for (auto& m : matJson)
 		{
+			fs::path basePath(ResourceManager::Get().GetCurrentRootPath());
+			fs::path matPath(_path);
+			matPath = matPath.parent_path();
+			matPath = matPath / m.get<std::string>();
+
+			matPath = matPath.lexically_relative(basePath);
+
 			auto mat = std::make_shared<Material>();
-			mat = ResourceManager::Get().Load<Material>(Utility::StringHelper::StringToWString(m.get<std::string>()));
+			mat = ResourceManager::Get().Load<Material>(matPath.wstring());
 			mats.push_back(mat);
 		}
 		_out->materials = std::move(mats);
 	}
 
-	// Mesh º¹¿ø
+	// Mesh ë³µì›
 	if (snapshot.contains("Mesh")) {
 		auto& meshJsonArr = snapshot["Mesh"];
 		if (!meshJsonArr.empty()) {
 			auto& meshJson = meshJsonArr[0];
 			MeshData meshData;
 
-			// Vertices º¹¿ø
+			// Vertices ë³µì›
 			if (meshJson.contains("Vertices")) {
 				for (auto& subMeshJson : meshJson["Vertices"]) {
 					std::vector<Mesh_Vertex> subMesh;
 					for (auto& vertJson : subMeshJson) {
 						Mesh_Vertex vertex;
 
-						// RTTR ÆÄ½Ì
+						// RTTR íŒŒì‹±
 						//type vertType = type::get<Mesh_Vertex>();
 						//for (auto& prop : vertType.get_properties()) {
 						//	if (prop.is_readonly())
@@ -267,7 +274,7 @@ void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std
 						//	auto& jval = vertJson[name];
 						//	rttr::variant newVal;
 
-						//	// ¼ıÀÚ/¹®ÀÚ/¹è¿­ Ã³¸®
+						//	// ìˆ«ì/ë¬¸ì/ë°°ì—´ ì²˜ë¦¬
 						//	if (jval.is_number_integer())
 						//		newVal = jval.get<int>();
 						//	else if (jval.is_number_float())
@@ -298,7 +305,7 @@ void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std
 						//		prop.set_value(vertex, newVal);
 						//}
 
-						// Á÷Á¢ ÆÄ½Ì
+						// ì§ì ‘ íŒŒì‹±
 						vertex.Pos = { vertJson["Pos"][0], vertJson["Pos"][1], vertJson["Pos"][2] };
 						vertex.Normal = { vertJson["Normal"][0], vertJson["Normal"][1], vertJson["Normal"][2] };
 						vertex.Tangent = { vertJson["Tangent"][0], vertJson["Tangent"][1], vertJson["Tangent"][2] };
@@ -309,7 +316,7 @@ void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std
 				}
 			}
 
-			// Indices º¹¿ø
+			// Indices ë³µì›
 			if (meshJson.contains("Indices")) {
 				for (auto& iSubMeshJson : meshJson["Indices"]) {
 					std::vector<UINT> indices;
@@ -325,7 +332,7 @@ void MMMEngine::ResourceSerializer::DeSerialize_StaticMesh(StaticMesh* _out, std
 	}
 
 
-	// MeshGroup º¹¿ø
+	// MeshGroup ë³µì›
 	if (snapshot.contains("MeshGroup"))
 	{
 		auto& meshGroupJsonArr = snapshot["MeshGroup"];

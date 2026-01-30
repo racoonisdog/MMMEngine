@@ -59,6 +59,9 @@ namespace MMMEngine::Editor
         void SetProgressCallbackString(ProgressCallbackString callback);
         void SetProgressCallbackPercent(ProgressCallbackPercent callback);
 
+        /// Visual Studio devenv.exe 경로 (파일 열기 등에 사용). 없으면 빈 경로.
+        std::filesystem::path FindDevEnv() const;
+
     private:
         // MSBuild.exe 경로 찾기
         std::filesystem::path FindMSBuild() const;

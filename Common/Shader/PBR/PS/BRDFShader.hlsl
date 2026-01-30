@@ -44,10 +44,10 @@ float4 main(PS_INPUT input) : SV_TARGET
     
     // 텍스처 샘플링
     float3 albedo = _albedo.Sample(_sp0, input.Tex).rgb;// * mBaseColor.rgb;
-    float metalic = _metallic.Sample(_sp0, input.Tex).r;// * mMetallic;
-    float roughness = _roughness.Sample(_sp0, input.Tex).r;// * mRoughness;
-    float ao = _ambientOcclusion.Sample(_sp0, input.Tex).r;// * mAoStrength;
-    float3 emissive = _emissive.Sample(_sp0, input.Tex).rgb;// * mEmissive;
+    float metalic = _metallic.Sample(_sp0, input.Tex).r * mMetallic;
+    float roughness = 0.0f;//_roughness.Sample(_sp0, input.Tex).r * mRoughness;
+    float ao = 1.0f; //_ambientOcclusion.Sample(_sp0, input.Tex).r * mAoStrength;
+    float3 emissive = _emissive.Sample(_sp0, input.Tex).rgb * mEmissive;
     
     // 노멀
     float3 normalMap = _normal.Sample(_sp0, input.Tex).xyz;
@@ -72,9 +72,10 @@ float4 main(PS_INPUT input) : SV_TARGET
     float3 F = Fresnel(H, V, F0);
     float G = GeoSchlick(NV, NL, roughness);
     
-    float3 kd = lerp(1.0f - F, 0.0f, metalic);
-    float3 diffuse = (kd * albedo / 3.141592f);
-    float3 specular = (D * F * G) / max(4.0f * NL * NV, 0.001f);
+    float3 kd = (1 - metalic) * (1 - F);
+    float3 diffuse = ((kd * albedo) / 3.141592f);
+    float denom = max(4.0f * NL * NV, 0.001f);
+    float3 specular = (D * F * G) / denom;
     
     // 광량 샘플링
     float3 irradiance = _irradiance.Sample(_sp0, N).rgb;
@@ -120,6 +121,9 @@ float4 main(PS_INPUT input) : SV_TARGET
     float3 color = (direct * shadowFactor) + amibentIBL + emissive;
     //float4 finalColor = float4(pow(color, 1.0f / 2.2f), 1.0f);
     
-    return float4(texColor.rgb * mLightColor * NL * mIntensity, 1.0f);
+    //return float4(texColor.rgb * mLightColor * NL * mIntensity, 1.0f);
+    
+    return float4(color, 1.0f);
+    //return float4(pow(color, 1 / 2.2), 1.0f);
     //return float4(N, 1.0f);
 }

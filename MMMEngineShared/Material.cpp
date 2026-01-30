@@ -44,18 +44,14 @@ RTTR_REGISTRATION
 
 
 // 프로퍼티 생성
-void MMMEngine::Material::AddProperty(const std::wstring& _name, const PropertyValue& _value)
+void MMMEngine::Material::AddProperty(const std::wstring _name, const PropertyValue& _value)
 {
 	// 없으면 생성, 있으면 갱신
-	auto it = m_properties.find(_name);
-	if (it == m_properties.end())
-		m_properties[_name] = _value;
-	else
-		it->second = _value;
+	m_properties[_name] = _value;
 }
 
 // 프로퍼티 갱신
-void MMMEngine::Material::SetProperty(const std::wstring& _name, const MMMEngine::PropertyValue& _value)
+void MMMEngine::Material::SetProperty(const std::wstring _name, const MMMEngine::PropertyValue& _value)
 {
 	auto it = m_properties.find(_name);
 	if (it == m_properties.end())

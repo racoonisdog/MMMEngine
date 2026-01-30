@@ -9,6 +9,7 @@
 #include "SceneManager.h"
 #include "SceneSerializer.h"
 #include "ProjectManager.h"
+#include "PhysxManager.h"
 #include "EditorRegistry.h"
 #include "StringHelper.h"
 
@@ -513,6 +514,7 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
                 {
 					g_editor_scene_before_play_sceneID = SceneManager::Get().GetCurrentScene().id;
                     SceneManager::Get().ReloadSnapShotCurrentScene();
+                    PhysxManager::Get().SyncRigidsFromTransforms();
                 }
                 else
                 {

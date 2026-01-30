@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -221,6 +221,7 @@
     <ClInclude Include="MMMTime.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="resource2.h" />
     <ClInclude Include="ResourceSerializer.h" />
     <ClInclude Include="RigidBodyComponent.h" />
     <ClInclude Include="SafeRelease.h" />
@@ -233,9 +234,10 @@
     <ClInclude Include="SerializableEvent.h" />
     <ClInclude Include="ShaderInfo.h" />
     <ClInclude Include="SkeletalMesh.h" />
-    <ClInclude Include="SkySphere.h" />
+    <ClInclude Include="SkyRenderer.h" />
     <ClInclude Include="SphereColliderComponent.h" />
     <ClInclude Include="StaticMesh.h" />
+    <ClInclude Include="UserScriptMessageSignatures.h" />
     <ClInclude Include="UserScriptsCommon.h" />
     <ClInclude Include="VShader.h" />
     <ClInclude Include="Singleton.hpp" />
@@ -303,13 +305,14 @@
     <ClCompile Include="ScriptBehaviour.cpp" />
     <ClCompile Include="ShaderInfo.cpp" />
     <ClCompile Include="SkeletalMesh.cpp" />
-    <ClCompile Include="SkySphere.cpp" />
+    <ClCompile Include="SkyRenderer.cpp" />
     <ClCompile Include="SphereColliderComponent.cpp" />
     <ClCompile Include="StaticMesh.cpp" />
     <ClCompile Include="VShader.cpp" />
     <ClCompile Include="ScriptLoader.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="Texture2D.cpp" />
+    <ClCompile Include="UserScriptMessageSignatures.cpp" />
     <ClCompile Include="TimeManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -317,6 +320,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Object.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MMMEngineShared.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

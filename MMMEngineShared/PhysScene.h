@@ -44,6 +44,7 @@ namespace MMMEngine
 
 		void PullRigidsFromPhysics();
 		void ApplyInterpolation(float alpha);
+		void SyncRigidsFromTransforms();
 
 		void DrainEvents();
 

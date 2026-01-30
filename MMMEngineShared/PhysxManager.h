@@ -61,6 +61,7 @@ namespace MMMEngine
 		// fixed step에서 호출되는 진입점
 		void StepFixed(float dt);
 		void ApplyInterpolation(float alpha);
+		void SyncRigidsFromTransforms();
 
 		//외부 노출함수
 		void NotifyRigidAdded(RigidBodyComponent* rb);

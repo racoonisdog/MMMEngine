@@ -63,9 +63,10 @@ void MMMEngine::MeshRenderer::Render()
 
 			command.vertexBuffer = meshBuffer.Get();
 			command.indexBuffer = indicesBuffer.Get();
-			command.material = material.get();
+			command.material = material;
 			command.worldMatIndex = RenderManager::Get().AddMatrix(GetTransform()->GetWorldMatrix());
 			command.indiciesSize = mesh->indexSizes[idx];
+			command.rendererID = renderIndex;
 
 			// TODO::CamDistance 보내줘야함!!
 			command.camDistance = 0.0f;

@@ -67,7 +67,6 @@ namespace MMMEngine {
 	struct TypeInfo {
 		ShaderType shaderType = ShaderType::S_PBR;		// 쉐이더타입
 		RenderType renderType = RenderType::R_GEOMETRY;	// 렌더타입
-		Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;	// VS타입일때만 존재
 	};
 
 	struct PropertyInfo {
@@ -114,6 +113,9 @@ namespace MMMEngine {
 		// 상수버퍼 저장용 맵 <constantBufferName, ID3D11Buffer>
 		std::unordered_map<std::wstring, Microsoft::WRL::ComPtr<ID3D11Buffer>> m_CBBufferMap;
 
+		// 글로벌 리소스 저장용 맵 <ShaderType, <propertyName ,PropertyValue>>
+		std::unordered_map<ShaderType, std::unordered_map<std::wstring, PropertyValue>> m_globalPropMap;
+
 		//// 텍스쳐 버퍼인덱스 주는 맵 <propertyName, index> (int == shader tN)
 		//std::unordered_map<ShaderType, std::unordered_map<std::wstring, int>> m_texPropertyMap;
 		
@@ -142,6 +144,12 @@ namespace MMMEngine {
 		void UpdateCBuffers(const ShaderType _type);
 
 		void ConvertMaterialType(const ShaderType _type, Material* _mat);
+
+		void AddGlobalPropVal(const ShaderType _type, const std::wstring _propName, const PropertyValue& _value);
+		void SetGlobalPropVal(const ShaderType _type, const std::wstring _propName, const PropertyValue& _value);
+		void RemoveGlobalPropVal(const ShaderType _type, const std::wstring _propName);
+
+		Microsoft::WRL::ComPtr<ID3D11InputLayout> CreateVShaderLayout(ID3D10Blob* _blob);
 	};
 
 	template<typename T>
