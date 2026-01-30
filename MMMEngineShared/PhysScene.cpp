@@ -314,12 +314,11 @@ void MMMEngine::PhysScene::AttachCollider(MMMEngine::RigidBodyComponent* rb, MMM
 		assert(false && "Shape가 없는 상태 로직 확인이 필요");
 	}
 
+	//if (col->GetGameObject()->GetTransform()->GetParent() != nullptr)
+	//{
+	//	col->SetChildValue(true);
+	//}
 
-
-	// 자식 콜라이더 로컬포즈 반영이 필요하면 여기서 setLocalPose 해줘야 함
-	// 예: shape->setLocalPose( ToPxTrans(colLocalOffsetPos, colLocalOffsetRot) );
-	// (col이 rb 기준 로컬오프셋을 계산할 수 있는 함수가 필요)
-	// Todo: 로컬포즈 반영이 필요하다면 여기서 코드 작성
 
 
 	// 필터 적용
@@ -369,6 +368,7 @@ void MMMEngine::PhysScene::DetachCollider(MMMEngine::RigidBodyComponent* rb, MMM
 		rb = ownerRb;;
 
 	rb->DetachCollider(col);
+	col->SetChildValue(false);
 
 	auto itList = m_collidersByRigid.find(rb);
 	if (itList != m_collidersByRigid.end())
@@ -482,6 +482,13 @@ void MMMEngine::PhysScene::RebuildCollider(MMMEngine::ColliderComponent* col, co
 
 void MMMEngine::PhysScene::PushRigidsToPhysics()
 {
+	for (auto& [col, rb] : m_ownerByCollider)
+	{
+		if (col == nullptr) continue;
+		if (!col->GetChildValue()) continue;
+		col->SetLocalShape();
+	}
+
 	for (auto* rb : m_rigids)
 	{
 		if (!rb) continue;

@@ -39,7 +39,7 @@ namespace MMMEngine
 		virtual ~Transform() = default;
 
 		Utility::Event<Transform, void(void)> onMatrixUpdate{ this };
-		Utility::Event<Transform, void(void)> onDetachFromParent{ this };
+		Utility::Event<Transform, void(ObjPtr<Transform>)> onUpdateTransformTree{ this };
 
 		const DirectX::SimpleMath::Matrix& GetLocalMatrix() const;
 		const DirectX::SimpleMath::Matrix& GetWorldMatrix() const;

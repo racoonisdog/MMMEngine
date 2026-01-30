@@ -93,6 +93,10 @@ namespace MMMEngine
 
 		std::vector<ColliderComponent*> m_PendingDestroyCols;
 
+		void SetJoinCollider();
+
+		void BrakeJoinCollider();
+
 	private:
 		// 내부에서만 쓰는 헬퍼
 		void FlushCommands_PreStep();

@@ -264,6 +264,34 @@ physx::PxTransform MMMEngine::ColliderComponent::GetWorldPosPx() const
 }
 
 
+void MMMEngine::ColliderComponent::SetChildValue(ObjPtr<Transform> T)
+{
+    if(T != nullptr)  Child_value = true;
+}
+
+bool MMMEngine::ColliderComponent::GetChildValue()
+{
+    return Child_value;
+}
+
+void MMMEngine::ColliderComponent::SetLocalShape()
+{
+    if (!m_Shape) return;
+    physx::PxRigidActor* actor = m_Shape->getActor();
+    if (!actor) return;
+
+    // 콜리더 월드 포즈 = GO 월드 * 콜리더 로컬 오프셋(m_LocalPose)
+    Vector3 goWorldPos = GetTransform()->GetWorldPosition();
+    Quaternion goWorldRot = GetTransform()->GetWorldRotation();
+    physx::PxTransform colWorldPx = ToPxTrans(goWorldPos, goWorldRot) * m_LocalPose;
+
+    // actor 기준 로컬 = actor 월드 역 * 콜리더 월드
+    physx::PxTransform actorWorld = actor->getGlobalPose();
+    physx::PxTransform shapeLocal = actorWorld.getInverse() * colWorldPx;
+
+    m_Shape->setLocalPose(shapeLocal);
+}
+
 void MMMEngine::ColliderComponent::SetShape(physx::PxShape* shape, bool owned)
 {
     if (m_Shape)
@@ -307,12 +335,18 @@ void MMMEngine::ColliderComponent::Initialize()
 		BuildShape(&physics, mat);
 	}
 	MMMEngine::PhysxManager::Get().NotifyColliderAdded(this);
+    
+    GetGameObject()->GetTransform()->onUpdateTransformTree.AddListener<ColliderComponent, &ColliderComponent::SetChildValue>(this);
 }
 
 void MMMEngine::ColliderComponent::UnInitialize()
 {
-    PhysxManager::Get().NotifyColliderRemoved(this);
+    if(GetGameObject().IsValid())
+    {
+        GetGameObject()->GetTransform()->onUpdateTransformTree.RemoveListener<ColliderComponent, &ColliderComponent::SetChildValue>(this);
+    }
 
+    PhysxManager::Get().NotifyColliderRemoved(this);
     if (m_Shape)
     {
         if (auto* actor = m_Shape->getActor())

@@ -102,6 +102,11 @@ namespace MMMEngine
 		//디버그 함수
 		virtual void PrintFilter() {};
 
+		void SetChildValue(ObjPtr<Transform> T);
+		bool GetChildValue();
+
+		void SetLocalShape();
+
 	protected:
 		// 파생 클래스가 shape 생성 후 반드시 호출
 		void SetShape(physx::PxShape* shape, bool owned = true);
@@ -154,7 +159,9 @@ namespace MMMEngine
 
 		bool m_geometryDirty = true;
 
-		bool m_filterDirty = true;		
+		bool m_filterDirty = true;
+
+		bool Child_value = false;
 
 	//콜리더 shape return 가상함수
 	public:
