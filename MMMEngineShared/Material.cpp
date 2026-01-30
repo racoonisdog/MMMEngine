@@ -24,8 +24,8 @@ RTTR_REGISTRATION
 
 	registration::class_<Material>("Material")
 		.constructor<>()(policy::ctor::as_std_shared_ptr)
-		.property("VShader", &Material::GetVShaderRttr, &Material::SetVShader)
-		.property("PShader", &Material::GetPShaderRttr, &Material::SetPShader);
+		.property("VShader", &Material::GetVShader, &Material::SetVShader)
+		.property("PShader", &Material::GetPShader, &Material::SetPShader);
 
 	type::register_converter_func(
 		[](std::shared_ptr<Resource> from, bool& ok) -> std::shared_ptr<Material>
@@ -84,38 +84,28 @@ MMMEngine::PropertyValue MMMEngine::Material::GetProperty(const std::wstring& _n
 
 }
 
-void MMMEngine::Material::SetVShader(const std::wstring& _filePath)
+void MMMEngine::Material::SetVShader(const ResPtr<VShader> _vShader)
 {
-	if (_filePath.empty())
+	if (!_vShader)
 		return;
-	m_pVShader = ResourceManager::Get().Load<VShader>(_filePath);
+	m_pVShader = _vShader;
 }
 
-void MMMEngine::Material::SetPShader(const std::wstring& _filePath)
+void MMMEngine::Material::SetPShader(const ResPtr<PShader> _pShader)
 {
-	if (_filePath.empty())
+	if (!_pShader)
 		return;
-	m_pPShader = ResourceManager::Get().Load<PShader>(_filePath);
+	m_pPShader = _pShader;
 }
 
-const MMMEngine::ResPtr<MMMEngine::VShader> MMMEngine::Material::GetVShader()
+MMMEngine::ResPtr<MMMEngine::VShader> MMMEngine::Material::GetVShader()
 {
 	return m_pVShader;
 }
 
-const MMMEngine::ResPtr<MMMEngine::PShader> MMMEngine::Material::GetPShader()
+MMMEngine::ResPtr<MMMEngine::PShader> MMMEngine::Material::GetPShader()
 {
 	return m_pPShader;
-}
-
-const std::wstring& MMMEngine::Material::GetVShaderRttr()
-{
-	return m_pVShader->GetFilePath();
-}
-
-const std::wstring& MMMEngine::Material::GetPShaderRttr()
-{
-	return m_pPShader->GetFilePath();
 }
 
 void MMMEngine::Material::LoadTexture(const std::wstring& _propertyName, const std::wstring& _filePath)

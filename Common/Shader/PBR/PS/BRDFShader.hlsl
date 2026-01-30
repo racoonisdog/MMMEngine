@@ -2,38 +2,88 @@
 #include "../../CommonSharedPS.hlsli"
 #include "../PBRShared.hlsli"
 
-// GGX
-float ndfGGX(float3 N, float3 H, float alpha)
+static const float PI = 3.14159265359f;
+static const float EPS = 1e-6f;
+
+float3 fresnelSchlick(float cosTheta, float3 F0)
 {
-    float NH = saturate(dot(N, H));
-    float a2 = alpha * alpha;
-    float d = (NH * NH) * (a2 - 1.0f) + 1.0f;
-    return a2 / (3.141592f * (d * d));
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-// Fresnel
-float3 Fresnel(float3 H, float3 V, float3 F0)
+float3 fresnelSchlickRoughness(float cosTheta, float3 F0, float roughness)
 {
-    float HV = saturate(dot(H, V));
-    return F0 + (1.0f - F0) * pow(1.0f - HV, 5.0f);
+    return F0 + (max(float3(1.0 - roughness, 1.0 - roughness, 1.0 - roughness), F0) - F0)
+                * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-// GeoSchlickSub
-float GeoSchlickSub(float NdotX, float roughness)
+float ndfGGX(float3 N, float3 H, float roughness)
 {
-    float r = roughness + 1.0f;
-    float k = (r * r) * 0.125f;
-    return NdotX / (NdotX * (1.0f - k) + k);
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = max(denom, EPS);
+    denom = PI * denom * denom;
+    return a2 / denom;
 }
 
-// GeoSchlick
-float GeoSchlick(float NV, float NL, float roughness)
+float geometrySchlickGGX(float NdotV, float roughness)
 {
+    float r = (roughness + 1.0);
+    float k = (r * r) / 8.0;
+
+    float num = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+    denom = max(denom, EPS);
+	
+    return num / denom;
+}
+
+float geometrySmith(float3 N, float3 V, float3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = geometrySchlickGGX(NdotV, roughness);
+    float ggx1 = geometrySchlickGGX(NdotL, roughness);
+	
+    return ggx1 * ggx2;
+}
+
+float CalculateShadowPCF(float4 LightPos)
+{
+    float3 projCoords = LightPos.xyz / LightPos.w;
+    float2 texCoords;
+    texCoords.x = projCoords.x * 0.5f + 0.5f;
+    texCoords.y = -projCoords.y * 0.5f + 0.5f;
     
-    float gv = GeoSchlickSub(NV, roughness);
-    float gl = GeoSchlickSub(NL, roughness);
-
-    return gv * gl;
+    if (texCoords.x < 0.0f || texCoords.x > 1.0f ||
+        texCoords.y < 0.0f || texCoords.y > 1.0f)
+        return 1.0f;
+    
+    float currentDepth = projCoords.z;
+    if (currentDepth < 0.0f || currentDepth > 1.0f)
+        return 1.0f;
+    
+    float bias = 0.005f;
+    currentDepth -= bias;
+    
+    // 3x3 PCF
+    float shadow = 0.0f;
+    float2 texelSize = 1.0f / 4096.0f; // Shadow Map 크기
+    
+    for (int x = -1; x <= 1; ++x)
+    {
+        for (int y = -1; y <= 1; ++y)
+        {
+            float2 offset = float2(x, y) * texelSize;
+            shadow += _shadowmap.Sample(_sp0, texCoords + offset);
+            //shadow += _shadowmap.SampleCmpLevelZero(samShadow, texCoords + offset, currentDepth);
+        }
+    }
+    shadow /= 9.0f;
+    
+    return shadow;
 }
 
 float4 main(PS_INPUT input) : SV_TARGET
@@ -42,88 +92,72 @@ float4 main(PS_INPUT input) : SV_TARGET
     float4 texColor = _albedo.Sample(_sp0, input.Tex);
     clip(texColor.a - 0.5f);
     
-    // 텍스처 샘플링
-    float3 albedo = _albedo.Sample(_sp0, input.Tex).rgb;// * mBaseColor.rgb;
-    float metalic = _metallic.Sample(_sp0, input.Tex).r * mMetallic;
-    float roughness = 0.0f;//_roughness.Sample(_sp0, input.Tex).r * mRoughness;
-    float ao = 1.0f; //_ambientOcclusion.Sample(_sp0, input.Tex).r * mAoStrength;
-    float3 emissive = _emissive.Sample(_sp0, input.Tex).rgb * mEmissive;
-    
-    // 노멀
+     // 필요한 변수를 모두 구하기
+    float3 lightColor = mLightColor * mIntensity;
+
+    float3 WorldPos = input.W_Pos;
+    float4 toDirLightViewPos = input.S_Pos;
+
+     // Normal
     float3 normalMap = _normal.Sample(_sp0, input.Tex).xyz;
     normalMap = normalize(normalMap * 2.0f - 1.0f);
     float3x3 tbn = float3x3(normalize(input.Tan), normalize(input.BiTan), normalize(input.Norm));
-
-    // 벡터
+    
     float3 N = normalize(mul(normalMap, tbn));
-    float3 V = normalize(mCamPos.xyz - input.W_Pos.xyz);
+
+    float3 V = normalize(mCamPos.xyz - WorldPos.xyz);
     float3 L = normalize(-mLightDir.xyz);
     float3 H = normalize(V + L);
-    
-    // 기본반사율 구하기
-    float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo, metalic);
-    
-    //BRDF 구성요소
-    float NV = saturate(dot(N, V));
-    float NL = saturate(dot(N, L));
-    
-    float alpha = max(roughness * roughness, 0.001f);
-    float D = ndfGGX(N, H, alpha);
-    float3 F = Fresnel(H, V, F0);
-    float G = GeoSchlick(NV, NL, roughness);
-    
-    float3 kd = (1 - metalic) * (1 - F);
-    float3 diffuse = ((kd * albedo) / 3.141592f);
-    float denom = max(4.0f * NL * NV, 0.001f);
-    float3 specular = (D * F * G) / denom;
-    
-    // 광량 샘플링
+    float3 R = reflect(-V, N);
+
+    float NdotL = saturate(dot(N, L));
+    float NdotV = saturate(dot(N, V));
+
+    float4 albedo = _albedo.Sample(_sp0, input.Tex);
+    float metallic = _metallic.Sample(_sp0, input.Tex).r * mMetallic;
+    float roughness = _roughness.Sample(_sp0, input.Tex).r * mRoughness;
+    float ao = _ambientOcclusion.Sample(_sp0, input.Tex).r;
+
+    // BRDF 계산
+    // Cook-Torrance 모델
+
+    // 직접광
+    float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo.rgb, metallic);
+    float NDF = ndfGGX(N, H, roughness);
+    float3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+    float G = geometrySmith(N, V, L, roughness);
+
+    float3 numerator = NDF * G * F;
+    float denominator = 4.0 * NdotV * NdotL + 1e-4f;
+    float3 specularBRDF = numerator / denominator;
+    float3 kS = F;
+    float3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+    float3 diffuseBRDF = (kD * albedo.rgb / PI);
+    float3 Lo = (diffuseBRDF + specularBRDF) * lightColor * NdotL;
+
+    float shadow = CalculateShadowPCF(toDirLightViewPos);
+    Lo *= shadow;
+
+    // 간접광 (IBL)
     float3 irradiance = _irradiance.Sample(_sp0, N).rgb;
-    float3 diffuseIBL = saturate(kd * albedo * irradiance);
+    float3 F_ibl = fresnelSchlickRoughness(NdotV, F0, roughness);
+    float3 kD_ibl = (1.0 - F_ibl) * (1.0 - metallic);
+    float3 diffuseIBL = kD_ibl * irradiance * albedo.rgb;
     
-    // LOD Mipmap 레벨 얻기
-    int specularTextureLevels, width, height;
-    _specular.GetDimensions(0, width, height, specularTextureLevels);
-    // 반사 샘플링
-    float3 Lr = reflect(-V, N);
-    float3 PrefilteredColor = _specular.SampleLevel(_sp0, Lr, roughness * specularTextureLevels).rgb;
+    uint width, height, numMips;
+    _specular.GetDimensions(0, width, height, numMips);
+
+    float maxMip = float(numMips - 1);
+    float lod = roughness * maxMip;
+
+    float3 prefilteredColor = _specular.SampleLevel(_sp0, R, lod).rgb;
+    float2 brdf = _brdflut.Sample(_sp0, float2(NdotV, roughness)).rg;
+    float3 specularIBL = prefilteredColor * (F_ibl * brdf.x + brdf.y);
+
+    float3 ambient = (diffuseIBL + specularIBL) * ao;
     
-    // BRDF 샘플링
-    float2 specularBRDF = _brdflut.Sample(_sp0, float2(NV, roughness)).rg;
-    float3 specularIBL = PrefilteredColor * (F0 * specularBRDF.r + specularBRDF.g);
-   
-    float3 amibentIBL = (diffuseIBL + specularIBL) * ao;
-    
-     // 쉐도우맵 처리
-    float currentShadowDepth = input.S_Pos.z / input.S_Pos.w; // 쉐도우맵 기준 NDC Z좌표
-    float2 shadowUV = input.S_Pos.xy / input.S_Pos.w;
-    
-    shadowUV.y *= -1.0f;
-    shadowUV = (shadowUV * 0.5f) + 0.5f;
-    
-    float shadowFactor = 1.0f;
-    
-    if (shadowUV.x >= 0.0f && shadowUV.x <= 1.0f && shadowUV.y >= 0.0f && shadowUV.y <= 1.0f)
-    {
-        // Normal
-        {
-            float sampleShadowDepth = _shadowmap.Sample(_sp0, shadowUV).r;
-        
-            if (currentShadowDepth > sampleShadowDepth + 0.001f)
-            {
-                shadowFactor = 0.0f;
-            }
-        }
-    }
-    
-    float3 light = mLightColor * mIntensity;
-    float3 direct = (diffuse + specular) * light * NL;
-    float3 color = (direct * shadowFactor) + amibentIBL + emissive;
-    //float4 finalColor = float4(pow(color, 1.0f / 2.2f), 1.0f);
-    
-    //return float4(texColor.rgb * mLightColor * NL * mIntensity, 1.0f);
-    
-    return float4(color, 1.0f);
-    //return float4(pow(color, 1 / 2.2), 1.0f);
-    //return float4(N, 1.0f);
+    float3 finalColor = Lo + ambient;
+
+    return float4(finalColor, 1.0f);
 }

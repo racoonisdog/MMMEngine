@@ -18,9 +18,7 @@ RTTR_REGISTRATION
 	registration::class_<StaticMesh>("StaticMesh")
 		.constructor<>()(policy::ctor::as_std_shared_ptr)
 		.property("castShadows", &StaticMesh::castShadows)
-		.property("receiveShadows", &StaticMesh::receiveShadows)
-		.property("meshData", &StaticMesh::meshData)
-		.property("meshGroupData", &StaticMesh::meshGroupData);
+		.property("receiveShadows", &StaticMesh::receiveShadows);
 
 	type::register_converter_func(
 		[](std::shared_ptr<Resource> from, bool& ok) -> std::shared_ptr<StaticMesh>

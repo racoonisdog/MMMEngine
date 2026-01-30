@@ -155,12 +155,14 @@ void MMMEngine::MaterialSerializer::UnSerealize(Material* _material, std::wstrin
 	// VShader
 	if (snapshot.contains("vshader")) {
 		std::wstring ws = Utility::StringHelper::StringToWString(snapshot["vshader"]["file"].get<std::string>());
-		_material->SetVShader(ws);
+		auto vs = ResourceManager::Get().Load<VShader>(ws);
+		_material->SetVShader(vs);
 	}
 
 	// PShader
 	if (snapshot.contains("pshader")) {
 		std::wstring ws = Utility::StringHelper::StringToWString(snapshot["pshader"]["file"].get<std::string>());
-		_material->SetPShader(ws);
+		auto ps = ResourceManager::Get().Load<PShader>(ws);
+		_material->SetPShader(ps);
 	}
 }

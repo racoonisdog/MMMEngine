@@ -84,10 +84,16 @@ void MMMEngine::ColliderComponent::ApplyFilterData()
     m_Shape->setQueryFilterData(m_QueryFilter);
 }
 
+void MMMEngine::ColliderComponent::SetRigidOffsetPose(const physx::PxTransform& pose)
+{
+    m_RigidOffsetPose = pose;
+    ApplyLocalPose();
+}
+
 void MMMEngine::ColliderComponent::ApplyLocalPose()
 {
     if (!m_Shape) return;
-    m_Shape->setLocalPose(m_LocalPose);
+    m_Shape->setLocalPose(m_RigidOffsetPose * m_LocalPose);
 }
 
 void MMMEngine::ColliderComponent::ApplyShapeModeFlags()

@@ -319,6 +319,8 @@ void MMMEngine::Transform::SetParent(ObjPtr<Transform> parent, bool worldPositio
 	const auto worldRotationBefore = GetWorldRotation();
 	const auto worldPositionBefore = GetWorldPosition();
 
+	onUpdateTransformTree.Invoke(this, parent);   // 참조 연결 / 해제
+
 	// 기존 부모에서 제거
 	if (m_parent)
 		m_parent->RemoveChild(SelfPtr(this));
@@ -373,7 +375,6 @@ void MMMEngine::Transform::SetParent(ObjPtr<Transform> parent, bool worldPositio
 	}
 
 	MarkDirty();
-	onDetachFromParent.Invoke(this);
 	onMatrixUpdate.Invoke(this);  
 	if(GetGameObject().IsValid())
 		GetGameObject()->UpdateActiveInHierarchy(); // 부모가 바뀌었으므로 Hierarchy 활성화 상태 업데이트

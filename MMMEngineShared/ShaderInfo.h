@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #define NOMINMAX
 #include "ExportSingleton.hpp"
 #include <unordered_map>
@@ -31,6 +31,8 @@ namespace MMMEngine {
 		S_TOON = 1,
 		S_PHONG = 2,
 		S_SKYBOX = 3,
+		S_PP = 4,
+		S_END
 	};
 
 	// -- 상수 정보 만들고 스타트업, json에 같은양식으로 등록할것!! --
@@ -98,6 +100,10 @@ namespace MMMEngine {
 		ResPtr<VShader> m_pDefaultVShader;
 		ResPtr<PShader> m_pDefaultPShader;
 
+		// 풀스크린 쉐이더
+		ResPtr<VShader> m_pFullScreenVS;
+		ResPtr<PShader> m_pFullScreenPS;
+
 		// 쉐이더 타입정보정의 < ShaderPath, TypeInfo >
 		std::unordered_map<std::wstring, TypeInfo> m_typeInfoMap;
 
@@ -121,6 +127,7 @@ namespace MMMEngine {
 		
 		
 		void CreatePShaderReflection(std::wstring&& _filePath);
+		void ClearWorldPropertyDatas() { m_globalPropMap.clear(); }
 
 		template<typename T>
 		Microsoft::WRL::ComPtr<ID3D11Buffer> CreateConstantBuffer();
@@ -131,13 +138,15 @@ namespace MMMEngine {
 		void ShutDown();
 
 	public:
-		std::wstring GetDefaultVShader();
-		std::wstring GetDefaultPShader();
+		ResPtr<VShader> GetDefaultVShader();
+		ResPtr<PShader> GetDefaultPShader();
+		ResPtr<VShader> GetFullScreenVShader();
+		ResPtr<PShader> GetFullScreenPShader();
 
 		const RenderType GetRenderType(const std::wstring& _shaderPath);
 		const ShaderType GetShaderType(const std::wstring& _shaderPath);
 		const int PropertyToIdx(const ShaderType _type, const std::wstring& _propertyName, PropertyInfo* _out = nullptr) const;
-		void MMMEngine::ShaderInfo::UpdateProperty(ID3D11DeviceContext4* context,
+		void UpdateProperty(ID3D11DeviceContext4* context,
 			const ShaderType shaderType,
 			const std::wstring& propertyName,
 			const void* data);
@@ -146,8 +155,11 @@ namespace MMMEngine {
 		void ConvertMaterialType(const ShaderType _type, Material* _mat);
 
 		void AddGlobalPropVal(const ShaderType _type, const std::wstring _propName, const PropertyValue& _value);
+		void AddAllGlobalPropVal(const std::wstring _propName, const PropertyValue& _value);
 		void SetGlobalPropVal(const ShaderType _type, const std::wstring _propName, const PropertyValue& _value);
+		void SetAllGlobalPropVal(const std::wstring _propName, const PropertyValue& _value);
 		void RemoveGlobalPropVal(const ShaderType _type, const std::wstring _propName);
+		void RemoveAllGlobalPropVal(const std::wstring _propName);
 
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> CreateVShaderLayout(ID3D10Blob* _blob);
 	};

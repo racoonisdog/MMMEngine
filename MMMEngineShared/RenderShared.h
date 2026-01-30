@@ -24,6 +24,8 @@ namespace MMMEngine {
 		R_PARTICLE = 6,
 		R_POSTPROCESS = 7,
 		R_UI = 8,
+		R_NONE = 9,
+		R_END
 	};
 
 	struct Render_CamBuffer {
