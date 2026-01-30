@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AssimpLoader.h" />
+    <ClInclude Include="AssimpLoaderWindow.h" />
     <ClInclude Include="BuildManager.h" />
     <ClInclude Include="ConsoleWindow.h" />
     <ClInclude Include="DebugDraw.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="AssimpLoader.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="AssimpLoaderWindow.cpp" />
     <ClCompile Include="BuildManager.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
     <ClCompile Include="DLLHotLoadHelper.cpp" />

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Export.h"
 #include <memory>
 #include <unordered_map>

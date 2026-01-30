@@ -28,6 +28,7 @@ using namespace MMMEngine::Utility;
 #include "PlayerBuildWindow.h"
 #include "SceneNameWindow.h"
 #include "SceneChangeWindow.h"
+#include "AssimpLoaderWindow.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -402,6 +403,11 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
                     g_editor_window_physicsSettings = true;
                     p_open = false;
                 }
+                if (ImGui::MenuItem(u8"Assimp 로더"))
+                {
+                    g_editor_window_assimpLoader = true;
+                    p_open = false;
+                }
                 ImGui::EndMenu();
             }
 
@@ -727,6 +733,7 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
     SceneViewWindow::Get().Render();
     PhysicsSettingsWindow::Get().Render();
     PlayerBuildWindow::Get().Render();
+    AssimpLoaderWindow::Get().Render();
 }
 
 void MMMEngine::Editor::ImGuiEditorContext::EndFrame()

@@ -180,18 +180,21 @@ bool MMMEngine::BehaviourManager::ReloadUserScripts(const std::string& name)
 
 void MMMEngine::BehaviourManager::UnloadUserScripts()
 {
-	switch (m_pScriptLoader->UnloadScript())
+	// 스크립트 언로드 시도
+	if (m_pScriptLoader)
 	{
-	case UnloadState::ScriptNotLoaded:
-		std::cout << "Script Not Loaded" << std::endl;
-		break;
-	case UnloadState::UnloadFail:
-		std::cout << "Script Unload Fail" << std::endl;
-		break;
-	case UnloadState::UnloadSuccess:
-		std::cout << "Script Unload Success!!" << std::endl;
-		break;
+		switch (m_pScriptLoader->UnloadScript())
+		{
+		case UnloadState::ScriptNotLoaded:   std::cout << "Script Not Loaded\n";   break;
+		case UnloadState::UnloadFail:        std::cout << "Script Unload Fail\n";  break;
+		case UnloadState::UnloadSuccess:     std::cout << "Script Unload Success!!\n"; break;
+		}
 	}
-}
 
+	// Behaviour 컨테이너 싹 비우기
+	m_activeBehaviours.clear();
+	m_inactiveBehaviours.clear();
+	m_firstCallBehaviours.clear();
+	m_needSort = false;
+}
 
