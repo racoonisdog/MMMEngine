@@ -9,6 +9,7 @@
 #include <imgui_internal.h>
 #include "ColliderComponent.h"
 #include "Camera.h"
+#include "RigidBodyComponent.h"
 #include <memory>
 
 using namespace MMMEngine::Editor;
@@ -214,6 +215,18 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 			tr->SetWorldPosition(t);
 			tr->SetWorldRotation(r);
 			tr->SetWorldScale(s);
+
+			if (g_editor_scene_playing)
+			{
+				auto rbPtr = g_selectedGameObject->GetComponent<RigidBodyComponent>();
+				if (rbPtr.IsValid())
+				{
+					if (rbPtr->GetKinematic())
+						rbPtr->SetKinematicTarget(t, r);
+					else
+						rbPtr->Editor_changeTrans(t, r);
+				}
+			}
 		}
 	}
 

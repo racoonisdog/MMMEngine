@@ -61,6 +61,12 @@ void MMMEngine::PhysxManager::StepFixed(float dt)
     FlushCommands_PostStep();    // detach/unreg/release 등 후처리
 }
 
+void MMMEngine::PhysxManager::ApplyInterpolation(float alpha)
+{
+    if (!m_IsInitialized) return;
+    m_PhysScene.ApplyInterpolation(alpha);
+}
+
 void MMMEngine::PhysxManager::NotifyRigidAdded(RigidBodyComponent* rb)
 {
     if (!rb) return;

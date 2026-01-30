@@ -57,6 +57,7 @@ namespace MMMEngine
 		const float GetTimeScale() const;
 		const float GetMaximumAllowedTimestep() const;
 		const uint32_t GetFrameCount() const;
+		const float GetInterpolationAlpha() const;
 	
 		void SetFixedDeltaTime(float fixedDelta);
 		void SetMaximumAllowedTimestep(float allowedTimestep);

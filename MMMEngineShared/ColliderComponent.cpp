@@ -12,9 +12,57 @@ RTTR_REGISTRATION
     using namespace MMMEngine;
 
     registration::class_<ColliderComponent>("ColliderComponent")
-        (rttr::metadata("INSPECTOR", "DONT_ADD_COMP"));
+        (rttr::metadata("INSPECTOR", "DONT_ADD_COMP"))
+        .property("StaticFriction", &ColliderComponent::GetStaticFriction, &ColliderComponent::SetStaticFriction)
+        .property("DynamicFriction", &ColliderComponent::GetDynamicFriction, &ColliderComponent::SetDynamicFriction)
+        .property("Restitution", &ColliderComponent::GetRestitution, &ColliderComponent::SetRestitution);
 }
 
+
+void MMMEngine::ColliderComponent::EnsureMaterial()
+{
+	auto& physics = MMMEngine::PhysicX::Get().GetPhysics();
+	if (!m_Material)
+	{
+		m_Material = physics.createMaterial(m_StaticFriction, m_DynamicFriction, m_Restitution);
+		m_MaterialOwned = true;
+	}
+}
+
+void MMMEngine::ColliderComponent::ApplyMaterial()
+{
+	EnsureMaterial();
+	if (!m_Material) return;
+	m_Material->setStaticFriction(m_StaticFriction);
+	m_Material->setDynamicFriction(m_DynamicFriction);
+	m_Material->setRestitution(m_Restitution);
+	if (m_Shape)
+	{
+		physx::PxMaterial* mats[1] = { m_Material };
+		m_Shape->setMaterials(mats, 1);
+	}
+}
+
+void MMMEngine::ColliderComponent::SetStaticFriction(float value)
+{
+	if (value < 0.0f) value = 0.0f;
+	m_StaticFriction = value;
+	ApplyMaterial();
+}
+
+void MMMEngine::ColliderComponent::SetDynamicFriction(float value)
+{
+	if (value < 0.0f) value = 0.0f;
+	m_DynamicFriction = value;
+	ApplyMaterial();
+}
+
+void MMMEngine::ColliderComponent::SetRestitution(float value)
+{
+	if (value < 0.0f) value = 0.0f;
+	m_Restitution = value;
+	ApplyMaterial();
+}
 
 void MMMEngine::ColliderComponent::ApplySceneQueryFlag()
 {
@@ -251,7 +299,8 @@ void MMMEngine::ColliderComponent::Initialize()
 {
 	// 
 	auto& physics = MMMEngine::PhysicX::Get().GetPhysics();
-	physx::PxMaterial* mat = MMMEngine::PhysicX::Get().GetDefaultMaterial();
+	EnsureMaterial();
+	physx::PxMaterial* mat = m_Material ? m_Material : MMMEngine::PhysicX::Get().GetDefaultMaterial();
 
 	if (mat)
 	{
@@ -275,5 +324,12 @@ void MMMEngine::ColliderComponent::UnInitialize()
         m_Shape = nullptr;
         m_Owned = false;
     }
+
+    if (m_Material && m_MaterialOwned)
+    {
+        m_Material->release();
+    }
+    m_Material = nullptr;
+    m_MaterialOwned = false;
 }
 

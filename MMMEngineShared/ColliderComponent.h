@@ -18,6 +18,8 @@ namespace MMMEngine
 		{
 			if (m_Shape && m_Owned) { m_Shape->release(); }
 			m_Shape = nullptr;
+			if (m_Material && m_MaterialOwned) { m_Material->release(); }
+			m_Material = nullptr;
 		};
 
 		enum class ShapeMode : uint8_t
@@ -36,6 +38,15 @@ namespace MMMEngine
 
 		physx::PxShape* GetPxShape() const { return m_Shape; }
 		ShapeMode GetShapeMode() const { return m_Mode; }
+
+		float GetStaticFriction() const { return m_StaticFriction; }
+		float GetDynamicFriction() const { return m_DynamicFriction; }
+		float GetRestitution() const { return m_Restitution; }
+		void SetStaticFriction(float value);
+		void SetDynamicFriction(float value);
+		void SetRestitution(float value);
+		physx::PxMaterial* GetPxMaterial() const { return m_Material; }
+
 
 
 		// 공통 설정(Shape 생성 전/후 둘 다 안전하게 동작)
@@ -102,14 +113,20 @@ namespace MMMEngine
 		virtual void ApplyLocalPose();
 
 		void ApplyShapeModeFlags();
+		void ApplyMaterial();
+		void EnsureMaterial();
 
 		
-
 
 	protected:
 		physx::PxShape* m_Shape = nullptr;
 		bool m_Owned = true;
+		physx::PxMaterial* m_Material = nullptr;
+		bool m_MaterialOwned = true;
 
+		float m_StaticFriction = 0.5f;
+		float m_DynamicFriction = 0.5f;
+		float m_Restitution = 0.0f;
 
 		ShapeMode m_Mode = ShapeMode::Simulation;
 		//이 shape가 Scene Query시스템에 포함될지 정함

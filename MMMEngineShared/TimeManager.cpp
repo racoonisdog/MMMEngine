@@ -92,6 +92,11 @@ const uint32_t MMMEngine::TimeManager::GetFrameCount() const
     return m_frameCount;
 }
 
+const float MMMEngine::TimeManager::GetInterpolationAlpha() const
+{
+    return m_interpolationAlpha;
+}
+
 void MMMEngine::TimeManager::SetFixedDeltaTime(float fixedDelta)
 {
     m_fixedDeltaTime = fixedDelta;
