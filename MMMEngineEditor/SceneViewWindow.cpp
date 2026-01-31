@@ -575,9 +575,21 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 			}
 		}
 
+		const float axisFadeRange = 0.2f;
+		const float backAxisAlpha = 0.425f;
+		auto calcAxisFade = [&](float depth)
+		{
+			const float start = -axisFadeRange;
+			const float end = axisFadeRange;
+			float t = (depth - start) / (end - start);
+			t = std::clamp(t, 0.0f, 1.0f);
+			t = t * t * (3.0f - 2.0f * t);
+			return backAxisAlpha + (1.0f - backAxisAlpha) * t;
+		};
+
 		auto drawAxisLine = [&](const AxisWidget& axis)
 		{
-			float alpha = axis.depth >= 0.0f ? 1.0f : 0.55f;
+			float alpha = calcAxisFade(axis.depth);
 			float lineAlpha = axis.filled ? 200.0f : 120.0f;
 			ImU32 lineColor = IM_COL32(
 				(int)(ImGui::ColorConvertU32ToFloat4(axis.color).x * 255.0f),
@@ -597,7 +609,7 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 
 		auto drawAxisCircleAndLabel = [&](const AxisWidget& axis)
 		{
-			float alpha = axis.depth >= 0.0f ? 1.0f : 0.55f;
+			float alpha = calcAxisFade(axis.depth);
 			ImU32 circleColor = IM_COL32(
 				(int)(ImGui::ColorConvertU32ToFloat4(axis.color).x * 255.0f),
 				(int)(ImGui::ColorConvertU32ToFloat4(axis.color).y * 255.0f),
@@ -616,7 +628,7 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 			{
 				ImVec2 textSize = ImGui::CalcTextSize(axis.label);
 				drawList->AddText(ImVec2(axis.endPos.x - textSize.x * 0.5f, axis.endPos.y - textSize.y * 0.5f),
-					IM_COL32(10, 10, 10, 220), axis.label);
+					IM_COL32(10, 10, 10, (int)(alpha * 220.0f)), axis.label);
 			}
 		};
 
