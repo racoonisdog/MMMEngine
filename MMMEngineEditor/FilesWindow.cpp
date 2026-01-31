@@ -650,20 +650,27 @@ void MMMEngine::Editor::FilesWindow::OpenFileInEditor(const fs::path& filePath)
 {
     std::string ext = filePath.extension().string();
 
-    // C++ 소스 파일인 경우 Visual Studio로 열기 (/edit = 기존 창에 열기, 없으면 1회만 실행)
+    // C++ 소스 파일인 경우 Visual Studio로 열기
     if (ext == ".cpp" || ext == ".h" || ext == ".hpp" || ext == ".c")
     {
-#ifdef _WIN32
-        fs::path devenvPath = BuildManager::Get().FindDevEnv();
-        if (!devenvPath.empty())
+        // 프로젝트 경로 가져오기
+        const auto& project = ProjectManager::Get().GetActiveProject();
+        fs::path projectRoot = fs::path(project.rootPath);
+        fs::path vcxprojPath = projectRoot / "Source" / "UserScripts" / "UserScripts.vcxproj";
+
+        if (fs::exists(vcxprojPath))
         {
-            // /edit: 이미 떠 있는 VS에 파일만 열기. 없으면 VS 한 번 띄우고 그 창에 열림
-            std::string cmd = "start \"\" \"" + devenvPath.string() + "\" /edit \"" + filePath.string() + "\"";
+#ifdef _WIN32
+            // Visual Studio에서 프로젝트와 파일을 함께 열기
+            std::string cmd = "start devenv \"" + vcxprojPath.string() + "\" \"" + filePath.string() + "\"";
             int result = system(cmd.c_str());
+
             if (result == 0)
-                return;
-        }
+            {
+                return; // 성공적으로 열렸으면 종료
+            }
 #endif
+        }
     }
 
     // 기본 에디터로 열기 (폴백)
