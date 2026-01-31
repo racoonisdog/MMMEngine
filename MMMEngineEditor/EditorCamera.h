@@ -17,6 +17,10 @@ namespace MMMEngine::Editor
 		float m_near;
 		float m_far;
 		float m_aspect;
+		bool m_isOrthographic = false;
+		float m_orthoSize = 10.0f;
+		float m_projectionBlend = 0.0f;
+		float m_projectionBlendSpeed = 6.0f;
 
 		mutable bool m_isProjMatrixDirty;
 		mutable bool m_isViewMatrixDirty;
@@ -28,6 +32,12 @@ namespace MMMEngine::Editor
 		int m_lastMouseX = 0;
 		int m_lastMouseY = 0;
 		bool m_firstMouseUpdate = true;
+		float m_targetPitch = 0.0f;
+		float m_targetYaw = 0.0f;
+		float m_pitch = 0.0f;
+		float m_yaw = 0.0f;
+		bool m_inputStateDirty = true;
+		DirectX::SimpleMath::Vector3 m_smoothedMovement = DirectX::SimpleMath::Vector3::Zero;
 
 		void UpdateProjMatrix();
 		void UpdateProjFrustum();
@@ -56,6 +66,10 @@ namespace MMMEngine::Editor
 		inline const float& GetNearPlane() const { return m_near; }
 		inline const float& GetFarPlane() const { return m_far; }
 		inline const float& GetAspectRatio() const { return m_aspect; }
+		inline bool IsOrthographic() const { return m_projectionBlend >= 0.5f; }
+		inline bool IsOrthographicTarget() const { return m_isOrthographic; }
+		inline float GetOrthoSize() const { return m_orthoSize; }
+		inline float GetProjectionBlend() const { return m_projectionBlend; }
 
 		inline const DirectX::SimpleMath::Vector3& GetPosition() const { return m_position; }
 		inline const DirectX::SimpleMath::Quaternion& GetRotation() const { return m_rotation; }
@@ -82,6 +96,10 @@ namespace MMMEngine::Editor
 		inline void SetFarPlane(float value) { m_far = m_near + 0.01f > value ? m_near + 0.01f : value; MarkProjectionMatrixDirty(); }
 		inline void SetAspectRatio(float value) { m_aspect = value; MarkProjectionMatrixDirty(); }
 		inline void SetAspectRatio(float width, float height) { m_aspect = width / height; MarkProjectionMatrixDirty(); }
+		inline void SetOrthographic(bool value) { m_isOrthographic = value; MarkProjectionMatrixDirty(); }
+		inline void SetOrthoSize(float value) { m_orthoSize = value < 0.01f ? 0.01f : value; MarkProjectionMatrixDirty(); }
+		inline void ToggleProjectionMode() { SetOrthographic(!m_isOrthographic); }
+		inline void SyncInputState() { m_inputStateDirty = true; }
 
 		void MarkViewMatrixDirty();
 		void MarkProjectionMatrixDirty();
@@ -90,6 +108,7 @@ namespace MMMEngine::Editor
 		inline const bool IsDirtyMatrix() { return m_isProjMatrixDirty || m_isViewMatrixDirty || m_isTransformMatrixDirty; }
 
 		void FocusOn(const DirectX::SimpleMath::Vector3& worldPosition, float distance = 5.0f);
+		void UpdateProjectionBlend();
 		void InputUpdate(int currentOp);
 	};
 }

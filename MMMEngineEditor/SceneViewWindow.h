@@ -82,9 +82,11 @@ namespace MMMEngine::Editor
 
 		bool m_isHovered = false;
 		bool m_isFocused = false;
+		bool m_blockCameraInput = false;
 
 		ImGuizmo::OPERATION m_guizmoOperation = ImGuizmo::OPERATION::TRANSLATE;
 		ImGuizmo::MODE m_guizmoMode = ImGuizmo::MODE::LOCAL;
+		float m_viewGizmoDistance = 10.0f;
 
 		bool CreateRenderTargets(ID3D11Device* device, int width, int height);
 		void ResizeRenderTarget(ID3D11Device* device, int width, int height);

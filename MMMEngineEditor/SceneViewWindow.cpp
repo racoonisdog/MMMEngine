@@ -16,6 +16,7 @@
 #include "RigidBodyComponent.h"
 #include <memory>
 #include <algorithm>
+#include <cmath>
 #include <vector>
 
 using namespace MMMEngine::Editor;
@@ -61,6 +62,7 @@ void MMMEngine::Editor::SceneViewWindow::Initialize(ID3D11Device* device, ID3D11
 		m_pCam->SetNearPlane(0.1f);
 		m_pCam->SetFarPlane(1000.0f);
 		m_pCam->SetAspectRatio((float)initWidth, (float)initHeight);
+		m_viewGizmoDistance = 10.0f;
 	}
 
 	m_pGridRenderer = std::make_unique<EditorGridRenderer>();
@@ -191,7 +193,7 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 	style.WindowMenuButtonPosition = ImGuiDir_None;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_width), static_cast<float>(m_height)), ImGuiCond_FirstUseEver);
 
 	ImGui::Begin(u8"\uf009 씬", &g_editor_window_sceneView);
 
@@ -233,7 +235,9 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 			{
 				auto& tr = g_selectedGameObject->GetTransform();
 				// 오브젝트의 위치로 포커스 (거리는 5.0f로 설정하거나 바운딩 박스 크기에 비례하게 설정)
-				m_pCam->FocusOn(tr->GetWorldPosition(), 7.0f);
+				const float focusDistance = 7.0f;
+				m_pCam->FocusOn(tr->GetWorldPosition(), focusDistance);
+				m_viewGizmoDistance = focusDistance;
 			}
 		}
 	}
@@ -241,8 +245,8 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 
 	// 사용 가능한 영역 크기 가져오기
 	ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-	m_lastWidth = viewportSize.x;
-	m_lastHeight = viewportSize.y;
+	m_lastWidth = static_cast<int>(viewportSize.x);
+	m_lastHeight = static_cast<int>(viewportSize.y);
 
 	auto scenecornerpos = ImGui::GetCursorPos();
 
@@ -259,12 +263,12 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 
 	ImVec2 imagePos = ImGui::GetItemRectMin();
 	ImVec2 imageMax = ImGui::GetItemRectMax();
+	ImVec2 imageSize = ImVec2(imageMax.x - imagePos.x, imageMax.y - imagePos.y);
 	bool gizmoDrawn = false;
 	// ImGuizmo는 별도의 DrawList에 그려짐
 	if (g_selectedGameObject.IsValid() && (int)m_guizmoOperation != 0)
 	{
 		gizmoDrawn = true;
-		ImVec2 imageSize = ImVec2(imageMax.x - imagePos.x, imageMax.y - imagePos.y);
 
 		ImGuizmo::SetRect(imagePos.x, imagePos.y, imageSize.x, imageSize.y);
 
@@ -282,7 +286,7 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 		}
 
 		ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
-		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetOrthographic(m_pCam->IsOrthographic());
 
 		auto viewMat = m_pCam->GetViewMatrix();
 		auto projMat = m_pCam->GetProjMatrix();
@@ -452,9 +456,19 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 			float fov = m_pCam->GetFOV();
 			float n = m_pCam->GetNearPlane();
 			float f = m_pCam->GetFarPlane();
+			bool ortho = m_pCam->IsOrthographicTarget();
 
 			// 컨트롤 간의 간격을 위해 ItemSpacing도 조절하고 싶다면 추가 가능
-			if (ImGui::DragFloat("FOV", &fov, 0.5f, 10.0f, 120.0f)) m_pCam->SetFOV(fov);
+			if (ImGui::Checkbox("Orthographic", &ortho)) m_pCam->SetOrthographic(ortho);
+			if (!ortho)
+			{
+				if (ImGui::DragFloat("FOV", &fov, 0.5f, 10.0f, 120.0f)) m_pCam->SetFOV(fov);
+			}
+			else
+			{
+				float orthoSize = m_pCam->GetOrthoSize();
+				if (ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.1f, 1000.0f)) m_pCam->SetOrthoSize(orthoSize);
+			}
 			if (ImGui::DragFloat("Near", &n, 0.01f, 0.01f, 10.0f)) m_pCam->SetNearPlane(n);
 			if (ImGui::DragFloat("Far", &f, 1.0f, 10.0f, 10000.0f)) m_pCam->SetFarPlane(f);
 
@@ -466,9 +480,235 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 		ImGui::PopStyleColor(3);
 	}
 
+	bool viewGizmoUsing = false;
+	if (imageSize.x > 0.0f && imageSize.y > 0.0f)
+	{
+		const float gizmoSize = 64.0f;
+		const float gizmoPadding = 8.0f;
+		const float axisLength = gizmoSize * 0.35f;
+		const float circleRadius = gizmoSize * 0.12f;
+		const float centerRadius = gizmoSize * 0.08f;
+
+		ImVec2 gizmoCenter = ImVec2(
+			imageMax.x - gizmoPadding - gizmoSize * 0.5f,
+			imagePos.y + gizmoPadding + gizmoSize * 0.5f);
+		ImVec2 gizmoMin = ImVec2(gizmoCenter.x - gizmoSize * 0.5f, gizmoCenter.y - gizmoSize * 0.5f);
+		ImVec2 gizmoMax = ImVec2(gizmoCenter.x + gizmoSize * 0.5f, gizmoCenter.y + gizmoSize * 0.5f);
+		const ImVec2 centerHalfSize = ImVec2(centerRadius * 0.75f, centerRadius * 0.75f);
+		const ImVec2 centerMin = ImVec2(gizmoCenter.x - centerHalfSize.x, gizmoCenter.y - centerHalfSize.y);
+		const ImVec2 centerMax = ImVec2(gizmoCenter.x + centerHalfSize.x, gizmoCenter.y + centerHalfSize.y);
+
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		drawList->AddRectFilled(gizmoMin, gizmoMax, IM_COL32(20, 20, 20, 100), 6.0f);
+		Matrix camWorld = m_pCam->GetTransformMatrix();
+		Vector3 camRight = camWorld.Right();
+		Vector3 camUp = camWorld.Up();
+		Vector3 camForward = camWorld.Forward();
+
+		struct AxisWidget
+		{
+			int index = 0;
+			ImVec2 dir2D = {};
+			float depth = 0.0f;
+			ImU32 color = 0;
+			const char* label = "";
+			ImVec2 endPos = {};
+			Vector3 axisWorld = Vector3::Zero;
+			bool filled = true;
+			float lineLength = 0.0f;
+		};
+
+		const ImU32 axisColors[3] =
+		{
+			IM_COL32(230, 70, 70, 255),
+			IM_COL32(110, 230, 110, 255),
+			IM_COL32(80, 140, 230, 255)
+		};
+		const char* axisLabels[3] = { "X", "Y", "Z" };
+
+		AxisWidget axes[6];
+		int axisCount = 0;
+		for (int i = 0; i < 3; ++i)
+		{
+			Vector3 baseAxis = Vector3::Zero;
+			if (i == 0) baseAxis = Vector3(1.0f, 0.0f, 0.0f);
+			else if (i == 1) baseAxis = Vector3(0.0f, 1.0f, 0.0f);
+			else baseAxis = Vector3(0.0f, 0.0f, 1.0f);
+
+			for (int sign = 0; sign < 2; ++sign)
+			{
+				const float s = sign == 0 ? 1.0f : -1.0f;
+				Vector3 axisWorld = baseAxis * s;
+
+				Vector3 axisView = Vector3(
+					axisWorld.Dot(camRight),
+					axisWorld.Dot(camUp),
+					axisWorld.Dot(camForward));
+				ImVec2 dir2 = ImVec2(axisView.x, -axisView.y);
+				float planar = std::sqrt(dir2.x * dir2.x + dir2.y * dir2.y);
+				if (planar > 1e-5f)
+				{
+					dir2.x /= planar;
+					dir2.y /= planar;
+				}
+				else
+				{
+					dir2.x = 0.0f;
+					dir2.y = 0.0f;
+				}
+
+				float depthT = (axisView.z + 1.0f) * 0.5f;
+				depthT = std::clamp(depthT, 0.0f, 1.0f);
+				float length = axisLength * planar * (0.6f + 0.4f * depthT);
+
+				AxisWidget& axis = axes[axisCount++];
+				axis.index = i;
+				axis.dir2D = dir2;
+				axis.depth = axisView.z;
+				axis.color = axisColors[i];
+				axis.label = sign == 0 ? axisLabels[i] : "";
+				axis.endPos = ImVec2(gizmoCenter.x + dir2.x * length, gizmoCenter.y + dir2.y * length);
+				axis.axisWorld = axisWorld;
+				axis.filled = (sign == 0);
+				axis.lineLength = length;
+			}
+		}
+
+		auto drawAxisLine = [&](const AxisWidget& axis)
+		{
+			float alpha = axis.depth >= 0.0f ? 1.0f : 0.55f;
+			float lineAlpha = axis.filled ? 200.0f : 120.0f;
+			ImU32 lineColor = IM_COL32(
+				(int)(ImGui::ColorConvertU32ToFloat4(axis.color).x * 255.0f),
+				(int)(ImGui::ColorConvertU32ToFloat4(axis.color).y * 255.0f),
+				(int)(ImGui::ColorConvertU32ToFloat4(axis.color).z * 255.0f),
+				(int)(alpha * lineAlpha));
+
+			float lineLen = axis.lineLength - circleRadius;
+			if (lineLen > 0.0f)
+			{
+				ImVec2 lineEnd = ImVec2(
+					gizmoCenter.x + axis.dir2D.x * lineLen,
+					gizmoCenter.y + axis.dir2D.y * lineLen);
+				drawList->AddLine(gizmoCenter, lineEnd, lineColor, 2.0f);
+			}
+		};
+
+		auto drawAxisCircleAndLabel = [&](const AxisWidget& axis)
+		{
+			float alpha = axis.depth >= 0.0f ? 1.0f : 0.55f;
+			ImU32 circleColor = IM_COL32(
+				(int)(ImGui::ColorConvertU32ToFloat4(axis.color).x * 255.0f),
+				(int)(ImGui::ColorConvertU32ToFloat4(axis.color).y * 255.0f),
+				(int)(ImGui::ColorConvertU32ToFloat4(axis.color).z * 255.0f),
+				(int)(alpha * 255.0f));
+			if (axis.filled)
+			{
+				drawList->AddCircleFilled(axis.endPos, circleRadius, circleColor);
+			}
+			else
+			{
+				drawList->AddCircle(axis.endPos, circleRadius, circleColor, 0, 2.0f);
+			}
+
+			if (axis.label && axis.label[0] != '\0')
+			{
+				ImVec2 textSize = ImGui::CalcTextSize(axis.label);
+				drawList->AddText(ImVec2(axis.endPos.x - textSize.x * 0.5f, axis.endPos.y - textSize.y * 0.5f),
+					IM_COL32(10, 10, 10, 220), axis.label);
+			}
+		};
+
+		AxisWidget ordered[6];
+		for (int i = 0; i < axisCount; ++i)
+			ordered[i] = axes[i];
+		std::sort(ordered, ordered + axisCount, [](const AxisWidget& a, const AxisWidget& b)
+		{
+			return a.depth < b.depth;
+		});
+
+		// Lines always behind center toggle
+		for (int i = 0; i < axisCount; ++i)
+			drawAxisLine(ordered[i]);
+
+		// Back axes (faded) circles/labels behind center toggle
+		for (int i = 0; i < axisCount; ++i)
+		{
+			if (ordered[i].depth < 0.0f)
+				drawAxisCircleAndLabel(ordered[i]);
+		}
+
+		// center toggle (rounded rect) drawn after back axes so it stays visible
+		drawList->AddRectFilled(centerMin, centerMax, IM_COL32(245, 245, 245, 240), 2.5f);
+
+		// Front axes circles/labels above center toggle
+		for (int i = 0; i < axisCount; ++i)
+		{
+			if (ordered[i].depth >= 0.0f)
+				drawAxisCircleAndLabel(ordered[i]);
+		}
+
+		ImVec2 mousePos = ImGui::GetMousePos();
+		bool anyHovered = false;
+		int hoveredAxis = -1;
+		for (int i = 0; i < axisCount; ++i)
+		{
+			ImVec2 delta = ImVec2(mousePos.x - axes[i].endPos.x, mousePos.y - axes[i].endPos.y);
+			if (delta.x * delta.x + delta.y * delta.y <= circleRadius * circleRadius)
+			{
+				hoveredAxis = i;
+				anyHovered = true;
+				break;
+			}
+		}
+
+		bool centerHovered = mousePos.x >= centerMin.x && mousePos.x <= centerMax.x
+			&& mousePos.y >= centerMin.y && mousePos.y <= centerMax.y;
+		if (centerHovered)
+			anyHovered = true;
+
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		{
+			if (centerHovered)
+			{
+				m_pCam->ToggleProjectionMode();
+			}
+			else if (hoveredAxis != -1)
+			{
+				Vector3 axisDir = axes[hoveredAxis].axisWorld;
+
+				Matrix camWorld = m_pCam->GetTransformMatrix();
+				Vector3 target = m_pCam->GetPosition() + camWorld.Forward() * (m_viewGizmoDistance < 0.1f ? 0.1f : m_viewGizmoDistance);
+
+				const float viewDistance = m_viewGizmoDistance < 0.1f ? 0.1f : m_viewGizmoDistance;
+				Vector3 eye = target + axisDir * viewDistance;
+
+				Vector3 up = Vector3(0.0f, 1.0f, 0.0f);
+				if (std::abs(axisDir.y) > 0.9f)
+				{
+					up = Vector3(0.0f, 0.0f, 1.0f);
+				}
+
+				DirectX::XMVECTOR eyeV = DirectX::XMVectorSet(eye.x, eye.y, eye.z, 1.0f);
+				DirectX::XMVECTOR targetV = DirectX::XMVectorSet(target.x, target.y, target.z, 1.0f);
+				DirectX::XMVECTOR upV = DirectX::XMVectorSet(up.x, up.y, up.z, 0.0f);
+
+				Matrix newView;
+				DirectX::XMStoreFloat4x4(&newView, DirectX::XMMatrixLookAtLH(eyeV, targetV, upV));
+				Matrix invView = newView.Invert();
+				m_pCam->SetPosition(invView.Translation());
+				m_pCam->SetRotation(Quaternion::CreateFromRotationMatrix(invView));
+				m_pCam->SyncInputState();
+			}
+		}
+
+		viewGizmoUsing = anyHovered && ImGui::IsMouseDown(ImGuiMouseButton_Left);
+		toolbuttonHovered = toolbuttonHovered || anyHovered || ImGui::IsMouseHoveringRect(gizmoMin, gizmoMax);
+	}
+
 	// 씬 뷰 픽킹 (좌클릭)
 	{
-		const bool gizmoBlocking = gizmoDrawn && (ImGuizmo::IsOver() || ImGuizmo::IsUsing());
+		const bool gizmoBlocking = (gizmoDrawn && (ImGuizmo::IsOver() || ImGuizmo::IsUsing())) || viewGizmoUsing;
 		ImVec2 mousePos = ImGui::GetMousePos();
 		bool mouseInImage = mousePos.x >= imagePos.x && mousePos.x <= imageMax.x
 			&& mousePos.y >= imagePos.y && mousePos.y <= imageMax.y;
@@ -516,6 +756,7 @@ void MMMEngine::Editor::SceneViewWindow::Render()
 			}
 		}
 	}
+	m_blockCameraInput = viewGizmoUsing;
 	ImGui::End();
 	ImGui::PopStyleVar();
 }
@@ -707,7 +948,8 @@ void MMMEngine::Editor::SceneViewWindow::RenderSceneToTexture(ID3D11DeviceContex
 			m_pOutlinePS = ResourceManager::Get().Load<PShader>(L"Shader/Editor/OutlinePS.hlsl");
 	}
 
-	if (m_isFocused)
+	m_pCam->UpdateProjectionBlend();
+	if (m_isFocused && !m_blockCameraInput)
 		m_pCam->InputUpdate((int)m_guizmoOperation);
 
 	auto view = m_pCam->GetViewMatrix();
