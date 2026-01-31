@@ -57,6 +57,7 @@ void Initialize()
 	ShaderInfo::Get().StartUp();
 
 	app->OnWindowSizeChanged.AddListener<RenderManager, &RenderManager::ResizeSwapChainSize>(&RenderManager::Get());
+	//app->OnWindowSizeChanged.AddListener<RenderManager, &RenderManager::ResizeSceneSize>(&RenderManager::Get());
 	RenderManager::Get().ResizeSceneSize(1920, 1080);
 
 	ComPtr<ID3D11Device> device = RenderManager::Get().GetDevice();
@@ -88,6 +89,7 @@ void Update()
 
 	TimeManager::Get().ConsumeFixedSteps([&](float fixedDt)
 		{
+			PhysxManager::Get().SetStep();
 			BehaviourManager::Get().BroadCastBehaviourMessage("FixedUpdate");
 			PhysxManager::Get().StepFixed(fixedDt);
 

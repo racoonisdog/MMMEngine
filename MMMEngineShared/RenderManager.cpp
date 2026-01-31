@@ -11,6 +11,7 @@
 #include "Material.h"
 
 #include "rttr/registration.h"
+#include <cmath>
 
 DEFINE_SINGLETON(MMMEngine::RenderManager)
 
@@ -552,18 +553,18 @@ namespace MMMEngine {
 		
 
 		// 뷰포트 갱신
-		m_sceneViewport.Width = _sceneWidth;
-		m_sceneViewport.Height = _sceneHeight;
+		m_sceneViewport.Width = static_cast<float>(_sceneWidth);
+		m_sceneViewport.Height = static_cast<float>(_sceneHeight);
 		m_sceneViewport.MinDepth = 0.0f;
 		m_sceneViewport.MaxDepth = 1.0f;
-		m_sceneViewport.TopLeftX = 0;
-		m_sceneViewport.TopLeftY = 1;
+		m_sceneViewport.TopLeftX = 0.0f;
+		m_sceneViewport.TopLeftY = 0.0f;
 
 		// todo : 렌더러 작업자에게 꼭 고지하기
 		// 카메라 Aspect Ratio 변경
 		if (m_pMainCamera.IsValid())
 		{
-			m_pMainCamera->SetAspect(_sceneWidth / _sceneHeight);
+			m_pMainCamera->SetAspect(static_cast<float>(_sceneWidth) / static_cast<float>(_sceneHeight));
 		}
 	}
 
@@ -669,30 +670,35 @@ namespace MMMEngine {
 			m_pDeviceContext->PSSetSamplers(0, 1, m_pDafaultSampler.GetAddressOf());
 
 			// 씬 뷰포트 설정
-			float sceneAspect = (float)m_sceneWidth / (float)m_sceneHeight;
-			float swapchainAspect = (float)m_clientWidth / (float)m_clientHeight;
+			float sceneAspect = static_cast<float>(m_sceneWidth) / static_cast<float>(m_sceneHeight);
+			float swapchainAspect = static_cast<float>(m_clientWidth) / static_cast<float>(m_clientHeight);
 
-			float drawW, drawH;
+			float drawWf, drawHf;
 
 			if (swapchainAspect > sceneAspect) {
-				drawH = (float)m_clientHeight;
-				drawW = (float)m_clientHeight * sceneAspect;
+				drawHf = static_cast<float>(m_clientHeight);
+				drawWf = static_cast<float>(m_clientHeight) * sceneAspect;
 			}
 			else {
-				drawW = (float)m_clientWidth;
-				drawH = (float)m_clientWidth / sceneAspect;
+				drawWf = static_cast<float>(m_clientWidth);
+				drawHf = static_cast<float>(m_clientWidth) / sceneAspect;
 			}
 
-			float offsetX = ((float)m_clientWidth - drawW) * 0.5f;
-			float offsetY = ((float)m_clientHeight - drawH) * 0.5f;
+			// 정수 픽셀 기준으로 스냅
+			int drawW = static_cast<int>(std::round(drawWf));
+			int drawH = static_cast<int>(std::round(drawHf));
+			int offsetX = (static_cast<int>(m_clientWidth) - drawW) / 2;
+			int offsetY = (static_cast<int>(m_clientHeight) - drawH) / 2;
 
-
-			m_swapViewport.TopLeftX = offsetX;
-			m_swapViewport.TopLeftY = offsetY;
-			m_swapViewport.Width = drawW;
-			m_swapViewport.Height = drawH;
+			m_swapViewport.TopLeftX = static_cast<float>(offsetX);
+			m_swapViewport.TopLeftY = static_cast<float>(offsetY);
+			m_swapViewport.Width = static_cast<float>(drawW);
+			m_swapViewport.Height = static_cast<float>(drawH);
 			m_swapViewport.MinDepth = 0.0f;
 			m_swapViewport.MaxDepth = 1.0f;
+
+			// 변경된 뷰포트를 실제 파이프라인에 반영
+			m_pDeviceContext->RSSetViewports(1, &m_swapViewport);
 
 			m_pDeviceContext->Draw(3, 0);
 		}
@@ -725,6 +731,122 @@ namespace MMMEngine {
 		ExcuteCommands();
 	}
 
+	void RenderManager::RenderPickingIds(ID3D11VertexShader* vs, ID3D11PixelShader* ps, ID3D11InputLayout* layout, ID3D11Buffer* idBuffer)
+	{
+		if (!vs || !ps || !layout || !idBuffer)
+			return;
+
+		// 캠 버퍼 업데이트
+		Render_CamBuffer m_camMat = {};
+		m_camMat.camPos = XMMatrixInverse(nullptr, m_viewMatrix).r[3];
+		m_camMat.mView = XMMatrixTranspose(m_viewMatrix);
+		m_camMat.mProjection = XMMatrixTranspose(m_projMatrix);
+
+		m_pDeviceContext->UpdateSubresource1(m_pCambuffer.Get(), 0, nullptr, &m_camMat, 0, 0, D3D11_COPY_DISCARD);
+
+		// 기본 렌더셋팅
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_pDeviceContext->IASetInputLayout(layout);
+		m_pDeviceContext->VSSetShader(vs, nullptr, 0);
+		m_pDeviceContext->PSSetShader(ps, nullptr, 0);
+		m_pDeviceContext->VSSetConstantBuffers(0, 1, m_pCambuffer.GetAddressOf());
+		m_pDeviceContext->VSSetConstantBuffers(1, 1, m_pTransbuffer.GetAddressOf());
+		m_pDeviceContext->PSSetConstantBuffers(5, 1, &idBuffer);
+		float blendFactor[4] = { 0,0,0,0 };
+		UINT sampleMask = 0xffffffff;
+		m_pDeviceContext->OMSetBlendState(m_pDefaultBS.Get(), blendFactor, sampleMask);
+		m_pDeviceContext->RSSetState(m_pDefaultRS.Get());
+		m_pDeviceContext->OMSetDepthStencilState(nullptr, 0);
+
+		struct PickingIdBuffer
+		{
+			uint32_t objectId = 0;
+			uint32_t padding[3] = { 0, 0, 0 };
+		} pickData;
+
+		for (auto& [type, commands] : m_renderCommands)
+		{
+			if (type == RenderType::R_SKYBOX)
+				continue;
+
+			for (auto& cmd : commands)
+			{
+				if (cmd.rendererID == UINT32_MAX)
+					continue;
+
+				UINT stride = sizeof(Mesh_Vertex);
+				UINT offset = 0;
+				m_pDeviceContext->IASetVertexBuffers(0, 1, &cmd.vertexBuffer, &stride, &offset);
+				m_pDeviceContext->IASetIndexBuffer(cmd.indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+				Render_TransformBuffer transformBuffer;
+				transformBuffer.mWorld = XMMatrixTranspose(m_objWorldMatMap[cmd.worldMatIndex]);
+				transformBuffer.mNormalMatrix = XMMatrixInverse(nullptr, m_objWorldMatMap[cmd.worldMatIndex]);
+				m_pDeviceContext->UpdateSubresource1(m_pTransbuffer.Get(), 0, nullptr, &transformBuffer, 0, 0, D3D11_COPY_DISCARD);
+
+				pickData.objectId = cmd.rendererID + 1;
+				m_pDeviceContext->UpdateSubresource1(idBuffer, 0, nullptr, &pickData, 0, 0, D3D11_COPY_DISCARD);
+
+				m_pDeviceContext->DrawIndexed(cmd.indiciesSize, 0, 0);
+			}
+		}
+	}
+
+	void RenderManager::RenderSelectedMask(ID3D11VertexShader* vs, ID3D11PixelShader* ps, ID3D11InputLayout* layout, const uint32_t* ids, uint32_t count)
+	{
+		if (!vs || !ps || !layout || !ids || count == 0)
+			return;
+
+		Render_CamBuffer m_camMat = {};
+		m_camMat.camPos = XMMatrixInverse(nullptr, m_viewMatrix).r[3];
+		m_camMat.mView = XMMatrixTranspose(m_viewMatrix);
+		m_camMat.mProjection = XMMatrixTranspose(m_projMatrix);
+
+		m_pDeviceContext->UpdateSubresource1(m_pCambuffer.Get(), 0, nullptr, &m_camMat, 0, 0, D3D11_COPY_DISCARD);
+
+		m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_pDeviceContext->IASetInputLayout(layout);
+		m_pDeviceContext->VSSetShader(vs, nullptr, 0);
+		m_pDeviceContext->PSSetShader(ps, nullptr, 0);
+		m_pDeviceContext->VSSetConstantBuffers(0, 1, m_pCambuffer.GetAddressOf());
+		m_pDeviceContext->VSSetConstantBuffers(1, 1, m_pTransbuffer.GetAddressOf());
+		// State (blend/depth/raster) is expected to be set by caller.
+
+		auto isSelected = [ids, count](uint32_t id) -> bool
+		{
+			for (uint32_t i = 0; i < count; ++i)
+			{
+				if (ids[i] == id)
+					return true;
+			}
+			return false;
+		};
+
+		for (auto& [type, commands] : m_renderCommands)
+		{
+			if (type == RenderType::R_SKYBOX)
+				continue;
+
+			for (auto& cmd : commands)
+			{
+				if (cmd.rendererID == UINT32_MAX || !isSelected(cmd.rendererID))
+					continue;
+
+				UINT stride = sizeof(Mesh_Vertex);
+				UINT offset = 0;
+				m_pDeviceContext->IASetVertexBuffers(0, 1, &cmd.vertexBuffer, &stride, &offset);
+				m_pDeviceContext->IASetIndexBuffer(cmd.indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+				Render_TransformBuffer transformBuffer;
+				transformBuffer.mWorld = XMMatrixTranspose(m_objWorldMatMap[cmd.worldMatIndex]);
+				transformBuffer.mNormalMatrix = XMMatrixInverse(nullptr, m_objWorldMatMap[cmd.worldMatIndex]);
+				m_pDeviceContext->UpdateSubresource1(m_pTransbuffer.Get(), 0, nullptr, &transformBuffer, 0, 0, D3D11_COPY_DISCARD);
+
+				m_pDeviceContext->DrawIndexed(cmd.indiciesSize, 0, 0);
+			}
+		}
+	}
+
 	void RenderManager::EndFrame()
 	{
 		// 캐싱된 데이터들 해제
@@ -736,14 +858,14 @@ namespace MMMEngine {
 
 	uint32_t RenderManager::AddRenderer(Renderer* _renderer)
 	{
-		static uint32_t index = 0;
-
 		if (_renderer == nullptr)
 			return UINT32_MAX;
-		
+
+		uint32_t id = m_nextRendererId++;
 		m_renderers.push_back(_renderer);
+		m_rendererIdMap[id] = _renderer;
 		m_renInitQueue.push(_renderer);
-		return index++;
+		return id;
 	}
 
 	void RenderManager::RemoveRenderer(int _idx)
@@ -751,17 +873,21 @@ namespace MMMEngine {
 		if (m_renderers.empty())
 			return;
 
-		if (_idx < m_renderers.size() && _idx >= 0)
-		{
-			if (m_renderers.size() == 1)
-			{
-				m_renderers.pop_back();
-				return;
-			}
+		auto it = m_rendererIdMap.find(static_cast<uint32_t>(_idx));
+		if (it == m_rendererIdMap.end())
+			return;
 
-			std::swap(m_renderers[_idx], m_renderers.back());
-			m_renderers[_idx]->renderIndex = _idx;
-			m_renderers.pop_back();
+		Renderer* target = it->second;
+		m_rendererIdMap.erase(it);
+
+		for (size_t i = 0; i < m_renderers.size(); ++i)
+		{
+			if (m_renderers[i] == target)
+			{
+				m_renderers[i] = m_renderers.back();
+				m_renderers.pop_back();
+				break;
+			}
 		}
 	}
 
@@ -793,5 +919,13 @@ namespace MMMEngine {
 			m_lights[_idx]->m_lightIndex = _idx;
 			m_lights.pop_back();
 		}
+	}
+
+	Renderer* RenderManager::GetRendererById(uint32_t id) const
+	{
+		auto it = m_rendererIdMap.find(id);
+		if (it == m_rendererIdMap.end())
+			return nullptr;
+		return it->second;
 	}
 }
