@@ -1,4 +1,4 @@
-﻿#include "PhysicsSettingsWindow.h"
+#include "PhysicsSettingsWindow.h"
 #include "EditorRegistry.h"
 #include "ProjectManager.h"
 #include "PhysicsSettings.h"

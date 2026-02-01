@@ -393,7 +393,7 @@ void MMMEngine::Editor::ImGuiEditorContext::Render()
                 {
                     ScriptBuildWindow::Get().StartBuild();
                 }
-                if (ImGui::MenuItem(u8"프로젝트 빌드"))
+                if (ImGui::MenuItem(u8"플레이어 빌드"))
                 {
                     g_editor_window_playerBuild = true;
 					p_open = false;
