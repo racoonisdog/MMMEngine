@@ -282,8 +282,17 @@ bool MMMEngine::ColliderComponent::GetChildValue()
 
 void MMMEngine::ColliderComponent::NoticeCompoundCollider(ObjPtr<Transform> preParent)
 {
-    auto NextParent_obj = preParent->GetGameObject();
-    auto CurParent_obj = GetTransform()->GetParent()->GetGameObject();
+    ObjPtr<GameObject> NextParent_obj{};
+    if (preParent.IsValid())
+    {
+        NextParent_obj = preParent->GetGameObject();
+    }
+    ObjPtr<GameObject> CurParent_obj{};
+    auto CurParent = GetTransform()->GetParent();
+    if (CurParent.IsValid())
+    {
+        CurParent_obj = CurParent->GetGameObject();
+    }
     auto Self_obj = GetGameObject();
 
     MMMEngine::PhysxManager::Get().NotifyCompoundColliderAdded(NextParent_obj, CurParent_obj, Self_obj);
