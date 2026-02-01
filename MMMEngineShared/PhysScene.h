@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "PhysX.h"
 #include "PhysicsEventCallback.h"
 #include "RigidBodyComponent.h"
@@ -8,21 +8,21 @@
 //using namespace DirectX::SimpleMath;
 
 
-//Todo : ÅÍÁö¸é MMMEngine °É¾îµÎ±â
+//Todo : í„°ì§€ë©´ MMMEngine ê±¸ì–´ë‘ê¸°
 struct PhysSceneDesc
 {
 	//Vec3 gravity = { 0.f, -9.81f, 0.f };
 	float gravity[3] = { 0.f, 0.f, 0.f };
 
 	uint32_t cpuThreadCount = 0;
-	//ÃÑ¾Ë°°Àº °¡¼Ó¿É¼Ç ÇÊ¿äÇÒ¶§ true ¹× ¼³Á¤
+	//ì´ì•Œê°™ì€ ê°€ì†ì˜µì…˜ í•„ìš”í• ë•Œ true ë° ì„¤ì •
 	bool enableCCD = false;
-	//pvd Çö ÇÁ·ÎÁ§Æ®¿¡¼­´Â ¾È¾¸
+	//pvd í˜„ í”„ë¡œì íŠ¸ì—ì„œëŠ” ì•ˆì”€
 	bool enablePVD = false;
 
-	//Ãæµ¹ ÇÊÅÍ ¼³Á¤
+	//ì¶©ëŒ í•„í„° ì„¤ì •
 	physx::PxSimulationFilterShader userFilterShader = nullptr;
-	//»ç¿ëÀÚ Ä¿½ºÅÒ Äİ¹é ÀÌº¥Æ® , Çö ÇÁ·ÎÁ§Æ®´Â ¾µ¿¹Á¤ ¾øÀ½
+	//ì‚¬ìš©ì ì»¤ìŠ¤í…€ ì½œë°± ì´ë²¤íŠ¸ , í˜„ í”„ë¡œì íŠ¸ëŠ” ì“¸ì˜ˆì • ì—†ìŒ
 	physx::PxSimulationEventCallback* userEventCallback = nullptr;
 };
 
@@ -39,7 +39,7 @@ namespace MMMEngine
 
 		void Destroy();
 
-		//½Ã¹Ä·¹ÀÌ¼ÇÀ» ÇÑ ÇÁ·¹ÀÓ ÁøÇà½ÃÅ°´Â ÇÔ¼ö //simulate °è»ê ½ÃÀÛ, fetchResults °è»êÀÌ ³¡³¯¶§±îÁö ´ë±â //¸ÖÆ¼½º·¹µå
+		//ì‹œë®¬ë ˆì´ì…˜ì„ í•œ í”„ë ˆì„ ì§„í–‰ì‹œí‚¤ëŠ” í•¨ìˆ˜ //simulate ê³„ì‚° ì‹œì‘, fetchResults ê³„ì‚°ì´ ëë‚ ë•Œê¹Œì§€ ëŒ€ê¸° //ë©€í‹°ìŠ¤ë ˆë“œ
 		void Step(float dt);
 
 		void PullRigidsFromPhysics();
@@ -48,21 +48,21 @@ namespace MMMEngine
 
 		void DrainEvents();
 
-		//PxRigidActor¸¦ PxScene¿¡ µî·Ï // addÇÑ¼ø°£ºÎÅÍ ¹°¸®°¡ Àû¿ë
+		//PxRigidActorë¥¼ PxSceneì— ë“±ë¡ // addí•œìˆœê°„ë¶€í„° ë¬¼ë¦¬ê°€ ì ìš©
 		void AddActor(physx::PxActor& actor);
-		//Scene¿¡¼­ actor¸¦ »©´Â ÇÔ¼ö  //Scene¿¡¼­ ºüÁö¸é ´õÀÌ»ó ½Ã¹Ä¾ÈÇÔ
+		//Sceneì—ì„œ actorë¥¼ ë¹¼ëŠ” í•¨ìˆ˜  //Sceneì—ì„œ ë¹ ì§€ë©´ ë”ì´ìƒ ì‹œë®¬ì•ˆí•¨
 		void RemoveActor(physx::PxActor& actor);
 
 		physx::PxScene& GetScene() { return *m_scene; }
 
-		//PhysScene´Â ÇÏ³ª¸¸ Á¸ÀçÇØ¾ßÇÔ ( ½Ì±ÛÅæ ±¸ÇöÀÌ ¾Æ´Ï¶ó º¹»ç ¸·¾ÆµÎ±â ÇÊ¿ä )
+		//PhysSceneëŠ” í•˜ë‚˜ë§Œ ì¡´ì¬í•´ì•¼í•¨ ( ì‹±ê¸€í†¤ êµ¬í˜„ì´ ì•„ë‹ˆë¼ ë³µì‚¬ ë§‰ì•„ë‘ê¸° í•„ìš” )
 		PhysScene(const PhysScene&) = delete;
 		PhysScene& operator=(const PhysScene&) = delete;
 		PhysScene(PhysScene&&) = delete;
 		PhysScene& operator=(PhysScene&&) = delete;
 
 		
-		//µî·Ï/ÇØÁ¦/ºÎÂø/ºĞ¸®/¸®ºôµå
+		//ë“±ë¡/í•´ì œ/ë¶€ì°©/ë¶„ë¦¬/ë¦¬ë¹Œë“œ
 		void RegisterRigid(MMMEngine::RigidBodyComponent* rb);
 		void UnregisterRigid(MMMEngine::RigidBodyComponent* rb);
 
@@ -77,13 +77,13 @@ namespace MMMEngine
 
 		void ReapplyFilters(const CollisionMatrix& matrix);
 
-		//Äİ¸®´õ Å©±â º¯°æ
+		//ì½œë¦¬ë” í¬ê¸° ë³€ê²½
 		void UpdateColliderGeometry(MMMEngine::ColliderComponent* col);
 
-		//Äİ¸®´õ ÀçºÎÂø
+		//ì½œë¦¬ë” ì¬ë¶€ì°©
 		void RebuildCollider(MMMEngine::ColliderComponent* col, const CollisionMatrix& matrix);
 
-		//ÇöÀç ¾À¿¡ µî·ÏµÈ rigidµé¿¡ ´ëÇØ pushtophysics È£Ãâ¿ë
+		//í˜„ì¬ ì”¬ì— ë“±ë¡ëœ rigidë“¤ì— ëŒ€í•´ pushtophysics í˜¸ì¶œìš©
 		void PushRigidsToPhysics();
 
 		void ChangeRigidType(MMMEngine::RigidBodyComponent* col, const CollisionMatrix& matrix);
@@ -91,10 +91,12 @@ namespace MMMEngine
 		const std::vector<MMMEngine::PhysXSimulationCallback::ContactEvent>& GetFrameContacts() const { return m_frameContacts; }
 		const std::vector<PhysXSimulationCallback::TriggerEvent>& GetFrameTriggers() const { return m_frameTriggers; }
 
-		//¸Ê Áß·Â ¼ÂÆÃ
+		//ë§µ ì¤‘ë ¥ ì…‹íŒ…
 		void SetGravity(float x, float y, float z);
 
 		void ResetFilteringFor(MMMEngine::ColliderComponent* col);
+
+		void TransferCollider(MMMEngine::RigidBodyComponent* oldRb, MMMEngine::RigidBodyComponent* newRb, MMMEngine::ColliderComponent* col, const CollisionMatrix& matrix);
 
 	private:
 		PhysSceneDesc m_desc;
@@ -108,13 +110,13 @@ namespace MMMEngine
 		std::vector<MMMEngine::PhysXSimulationCallback::TriggerEvent> m_frameTriggers;
 
 
-		//ÇØ´ç scene¿¡¼­ »ç¿ëµÇ´Â rigid ¸ñ·Ï
+		//í•´ë‹¹ sceneì—ì„œ ì‚¬ìš©ë˜ëŠ” rigid ëª©ë¡
 		std::unordered_set<MMMEngine::RigidBodyComponent*> m_rigids;
 		
-		//ÇØ´ç shape°¡ ¾î´À actor¿¡ ºÙ¾îÀÖ´ÂÁö ( ¾î¶² collider°¡ rigid¿¡ ºÙ¾ú´ÂÁö )
+		//í•´ë‹¹ shapeê°€ ì–´ëŠ actorì— ë¶™ì–´ìˆëŠ”ì§€ ( ì–´ë–¤ colliderê°€ rigidì— ë¶™ì—ˆëŠ”ì§€ )
 		std::unordered_map< MMMEngine::ColliderComponent*, MMMEngine::RigidBodyComponent*> m_ownerByCollider;
 
-		// Rigid°¡ Á×°Å³ª Á¦°ÅÇÒ¶§ ÀÏ°ıÀûÀ¸·Î detachÃ³¸®ÇÏ±â À§ÇÑ ÄÁÅ×ÀÌ³Ê ( ÀÓ½Ã º¸°ü ÄÁÅ×ÀÌ³Ê )
+		// Rigidê°€ ì£½ê±°ë‚˜ ì œê±°í• ë•Œ ì¼ê´„ì ìœ¼ë¡œ detachì²˜ë¦¬í•˜ê¸° ìœ„í•œ ì»¨í…Œì´ë„ˆ ( ì„ì‹œ ë³´ê´€ ì»¨í…Œì´ë„ˆ )
 		std::unordered_map<MMMEngine::RigidBodyComponent*, std::vector<MMMEngine::ColliderComponent*>> m_collidersByRigid;
 	};
 }

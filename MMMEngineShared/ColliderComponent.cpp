@@ -280,22 +280,29 @@ bool MMMEngine::ColliderComponent::GetChildValue()
     return Child_value;
 }
 
+void MMMEngine::ColliderComponent::NoticeCompoundCollider(ObjPtr<Transform> preParent)
+{
+    auto NextParent_obj = preParent->GetGameObject();
+    auto CurParent_obj = GetTransform()->GetParent()->GetGameObject();
+    auto Self_obj = GetGameObject();
+
+    MMMEngine::PhysxManager::Get().NotifyCompoundColliderAdded(NextParent_obj, CurParent_obj, Self_obj);
+}
+
 void MMMEngine::ColliderComponent::SetLocalShape()
 {
     if (!m_Shape) return;
-    physx::PxRigidActor* actor = m_Shape->getActor();
+    auto* actor = m_Shape->getActor();
     if (!actor) return;
 
-    // 콜리더 월드 포즈 = GO 월드 * 콜리더 로컬 오프셋(m_LocalPose)
     Vector3 goWorldPos = GetTransform()->GetWorldPosition();
     Quaternion goWorldRot = GetTransform()->GetWorldRotation();
-    physx::PxTransform colWorldPx = ToPxTrans(goWorldPos, goWorldRot) * m_LocalPose;
+    physx::PxTransform goWorldPx = ToPxTrans(goWorldPos, goWorldRot);
 
-    // actor 기준 로컬 = actor 월드 역 * 콜리더 월드
     physx::PxTransform actorWorld = actor->getGlobalPose();
-    physx::PxTransform shapeLocal = actorWorld.getInverse() * colWorldPx;
+    physx::PxTransform rigidOffset = actorWorld.getInverse() * goWorldPx;
 
-    m_Shape->setLocalPose(shapeLocal);
+    SetRigidOffsetPose(rigidOffset);
 }
 
 void MMMEngine::ColliderComponent::SetShape(physx::PxShape* shape, bool owned)
@@ -342,14 +349,14 @@ void MMMEngine::ColliderComponent::Initialize()
 	}
 	MMMEngine::PhysxManager::Get().NotifyColliderAdded(this);
     
-    GetGameObject()->GetTransform()->onUpdateTransformTree.AddListener<ColliderComponent, &ColliderComponent::SetChildValue>(this);
+    GetGameObject()->GetTransform()->onUpdateTransformTree.AddListener<ColliderComponent, &ColliderComponent::NoticeCompoundCollider>(this);
 }
 
 void MMMEngine::ColliderComponent::UnInitialize()
 {
     if(GetGameObject().IsValid())
     {
-        GetGameObject()->GetTransform()->onUpdateTransformTree.RemoveListener<ColliderComponent, &ColliderComponent::SetChildValue>(this);
+        GetGameObject()->GetTransform()->onUpdateTransformTree.RemoveListener<ColliderComponent, &ColliderComponent::NoticeCompoundCollider>(this);
     }
 
     PhysxManager::Get().NotifyColliderRemoved(this);

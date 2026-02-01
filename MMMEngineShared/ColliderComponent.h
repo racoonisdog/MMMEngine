@@ -105,7 +105,11 @@ namespace MMMEngine
 		void SetChildValue(ObjPtr<Transform> T);
 		bool GetChildValue();
 
+		void NoticeCompoundCollider(ObjPtr<Transform> preParent);
+
 		void SetLocalShape();
+
+		void SetRigidOffsetPose(const physx::PxTransform& pose);
 
 	protected:
 		// 파생 클래스가 shape 생성 후 반드시 호출
@@ -120,7 +124,7 @@ namespace MMMEngine
 
 
 		virtual void ApplyLocalPose();
-		void SetRigidOffsetPose(const physx::PxTransform& pose);
+		
 
 		void ApplyShapeModeFlags();
 		void ApplyMaterial();

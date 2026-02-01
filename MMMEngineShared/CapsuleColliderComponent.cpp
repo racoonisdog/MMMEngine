@@ -65,7 +65,8 @@ bool MMMEngine::CapsuleColliderComponent::UpdateShapeGeometry()
 void MMMEngine::CapsuleColliderComponent::ApplyLocalPose()
 {
 	if (!m_Shape) return;
-	m_Shape->setLocalPose(m_LocalPose * m_AxisCorrection);
+	// rigidOffset -> local -> axisCorrection 순서
+	m_Shape->setLocalPose(m_RigidOffsetPose * m_LocalPose * m_AxisCorrection);
 }
 
 void MMMEngine::CapsuleColliderComponent::BuildShape(physx::PxPhysics* physics, physx::PxMaterial* material)
@@ -83,13 +84,6 @@ void MMMEngine::CapsuleColliderComponent::BuildShape(physx::PxPhysics* physics, 
 
     // 부모가 userData 설정 및 ApplyAll 수행
     SetShape(shape, true);
-
-    // Y-up 캡슐이 필요하면 아래코드로
-	shape->setLocalPose(
-		physx::PxTransform(
-			physx::PxQuat(physx::PxHalfPi, physx::PxVec3(0, 0, 1))
-		)
-	);
 }
 
 MMMEngine::ColliderComponent::DebugColliderShapeDesc MMMEngine::CapsuleColliderComponent::GetDebugShapeDesc() const

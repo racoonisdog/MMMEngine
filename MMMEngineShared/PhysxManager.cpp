@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "BehaviourManager.h"
 #include "PhysxHelper.h"
+#include "Transform.h"
 
 DEFINE_SINGLETON(MMMEngine::PhysxManager)
 
@@ -168,7 +169,7 @@ void MMMEngine::PhysxManager::RequestRegisterRigid(MMMEngine::RigidBodyComponent
             ++it;
     }
 
-    m_Commands.push_back({ CmdType::RegRigid, rb, nullptr });
+    m_Commands.push_back({ CmdType::RegRigid, rb, nullptr, nullptr});
 }
 
 // rigidbody가 가진 physX actor를 pxScene에서 제거 ( rigidbody를 더이상 물리월드에 존재하지 않게 만드는 함수 )
@@ -190,7 +191,7 @@ void MMMEngine::PhysxManager::RequestUnregisterRigid(MMMEngine::RigidBodyCompone
     //지울예정인 큐에 담음
     m_PendingUnreg.insert(rb);
     //큐에서 지운 rigid를 unregid type으로 바꿔서 physScene에서 actor를 빼도록 함
-    m_Commands.push_back({ CmdType::UnregRigid, rb, nullptr });
+    m_Commands.push_back({ CmdType::UnregRigid, rb, nullptr , nullptr});
 }
 
 //collider를 physx로 만들고 만든 shape를 rigdbody에 attachShape함
@@ -210,7 +211,7 @@ void MMMEngine::PhysxManager::RequestAttachCollider(MMMEngine::RigidBodyComponen
         else
             ++it;
     }
-    m_Commands.push_back({ CmdType::AttachCol, rb, col });
+    m_Commands.push_back({ CmdType::AttachCol, rb, col , nullptr});
 }
 
 //rigid의 actor에서 해당 collider의 pxshape를 제거함
@@ -229,7 +230,7 @@ void MMMEngine::PhysxManager::RequestDetachCollider(MMMEngine::RigidBodyComponen
     }
 
     //attachcol했던 파일을 detach로 넣어서 제거
-    m_Commands.push_back({ CmdType::DetachCol, rb, col });
+    m_Commands.push_back({ CmdType::DetachCol, rb, col , nullptr});
 }
 
 //collider의 shape를 다시 만들어서 원래 붙어있던 actor에 다시 붙인다 (collider쪽에 자기자신이 등록된 object확인 법필요 )
@@ -245,7 +246,7 @@ void MMMEngine::PhysxManager::RequestRebuildCollider(MMMEngine::RigidBodyCompone
         else
             ++it;
     }
-    m_Commands.push_back({ CmdType::RebuildCol, rb, col });
+    m_Commands.push_back({ CmdType::RebuildCol, rb, col , nullptr});
 }
 
 //레이어/마스크 정책이 바뀌면 Scene에 존재하는 모든 shape의 filterdata를 다시 넣도록 지시
@@ -278,7 +279,7 @@ void MMMEngine::PhysxManager::RequestChangeRigidType(MMMEngine::RigidBodyCompone
     // 여기서는 "Flush 순서 강제"로 가는 게 보통 더 낫다.
     // 따라서 여기서는 지우지 않고, FlushCommands_PreStep에서 ChangeRigidType을 먼저 처리하게 만든다.
 
-    m_Commands.push_back({ CmdType::ChangeRigid, rb, nullptr });
+    m_Commands.push_back({ CmdType::ChangeRigid, rb, nullptr , nullptr});
 }
 
 MMMEngine::RigidBodyComponent* MMMEngine::PhysxManager::GetOrCreateRigid(ObjPtr<GameObject> go)
@@ -309,6 +310,68 @@ void MMMEngine::PhysxManager::SetLayerCollision(uint32_t layerA, uint32_t layerB
     m_FilterDirty = true;
 }
 
+
+void MMMEngine::PhysxManager::NotifyCompoundColliderAdded(ObjPtr<GameObject> nextParent, ObjPtr<GameObject> curParent, ObjPtr<GameObject> child)
+{
+    if (!child.IsValid()) return;
+
+    // 자기 Rigidbody (없을 수 있으면 방어)
+    auto selfRbPtr = child->GetComponent<RigidBodyComponent>();
+    RigidBodyComponent* selfRb = selfRbPtr.IsValid() ? static_cast<RigidBodyComponent*>(selfRbPtr.GetRaw())
+        : nullptr;
+
+    // old/new 루트 (너의 정책: 최상위 rigid)
+    RigidBodyComponent* oldRoot = curParent.IsValid() ? FindHighestRigid(curParent) : selfRb;
+    RigidBodyComponent* newRoot = nextParent.IsValid() ? FindHighestRigid(nextParent) : selfRb;
+
+    if (!newRoot)
+    {
+        if (!selfRb) selfRb = GetOrCreateRigid(child);
+        newRoot = selfRb;
+    }
+    if (oldRoot == newRoot) return;
+
+    // 서브트리 콜라이더 수집
+    std::vector<ColliderComponent*> cols;
+    CollectCollidersInSubtree(child, cols);
+
+    // per-collider 커맨드 적재
+    for (auto* col : cols)
+    {
+        if (!col) continue;
+        m_Commands.push_back({ CmdType::TransferCol, newRoot, col, oldRoot });
+    }
+}
+
+void MMMEngine::PhysxManager::CollectCollidersInSubtree(ObjPtr<GameObject> root, std::vector<ColliderComponent*>& out)
+{
+    if (!root.IsValid()) return;
+
+    std::vector<ObjPtr<Transform>> stack;
+    stack.push_back(root->GetTransform());
+
+    while (!stack.empty())
+    {
+        auto tr = stack.back();
+        stack.pop_back();
+        if (!tr) continue;
+
+        auto go = tr->GetGameObject();
+        if (go.IsValid())
+        {
+            auto cols = go->GetComponents<ColliderComponent>();
+            for (auto& c : cols)
+            {
+                if (c.IsValid())
+                    out.push_back(static_cast<ColliderComponent*>(c.GetRaw()));
+            }
+        }
+
+        const size_t childCount = tr->GetChildCount();
+        for (size_t i = 0; i < childCount; ++i)
+            stack.push_back(tr->GetChild(i));
+    }
+}
 
 //물리 시뮬레이션을 돌리기 직전(simulate하기전)에 큐에 쌓인 명령 중 지금 해도 안전한것을 physScene에 실행함
 // actor생성 및 acotr를 추가하는 작업 / shape생성 밑 붙이는 작업 / shape 교체등을 여기서 한다
@@ -350,6 +413,10 @@ void MMMEngine::PhysxManager::FlushCommands_PreStep()
 
         case CmdType::RebuildCol:
             m_PhysScene.RebuildCollider(it->col, m_CollisionMatrix);
+            it = m_Commands.erase(it);
+            break;
+        case CmdType::TransferCol:
+            m_PhysScene.TransferCollider(it->cur_rb, it->new_rb, it->col, m_CollisionMatrix);
             it = m_Commands.erase(it);
             break;
         default:
@@ -630,4 +697,39 @@ void MMMEngine::PhysxManager::DispatchPhysicsEvents()
 void MMMEngine::PhysxManager::Shutdown()
 {
     UnbindScene();
+}
+
+MMMEngine::RigidBodyComponent* MMMEngine::PhysxManager::FindHighestRigid(ObjPtr<GameObject> start)
+{
+    //if (!start.IsValid()) return nullptr;
+
+    //auto CheckParent = start->GetTransform()->GetParent();
+
+    //MMMEngine::RigidBodyComponent* LastRigidBodyComponent{};
+
+    //for (CheckParent; (CheckParent != nullptr);)
+    //{
+    //    auto tempParent = CheckParent->GetComponent<RigidBodyComponent>();
+    //    if (tempParent.IsValid())
+    //    {
+    //        LastRigidBodyComponent = static_cast<RigidBodyComponent*> (tempParent.GetRaw());
+    //    }
+
+    //    CheckParent = CheckParent->GetParent();
+    //}
+
+    //return LastRigidBodyComponent;
+    if (!start.IsValid()) return nullptr;
+
+    RigidBodyComponent* last = nullptr;
+    for (auto cur = start->GetTransform(); cur != nullptr; cur = cur->GetParent())
+    {
+        auto go = cur->GetGameObject();
+        if (!go.IsValid()) continue;
+
+        auto rb = go->GetComponent<RigidBodyComponent>();
+        if (rb.IsValid())
+            last = static_cast<RigidBodyComponent*>(rb.GetRaw());
+    }
+    return last;
 }

@@ -93,9 +93,9 @@ namespace MMMEngine
 
 		std::vector<ColliderComponent*> m_PendingDestroyCols;
 
-		void SetJoinCollider();
+		void NotifyCompoundColliderAdded(ObjPtr<GameObject> nextParent, ObjPtr<GameObject> curParent, ObjPtr<GameObject> Child);
 
-		void BrakeJoinCollider();
+		void CollectCollidersInSubtree(ObjPtr<GameObject> root, std::vector<ColliderComponent*>& out);
 
 	private:
 		// 내부에서만 쓰는 헬퍼
@@ -131,6 +131,10 @@ namespace MMMEngine
 		std::vector<std::variant<CollisionInfo, TriggerInfo>> Callback_Que;
 
 		void Shutdown();
+
+		//compound용 내부함수
+		RigidBodyComponent* FindHighestRigid(ObjPtr<GameObject> start);
+
 	private:
 		// 주입 ,바인딩
 		MMMEngine::Scene* m_Scene = nullptr;              // 현재 씬(소유 X)
@@ -147,7 +151,8 @@ namespace MMMEngine
 			AttachCol,      //이 RigidBody에 이 Collider에 붙여라  //actor->attachShape(shape)
 			DetachCol,      //이 Collider를 actor에서 떼어놔라       //actor->detachShape(shape)
 			RebuildCol,     //이 Collider의 shape를 다시 만들어라 //새 geometry로 BuildShape -> 다시 attach
-			ChangeRigid		//RigidBody의 타입은 변경하라
+			ChangeRigid,	//RigidBody의 타입은 변경하라
+			TransferCol		//자식 객체의 collider 커맨드
 		};
 
 		struct Command
@@ -155,6 +160,7 @@ namespace MMMEngine
 			CmdType type;
 			MMMEngine::RigidBodyComponent* new_rb = nullptr;
 			MMMEngine::ColliderComponent* col = nullptr;
+			MMMEngine::RigidBodyComponent* cur_rb = nullptr;
 		};
 
 		std::vector<Command> m_Commands;
@@ -171,5 +177,7 @@ namespace MMMEngine
 
 
 		std::unordered_set<ColliderComponent*> m_FilterDirtyColliders;
+
+		
 	};
 }

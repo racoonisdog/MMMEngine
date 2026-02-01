@@ -1,106 +1,74 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="AnimationClip.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Behaviour.cpp" />
+    <ClCompile Include="BehaviourManager.cpp" />
+    <ClCompile Include="BoxColliderComponent.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CapsuleColliderComponent.cpp" />
+    <ClCompile Include="ColliderComponent.cpp" />
+    <ClCompile Include="CollisionMatrix.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalRegistry.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MaterialSerializer.cpp" />
+    <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="MissingScriptBehaviour.cpp" />
     <ClCompile Include="MUID.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="PhysicsEventCallback.cpp" />
+    <ClCompile Include="PhysicsFilter.cpp" />
+    <ClCompile Include="PhysicsSettings.cpp" />
+    <ClCompile Include="PhysScene.cpp" />
+    <ClCompile Include="PhysX.cpp" />
+    <ClCompile Include="PhysxHelper.cpp" />
+    <ClCompile Include="PhysxManager.cpp" />
+    <ClCompile Include="PShader.cpp" />
+    <ClCompile Include="RenderCommand.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RendererTools.cpp" />
     <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="RenderShared.cpp" />
+    <ClCompile Include="RenderStateGuard.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="ResourceSerializer.cpp" />
+    <ClCompile Include="RigidBodyComponent.cpp" />
     <ClCompile Include="rttr_directxmath_registry.cpp" />
     <ClCompile Include="rttr_simplemath_registry.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneSerializer.cpp" />
     <ClCompile Include="ScriptBehaviour.cpp" />
+    <ClCompile Include="ShaderInfo.cpp" />
+    <ClCompile Include="SkeletalMesh.cpp" />
+    <ClCompile Include="SkyRenderer.cpp" />
+    <ClCompile Include="SphereColliderComponent.cpp" />
+    <ClCompile Include="StaticMesh.cpp" />
+    <ClCompile Include="VShader.cpp" />
     <ClCompile Include="ScriptLoader.cpp" />
     <ClCompile Include="StringHelper.cpp" />
-    <ClCompile Include="TimeManager.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="UserScriptMessageSignatures.cpp" />
+    <ClCompile Include="TimeManager.cpp" />
     <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="CapsuleColliderComponent.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="ColliderComponent.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisionMatrix.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsEventCallback.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsFilter.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysScene.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysX.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysxHelper.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysxManager.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="RigidBodyComponent.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderCommand.cpp">
-      <Filter>소스 파일\Core\Render API</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderStateGuard.cpp">
-      <Filter>소스 파일\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>소스 파일\Core\Render API\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>소스 파일\Core\Render API\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="SphereColliderComponent.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="BoxColliderComponent.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="BehaviourManager.cpp">
-      <Filter>소스 파일\Core\Behaviour API</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="SkyRenderer.cpp">
-      <Filter>소스 파일\Core\Render API\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>소스 파일\Core\Render API\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshRenderer.cpp">
-      <Filter>소스 파일\Core\Render API\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="JoinRigidInfo.cpp">
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
-    <ClCompile Include="JoinColliderInfo.cpp">
-	</ClCompile>
-    <ClCompile Include="PhysicsSettings.cpp">
-	</ClCompile>
-      <Filter>소스 파일\Core\Physcis API</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimationClip.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="Behaviour.h" />
+    <ClInclude Include="BoxColliderComponent.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CapsuleColliderComponent.h" />
+    <ClInclude Include="ColliderComponent.h" />
+    <ClInclude Include="CollisionMatrix.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Delegates.hpp" />
     <ClInclude Include="DisplayMode.h" />
@@ -108,6 +76,10 @@
     <ClInclude Include="ExportSingleton.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GlobalRegistry.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialSerializer.h" />
+    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="MissingScriptBehaviour.h" />
     <ClInclude Include="MMMApplication.h" />
     <ClInclude Include="MMMResources.h" />
@@ -118,12 +90,29 @@
     <ClInclude Include="InputKeyCode.h" />
     <ClInclude Include="MMMInput.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="PhysicsEventCallback.h" />
+    <ClInclude Include="PhysicsFilter.h" />
+    <ClInclude Include="PhysicsSettings.h" />
+    <ClInclude Include="PhysScene.h" />
+    <ClInclude Include="PhysX.h" />
+    <ClInclude Include="PhysxHelper.h" />
+    <ClInclude Include="PhysxManager.h" />
+    <ClInclude Include="PShader.h" />
+    <ClInclude Include="RenderCommand.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RendererTools.h" />
     <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="RenderShared.h" />
+    <ClInclude Include="RenderStateGuard.h" />
     <ClInclude Include="Resolution.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="MMMTime.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="ResourceSerializer.h" />
+    <ClInclude Include="RigidBodyComponent.h" />
+    <ClInclude Include="SafeRelease.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SceneRef.h" />
@@ -131,472 +120,23 @@
     <ClInclude Include="ScriptBehaviour.h" />
     <ClInclude Include="ScriptLoader.h" />
     <ClInclude Include="SerializableEvent.h" />
+    <ClInclude Include="ShaderInfo.h" />
+    <ClInclude Include="SkeletalMesh.h" />
+    <ClInclude Include="SkyRenderer.h" />
+    <ClInclude Include="SphereColliderComponent.h" />
+    <ClInclude Include="StaticMesh.h" />
+    <ClInclude Include="UserScriptMessageSignatures.h" />
+    <ClInclude Include="UserScriptsCommon.h" />
+    <ClInclude Include="VShader.h" />
     <ClInclude Include="Singleton.hpp" />
     <ClInclude Include="StringHelper.h" />
+    <ClInclude Include="Texture2D.h" />
     <ClInclude Include="TimeManager.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="BehaviourManager.h" />
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="소스 파일\Core">
-      <UniqueIdentifier>{6e95a25c-97cb-4986-92fc-2c2c159e1884}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Object API">
-      <UniqueIdentifier>{15f04ef4-0d77-4cbb-b82e-1ebeb228d8f0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core">
-      <UniqueIdentifier>{b7472de8-e436-4e0f-bfe7-6d4d1a14f463}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Object API">
-      <UniqueIdentifier>{30f2f91b-60c1-4b27-b369-eeb01b79f5f5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Utility">
-      <UniqueIdentifier>{6bbd6fd2-454b-4946-89b5-785f6376765a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Utility">
-      <UniqueIdentifier>{bb817747-9bed-4c9b-9d18-d3727af467be}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Resource API">
-      <UniqueIdentifier>{9429d884-7bed-4e3a-8a66-6736b614e7c7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Scene API">
-      <UniqueIdentifier>{f41342cf-51ab-49c1-a516-6aa1444b9872}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Input API">
-      <UniqueIdentifier>{0541079b-0c19-4d7d-9149-a84c89ebef56}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Input API">
-      <UniqueIdentifier>{a1c10f2f-8f28-4dd3-a335-a9ab53d1d169}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Time API">
-      <UniqueIdentifier>{92e9c672-6b84-46be-8699-a0b5f3f8e686}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Time API">
-      <UniqueIdentifier>{dc3fa110-e47b-42bb-905e-25c4efa41aaa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Application API">
-      <UniqueIdentifier>{8cb218df-594c-49d2-9e63-218696dadb13}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Global Registry">
-      <UniqueIdentifier>{93651194-ba3a-4e45-bd12-1fd240cc5473}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Screen API">
-      <UniqueIdentifier>{63578d04-b180-4852-ad1b-7bb967344042}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Common">
-      <UniqueIdentifier>{e296e3ca-bfb6-4f05-a670-78d6d9a801f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Behaviour API">
-      <UniqueIdentifier>{ef8554e5-7448-4e9f-9aab-845d6bd3c5bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Behaviour API">
-      <UniqueIdentifier>{a2261ff3-b7f4-480e-9137-39b33451370d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Resource API">
-      <UniqueIdentifier>{b4e5e7a3-5660-4bc1-8594-1f4c1e227717}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\GlobalRegistry">
-      <UniqueIdentifier>{217c690e-d5d9-466a-adc0-74b9d1005041}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Scene API">
-      <UniqueIdentifier>{46632266-5bac-4656-8d00-478461ab2139}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Utility\RTTRRegistry">
-      <UniqueIdentifier>{72b6886a-0c46-4ae0-8d62-ce00537cd485}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Render API">
-      <UniqueIdentifier>{40b7158d-7ebd-49ac-99d6-edf8f26a4e2f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Render API">
-      <UniqueIdentifier>{1cec20a9-1188-40bb-9133-6ac8013e9f9d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Render API\Component">
-      <UniqueIdentifier>{0e59476e-dea6-4d08-88c1-25db456774a0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Render API\Component">
-      <UniqueIdentifier>{b49ed825-6352-4a69-b964-0fc912cadab6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Render API\Resource">
-      <UniqueIdentifier>{b9f1ba23-e29a-4678-b6e5-00423f557c62}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Render API\Tool">
-      <UniqueIdentifier>{66353a24-cf77-47fc-8356-1bc4b23e5b62}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Render API\Tools">
-      <UniqueIdentifier>{f84e2c2c-43b1-43c4-95ea-766be768f268}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Render API\Resource">
-      <UniqueIdentifier>{6b2389a3-5afb-4b2f-ac7d-4b8c86d92fa1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\Core\Behaviour API\ScriptLoader">
-      <UniqueIdentifier>{26e64790-fb4f-41a4-ab03-f82ee13aa8ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Behaviour API\ScriptLoader">
-      <UniqueIdentifier>{ac9c3fcd-296c-4781-9f20-4ea519460450}</UniqueIdentifier>
-    </Filter>
-    <ClInclude Include="CapsuleColliderComponent.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="ColliderComponent.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisionMatrix.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsEventCallback.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsFilter.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysScene.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysX.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysxHelper.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysxManager.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="RigidBodyComponent.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderCommand.h">
-      <Filter>헤더 파일\Core\Render API</Filter>
-    </ClInclude>
-    <ClInclude Include="SafeRelease.h">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderStateGuard.h">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="BoxColliderComponent.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="SphereColliderComponent.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>헤더 파일\Core\Render API\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>헤더 파일\Core\Render API\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>헤더 파일\Core\Render API\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="UserScriptMessageSignatures.h">
-      <Filter>헤더 파일\Core\Behaviour API</Filter>
-    </ClInclude>
-    <ClInclude Include="UserScriptsCommon.h">
-      <Filter>헤더 파일\Core\Behaviour API</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsSettings.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="SkyRenderer.h">
-      <Filter>헤더 파일\Core\Render API\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderShared.h">
-      <Filter>헤더 파일\Core\Render API</Filter>
-    </ClInclude>
-    <ClInclude Include="JoinRigidInfo.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
-    <ClInclude Include="JoinColliderInfo.h">
-      <Filter>헤더 파일\Core\Physics API</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Object.h">
-      <Filter>헤더 파일\Core\Object API</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectManager.h">
-      <Filter>헤더 파일\Core\Object API</Filter>
-    </ClInclude>
-    <ClInclude Include="Delegates.hpp">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="MUID.h">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Singleton.hpp">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="StringHelper.h">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>헤더 파일\Core\Input API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMInput.h">
-      <Filter>헤더 파일\Core\Input API</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeManager.h">
-      <Filter>헤더 파일\Core\Time API</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>헤더 파일\Core\Resource API</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>헤더 파일\Core\Resource API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMTime.h">
-      <Filter>헤더 파일\Core\Time API</Filter>
-    </ClInclude>
-    <ClInclude Include="InputKeyCode.h">
-      <Filter>헤더 파일\Core\Input API</Filter>
-    </ClInclude>
-    <ClInclude Include="InputConstant.h">
-      <Filter>헤더 파일\Core\Input API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMApplication.h">
-      <Filter>헤더 파일\Core\Application API</Filter>
-    </ClInclude>
-    <ClInclude Include="App.h">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="GlobalRegistry.h">
-      <Filter>헤더 파일\Core\Global Registry</Filter>
-    </ClInclude>
-    <ClInclude Include="SerializableEvent.h">
-      <Filter>헤더 파일\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>헤더 파일\Core\Scene API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMResources.h">
-      <Filter>헤더 파일\Core\Resource API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMScreen.h">
-      <Filter>헤더 파일\Core\Screen API</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneManager.h">
-      <Filter>헤더 파일\Core\Scene API</Filter>
-    </ClInclude>
-    <ClInclude Include="Resolution.h">
-      <Filter>헤더 파일\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="DisplayMode.h">
-      <Filter>헤더 파일\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Behaviour.h">
-      <Filter>헤더 파일\Core\Behaviour API</Filter>
-    </ClInclude>
-    <ClInclude Include="BehaviourManager.h">
-      <Filter>헤더 파일\Core\Behaviour API</Filter>
-    </ClInclude>
-    <ClInclude Include="Export.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ExportSingleton.hpp">
-      <Filter>헤더 파일\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneRef.h">
-      <Filter>헤더 파일\Core\Scene API</Filter>
-    </ClInclude>
-    <ClInclude Include="MMMSceneManagement.h">
-      <Filter>헤더 파일\Core\Scene API</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneSerializer.h">
-      <Filter>헤더 파일\Core\Scene API</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderManager.h">
-      <Filter>헤더 파일\Core\Render API</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshRenderer.h">
-      <Filter>헤더 파일\Core\Render API\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="RendererTools.h">
-      <Filter>헤더 파일\Core\Render API\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture2D.h">
-      <Filter>헤더 파일\Core\Render API\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="PShader.h">
-      <Filter>헤더 파일\Core\Render API\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="ScriptLoader.h">
-      <Filter>헤더 파일\Core\Behaviour API\ScriptLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="StaticMesh.h">
-      <Filter>헤더 파일\Core\Render API\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="SkeletalMesh.h">
-      <Filter>헤더 파일\Core\Render API\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationClip.h">
-      <Filter>헤더 파일\Core\Render API\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="VShader.h">
-      <Filter>헤더 파일\Core\Render API\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>헤더 파일\Core\Render API\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="MaterialSerializer.h">
-      <Filter>헤더 파일\Core\Render API\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="ScriptBehaviour.h">
-      <Filter>헤더 파일\Core\Behaviour API</Filter>
-    </ClInclude>
-    <ClInclude Include="MissingScriptBehaviour.h">
-      <Filter>헤더 파일\Core\Behaviour API</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceSerializer.h">
-      <Filter>헤더 파일\Core\Render API\Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderInfo.h">
-      <Filter>헤더 파일\Core\Render API</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Object.cpp">
-      <Filter>소스 파일\Core\Object API</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectManager.cpp">
-      <Filter>소스 파일\Core\Object API</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="StringHelper.cpp">
-      <Filter>소스 파일\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="InputManager.cpp">
-      <Filter>소스 파일\Core\Input API</Filter>
-    </ClCompile>
-    <ClCompile Include="TimeManager.cpp">
-      <Filter>소스 파일\Core\Time API</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>소스 파일\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="App.cpp">
-      <Filter>소스 파일\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Behaviour.cpp">
-      <Filter>소스 파일\Core\Behaviour API</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>소스 파일\Core\Resource API</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalRegistry.cpp">
-      <Filter>소스 파일\Core\GlobalRegistry</Filter>
-    </ClCompile>
-    <ClCompile Include="Resource.cpp">
-      <Filter>소스 파일\Core\Resource API</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>소스 파일\Core\Scene API</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>소스 파일\Core\Scene API</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneSerializer.cpp">
-      <Filter>소스 파일\Core\Scene API</Filter>
-    </ClCompile>
-    <ClCompile Include="MUID.cpp">
-      <Filter>소스 파일\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr_simplemath_registry.cpp">
-      <Filter>소스 파일\Utility\RTTRRegistry</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderManager.cpp">
-      <Filter>소스 파일\Core\Render API</Filter>
-    </ClCompile>
-    <ClCompile Include="RendererTools.cpp">
-      <Filter>소스 파일\Core\Render API\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture2D.cpp">
-      <Filter>소스 파일\Core\Render API\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="VShader.cpp">
-      <Filter>소스 파일\Core\Render API\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="PShader.cpp">
-      <Filter>소스 파일\Core\Render API\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptBehaviour.cpp">
-      <Filter>소스 파일\Core\Behaviour API</Filter>
-    </ClCompile>
-    <ClCompile Include="UserScriptMessageSignatures.cpp">
-      <Filter>소스 파일\Core\Behaviour API</Filter>
-    </ClCompile>
-    <ClCompile Include="ScriptLoader.cpp">
-      <Filter>소스 파일\Core\Behaviour API\ScriptLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="MissingScriptBehaviour.cpp">
-      <Filter>소스 파일\Core\Behaviour API</Filter>
-    </ClCompile>
-    <ClCompile Include="rttr_directxmath_registry.cpp">
-      <Filter>소스 파일\Utility\RTTRRegistry</Filter>
-    </ClCompile>
-    <ClCompile Include="StaticMesh.cpp">
-      <Filter>소스 파일\Core\Render API\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="SkeletalMesh.cpp">
-      <Filter>소스 파일\Core\Render API\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="AnimationClip.cpp">
-      <Filter>소스 파일\Core\Render API\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>소스 파일\Core\Render API\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="MaterialSerializer.cpp">
-      <Filter>소스 파일\Core\Render API\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceSerializer.cpp">
-      <Filter>소스 파일\Core\Render API\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderShared.cpp">
-      <Filter>소스 파일\Core\Render API</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderInfo.cpp">
-      <Filter>소스 파일\Core\Render API</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Object.inl">
-      <Filter>헤더 파일\Core\Object API</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="헤더 파일\Core\Physics API">
-      <UniqueIdentifier>{7210efdf-bb0c-4a09-8874-d36d7238e32e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\Core\Physcis API">
-      <UniqueIdentifier>{e66850de-f491-4f75-9843-c4ad5567a533}</UniqueIdentifier>
-    </Filter>
+    <None Include="Object.inl" />
   </ItemGroup>
 </Project>

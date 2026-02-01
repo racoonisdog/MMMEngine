@@ -185,8 +185,6 @@
     <ClInclude Include="ExportSingleton.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GlobalRegistry.h" />
-    <ClInclude Include="JoinColliderInfo.h" />
-    <ClInclude Include="JoinRigidInfo.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialSerializer.h" />
@@ -264,8 +262,6 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GlobalRegistry.cpp" />
     <ClCompile Include="InputManager.cpp" />
-    <ClCompile Include="JoinColliderInfo.cpp" />
-    <ClCompile Include="JoinRigidInfo.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialSerializer.cpp" />

@@ -31,6 +31,8 @@ bool MMMEngine::PhysScene::Create(const PhysSceneDesc& desc)
 
 bool MMMEngine::PhysScene::CreateScene()
 {
+
+
 	auto& physics = PhysicX::Get().GetPhysics();
 
 	physx::PxSceneDesc pxDesc(physics.getTolerancesScale());
@@ -609,5 +611,38 @@ void MMMEngine::PhysScene::ResetFilteringFor(MMMEngine::ColliderComponent* col)
 
 	// PhysX에 "필터링 다시 계산" 요청
 	m_scene->resetFiltering(*actor);
+}
+
+void MMMEngine::PhysScene::TransferCollider(MMMEngine::RigidBodyComponent* oldRb, MMMEngine::RigidBodyComponent* newRb, MMMEngine::ColliderComponent* col, const CollisionMatrix& matrix)
+{
+	if (!col || !newRb) return;
+	if (!newRb->GetPxActor())
+	{
+		std::cout << "Conpound 등록중 Actor 없어서 오류" << std::endl;
+		return; // newRb는 이미 Register되어 있어야 함
+	}
+
+	// old에서 detach
+	if (oldRb)
+	{
+		DetachCollider(oldRb, col); // ownerByCollider / collidersByRigid 정리 포함
+	}
+
+	// newRb 기준 local pose 계산
+	auto go = col->GetGameObject();
+	if (go.IsValid())
+	{
+		Vector3 goWorldPos = go->GetTransform()->GetWorldPosition();
+		Quaternion goWorldRot = go->GetTransform()->GetWorldRotation();
+
+		physx::PxTransform goWorldPx = ToPxTrans(goWorldPos, goWorldRot);
+		physx::PxTransform actorWorld = newRb->GetPxActor()->getGlobalPose();
+		physx::PxTransform rigidOffset = actorWorld.getInverse() * goWorldPx;
+
+		col->SetRigidOffsetPose(rigidOffset);
+	}
+
+	// 새 rb에 attach + 필터 재적용
+	AttachCollider(newRb, col, matrix);
 }
 
