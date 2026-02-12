@@ -21,7 +21,8 @@ RTTR_REGISTRATION
 		.property("Mesh", &MeshRenderer::GetMesh, &MeshRenderer::SetMesh)
 		//.property("Materials", &MeshRenderer::GetMaterial, &MeshRenderer::SetMaterial)
 		.property("CastShadow", &MeshRenderer::GetCastShadow, &MeshRenderer::SetCastShadow)
-		.property("ReceiveShadow", &MeshRenderer::GetReceiveShadow, &MeshRenderer::SetReceiveShadow);
+		.property("ReceiveShadow", &MeshRenderer::GetReceiveShadow, &MeshRenderer::SetReceiveShadow)
+		.property("DitherAlpha", &MeshRenderer::GetDitherAlpha, &MeshRenderer::SetDitherAlpha);
 
 	registration::class_<ObjPtr<MeshRenderer>>("ObjPtr<MeshRenderer>")
 		.constructor<>(
@@ -122,6 +123,8 @@ void MMMEngine::MeshRenderer::Render()
 			command.rendererID = renderIndex;
 			command.castShadow = castShadows;
 			command.receiveShadow = receiveShadows;
+			command.useDitherAlpha = (ditherAlpha < 1.0f);
+			command.ditherAlpha = ditherAlpha;
 
 			// TODO::CamDistance 보내줘야함!!
 			command.camDistance = 0.0f;

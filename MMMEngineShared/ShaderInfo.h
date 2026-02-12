@@ -32,6 +32,7 @@ namespace MMMEngine {
 		S_PHONG = 2,
 		S_SKYBOX = 3,
 		S_PP = 4,
+		S_SNOW = 5,
 		S_END
 	};
 
@@ -81,6 +82,19 @@ namespace MMMEngine {
 		float mEmissive;
 		DirectX::SimpleMath::Vector3 mPadding;
 	};
+
+	struct SNOW_SnowParams
+	{
+		float tileScale;
+		float warpStrength;
+		float windStrength;
+		float iceStrength;
+
+		int octaves;
+		float mAoStrength;
+		DirectX::SimpleMath::Vector2 padding;
+	};
+
 	// ----
 
 	enum class PropertyType : int {

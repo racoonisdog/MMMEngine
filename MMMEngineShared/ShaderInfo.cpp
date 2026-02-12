@@ -135,12 +135,16 @@ void MMMEngine::ShaderInfo::StartUp()
 	m_typeInfoMap[L"Shader/PBR/PS/TrailUnlitPS.hlsl"] = { ShaderType::S_PBR, RenderType::R_GEOMETRY };
 	m_typeInfoMap[L"Shader/PBR/PS/LineUnlitPS.hlsl"] = { ShaderType::S_PBR, RenderType::R_PARTICLE };
 	m_typeInfoMap[L"Shader/TOON/ToonPS.hlsl"] = { ShaderType::S_TOON, RenderType::R_GEOMETRY };
+	m_typeInfoMap[L"Shader/Snow/TestSnowPS.hlsl"] = { ShaderType::S_SNOW, RenderType::R_GEOMETRY };
 	m_typeInfoMap[L"Shader/SkyBox/SkyBoxPixelShader.hlsl"] = { ShaderType::S_SKYBOX, RenderType::R_SKYBOX };
+
 
 	// 구조체별 이름 등록 (쉐이더 이름과같게)
 	m_CBBufferMap[L"MatBuffer"] = CreateConstantBuffer<PBR_MaterialBuffer>();
 	m_CBBufferMap[L"LightBuffer"] = CreateConstantBuffer<Render_LightBuffer>();
 	m_CBBufferMap[L"ToonMatBuffer"] = CreateConstantBuffer<TOON_MaterialBuffer>();
+	m_CBBufferMap[L"SnowParams"] = CreateConstantBuffer<SNOW_SnowParams>();
+	
 
 	// 사용 상수버퍼 등록
 	m_typeBufferMap[ShaderType::S_PBR].push_back({ L"MatBuffer" , 3 });
@@ -148,6 +152,8 @@ void MMMEngine::ShaderInfo::StartUp()
 
 	m_typeBufferMap[ShaderType::S_TOON].push_back({ L"LightBuffer" , 1 });
 	m_typeBufferMap[ShaderType::S_TOON].push_back({ L"ToonMatBuffer" , 3 });
+
+	m_typeBufferMap[ShaderType::S_SNOW].push_back({ L"SnowParams" , 5 });
 
 	// 타입별 레지스터 번호 등록
 	m_propertyInfoMap[ShaderType::S_PBR][L"_albedo"] = { PropertyType::Texture, 0 };
@@ -209,11 +215,31 @@ void MMMEngine::ShaderInfo::StartUp()
 	m_propertyInfoMap[ShaderType::S_SKYBOX][L"_cubemap"]	= { PropertyType::Texture, 0 };
 	//m_propertyInfoMap[ShaderType::S_SKYBOX][L"_sp0"]		= { PropertyType::Sampler, 0 };
 
+	// --- Snow ---
+	m_propertyInfoMap[ShaderType::S_SNOW][L"_albedo"] = { PropertyType::Texture, 0 };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"_normal"] = { PropertyType::Texture, 1, ResourceManager::Get().Load<Texture2D>(L"Shader/Resource/Default_Texture/Default_Normal.png") };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"_emissive"] = { PropertyType::Texture, 2 };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"_shadowmap"] = { PropertyType::Texture, 3 };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"_opacity"] = { PropertyType::Texture, 4 };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"_ambientOcclusion"] = { PropertyType::Texture, 10 };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"_lutMap"] = { PropertyType::Texture, 11, ResourceManager::Get().Load<Texture2D>(L"Shader/Resource/Default_Texture/Toon_Lut.png") };
+
+	// SnowParams(b5)
+	m_propertyInfoMap[ShaderType::S_SNOW][L"tileScale"] = { PropertyType::Constant, 5, 0.15f };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"warpStrength"] = { PropertyType::Constant, 5, 0.25f };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"windStrength"] = { PropertyType::Constant, 5, 0.2f };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"iceStrength"] = { PropertyType::Constant, 5, 0.4f };
+
+	m_propertyInfoMap[ShaderType::S_SNOW][L"octaves"] = { PropertyType::Constant, 5, 4 };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"mAoStrength"] = { PropertyType::Constant, 5, 0.2f };
+	m_propertyInfoMap[ShaderType::S_SNOW][L"padding"] = { PropertyType::Constant, 5 };
+	//---
 
 	// 쉐이더 리플렉션 등록 (상수버퍼 개별업데이트 사용하기 위함) (!! 순서중요)
 	CreatePShaderReflection(L"Shader/PBR/PS/BRDFShader.hlsl");
 	CreatePShaderReflection(L"Shader/SkyBox/SkyBoxPixelShader.hlsl");
 	CreatePShaderReflection(L"Shader/TOON/ToonPS.hlsl");
+	CreatePShaderReflection(L"Shader/Snow/TestSnowPS.hlsl");
 
 	// 기본 쉐이더 정의
 	m_pDefaultVShader = ResourceManager::Get().Load<VShader>(L"Shader/PBR/VS/StaticVertexShader.hlsl");

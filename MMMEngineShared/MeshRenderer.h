@@ -21,6 +21,7 @@ namespace MMMEngine {
 	public:
 		ResPtr<StaticMesh> GetMesh() { return mesh; }
 		void SetMesh(ResPtr<StaticMesh> _mesh);
+		float ditherAlpha = 1.0f;
 
 		void SetCastShadow(bool _val);
 		bool GetCastShadow();
@@ -29,6 +30,9 @@ namespace MMMEngine {
 
 		void SetMaterial(std::vector<ResPtr<Material>>& _materials);
 		std::vector<ResPtr<Material>>& GetMaterial();
+
+		float GetDitherAlpha() const { return ditherAlpha; }
+		void SetDitherAlpha(float _alpha) { ditherAlpha = (_alpha <= 0.0f) ? 0.0f : ((_alpha >= 1.0f) ? 1.0f : _alpha); }
 	};
 }
 

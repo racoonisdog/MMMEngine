@@ -30,6 +30,10 @@ namespace MMMEngine {
 		// Particle rendering overrides
 		bool useParticleAlpha = false;
 		float particleAlpha = 1.0f;
+
+		// MeshRenderer dithering (no alpha pass: control transparency via dither)
+		bool useDitherAlpha = false;
+		float ditherAlpha = 1.0f;
 	};
 }
 

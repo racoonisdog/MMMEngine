@@ -10,7 +10,6 @@ struct PSInput
 
 float4 main(PSInput input) : SV_TARGET
 {
-    // 텍스처 샘플링
     float4 color = _inputTex.Sample(_sp0, input.uv);
 
     // 간단한 효과 예시: 색 반전

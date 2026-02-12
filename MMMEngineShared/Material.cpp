@@ -156,7 +156,7 @@ bool MMMEngine::Material::LoadFromFilePath(const std::wstring& _filePath)
 	int currPropSize = (int)m_properties.size();
 
 	// 프로퍼티 변경 감지시 자동으로 재직렬화
-	if (currPropSize > prevPropSize) {
+	if (currPropSize != prevPropSize) {
 		std::wstring fileName = fPath.filename().wstring();
 		std::wstring parentPath = fPath.parent_path().wstring();
 

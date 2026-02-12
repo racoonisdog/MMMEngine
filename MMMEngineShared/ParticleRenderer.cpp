@@ -1,4 +1,4 @@
-﻿#include "ParticleRenderer.h"
+#include "ParticleRenderer.h"
 
 #include "RenderManager.h"
 #include "RenderCommand.h"
@@ -315,8 +315,7 @@ namespace MMMEngine
 		{
 			m_isPlaying = false;
 			m_spawnAccumulator = 0.0f;
-			if (!m_previewEnabled)
-				m_particles.clear();
+			// Pause/Stop 시 파티클을 지우지 않음 — 멈춘 상태로 계속 보이게 함 (다음 Play 시 위 분기에서 clear)
 		}
 		m_prevRuntimeActive = runtimeActive;
 
