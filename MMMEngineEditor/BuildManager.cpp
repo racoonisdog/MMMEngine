@@ -1,4 +1,4 @@
-﻿#include "BuildManager.h"
+#include "BuildManager.h"
 #include "UserScriptsGenerator.h"
 #include "ProjectManager.h"
 #include <Windows.h>
@@ -589,9 +589,9 @@ namespace MMMEngine::Editor
         // 디버그 구성에서 /bigobj 강제 활성화
         if (config == BuildConfiguration::Debug)
         {
-            // CL_AdditionalOptions를 통해 기존 AdditionalOptions 뒤에 /bigobj를 붙인다.
-            // %(AdditionalOptions)는 프로젝트에 설정된 기존 옵션을 유지하도록 한다.
-            cmdStream << "/p:CL_AdditionalOptions=\\\"/bigobj %(AdditionalOptions)\\\" ";
+            // 커맨드라인 인자를 단순하게 전달하여 MSBuild가 잘못 파싱하지 않도록 한다.
+            // 기존 AdditionalOptions는 이 빌드 경로에서는 덮어써도 된다고 가정한다.
+            cmdStream << "/p:CL_AdditionalOptions=/bigobj ";
         }
 
         //<< "/m:" << std::thread::hardware_concurrency() << " "  // 병렬 빌드 (CPU 코어 수만큼)
