@@ -584,12 +584,21 @@ namespace MMMEngine::Editor
         cmdStream << "\"" << msbuildPath.string() << "\" "
             << "\"" << vcxprojPath.string() << "\" "
             << "/p:Configuration=" << configStr << " "
-            << "/p:Platform=x64 "
-            //<< "/m:" << std::thread::hardware_concurrency() << " "  // 병렬 빌드 (CPU 코어 수만큼)
-            //<< "/p:CL_MPCount=" << std::thread::hardware_concurrency() << " "  // 컴파일러 병렬화
-            //<< "/p:UseMultiToolTask=true "
-            //<< "/p:EnforceProcessCountAcrossBuilds=true "
-            << "/v:minimal "  // 최소 출력
+            << "/p:Platform=x64 ";
+
+        // 디버그 구성에서 /bigobj 강제 활성화
+        if (config == BuildConfiguration::Debug)
+        {
+            // CL_AdditionalOptions를 통해 기존 AdditionalOptions 뒤에 /bigobj를 붙인다.
+            // %(AdditionalOptions)는 프로젝트에 설정된 기존 옵션을 유지하도록 한다.
+            cmdStream << "/p:CL_AdditionalOptions=\\\"/bigobj %(AdditionalOptions)\\\" ";
+        }
+
+        //<< "/m:" << std::thread::hardware_concurrency() << " "  // 병렬 빌드 (CPU 코어 수만큼)
+        //<< "/p:CL_MPCount=" << std::thread::hardware_concurrency() << " "  // 컴파일러 병렬화
+        //<< "/p:UseMultiToolTask=true "
+        //<< "/p:EnforceProcessCountAcrossBuilds=true "
+        cmdStream << "/v:minimal "  // 최소 출력
             << "/nologo";     // 로고 숨김
 
         std::string cmd = cmdStream.str();
