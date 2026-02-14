@@ -518,6 +518,8 @@ void MMMEngine::ExampleBehaviour::Update()
       <DisableSpecificWarnings>4819;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;RTTR_DLL;USERSCRIPTS_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>)xml" << engineSharedInclude << R"xml(;)xml" << engineSharedIncludeDXTk << R"xml(;)xml" << engineSharedIncludeDXTkInc << R"xml(;)xml" << engineSharedIncludePhysXInc << R"xml(;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <!-- Debug 빌드에서는 항상 /bigobj를 적용하고, 기존 AdditionalOptions는 %(AdditionalOptions)로 보존 -->
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

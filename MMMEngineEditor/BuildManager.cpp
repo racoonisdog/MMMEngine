@@ -1,4 +1,4 @@
-#include "BuildManager.h"
+﻿#include "BuildManager.h"
 #include "UserScriptsGenerator.h"
 #include "ProjectManager.h"
 #include <Windows.h>
@@ -579,20 +579,13 @@ namespace MMMEngine::Editor
 
         const char* configStr = (config == BuildConfiguration::Debug) ? "Debug" : "Release";
 
-        // MSBuild 명령 구성
+        // MSBuild 명령 구성 (여기서는 /bigobj를 건드리지 않고,
+        // UserScripts.vcxproj에서 Debug 설정의 AdditionalOptions로 관리한다)
         std::ostringstream cmdStream;
         cmdStream << "\"" << msbuildPath.string() << "\" "
             << "\"" << vcxprojPath.string() << "\" "
             << "/p:Configuration=" << configStr << " "
             << "/p:Platform=x64 ";
-
-        // 디버그 구성에서 /bigobj 강제 활성화
-        if (config == BuildConfiguration::Debug)
-        {
-            // 커맨드라인 인자를 단순하게 전달하여 MSBuild가 잘못 파싱하지 않도록 한다.
-            // 기존 AdditionalOptions는 이 빌드 경로에서는 덮어써도 된다고 가정한다.
-            cmdStream << "/p:CL_AdditionalOptions=/bigobj ";
-        }
 
         //<< "/m:" << std::thread::hardware_concurrency() << " "  // 병렬 빌드 (CPU 코어 수만큼)
         //<< "/p:CL_MPCount=" << std::thread::hardware_concurrency() << " "  // 컴파일러 병렬화
